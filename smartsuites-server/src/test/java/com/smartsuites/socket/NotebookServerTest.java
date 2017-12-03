@@ -1,0 +1,409 @@
+/*
+ * Copyright (c) 2017. 联思智云（北京）科技有限公司. All rights reserved.
+ */
+package com.smartsuites.socket;
+
+import com.google.gson.Gson;
+
+import com.smartsuites.rest.AbstractTestRestApi;
+import com.smartsuites.display.AngularObject;
+import com.smartsuites.display.AngularObjectBuilder;
+import com.smartsuites.display.AngularObjectRegistry;
+import com.smartsuites.interpreter.InterpreterGroup;
+import com.smartsuites.interpreter.InterpreterSetting;
+import com.smartsuites.interpreter.remote.RemoteAngularObjectRegistry;
+import com.smartsuites.notebook.Note;
+import com.smartsuites.notebook.Notebook;
+import com.smartsuites.notebook.Paragraph;
+import com.smartsuites.notebook.socket.Message;
+import com.smartsuites.notebook.socket.Message.OP;
+import com.smartsuites.scheduler.Job;
+import com.smartsuites.server.ZeppelinServer;
+import com.smartsuites.user.AuthenticationInfo;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import javax.servlet.http.HttpServletRequest;
+
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.HashSet;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
+
+/**
+ * Basic REST API tests for notebookServer
+ */
+public class NotebookServerTest extends AbstractTestRestApi {
+  private static Notebook notebook;
+  private static NotebookServer notebookServer;
+  private static Gson gson;
+  private HttpServletRequest mockRequest;
+  private AuthenticationInfo anonymous;
+
+  @BeforeClass
+  public static void init() throws Exception {
+    AbstractTestRestApi.startUp(NotebookServerTest.class.getSimpleName());
+    gson = new Gson();
+    notebook = ZeppelinServer.notebook;
+    notebookServer = ZeppelinServer.notebookWsServer;
+  }
+
+  @AfterClass
+  public static void destroy() throws Exception {
+    AbstractTestRestApi.shutDown();
+  }
+
+  @Before
+  public void setUp() {
+    mockRequest = mock(HttpServletRequest.class);
+    anonymous = new AuthenticationInfo("anonymous");
+  }
+
+  @Test
+  public void checkOrigin() throws UnknownHostException {
+    NotebookServer server = new NotebookServer();
+    String origin = "http://" + InetAddress.getLocalHost().getHostName() + ":8080";
+
+    assertTrue("Origin " + origin + " is not allowed. Please check your hostname.",
+          server.checkOrigin(mockRequest, origin));
+  }
+
+  @Test
+  public void checkInvalidOrigin(){
+    NotebookServer server = new NotebookServer();
+    assertFalse(server.checkOrigin(mockRequest, "http://evillocalhost:8080"));
+  }
+
+  @Test
+  public void testMakeSureNoAngularObjectBroadcastToWebsocketWhoFireTheEvent() throws IOException, InterruptedException {
+    // create a notebook
+    Note note1 = notebook.createNote(anonymous);
+
+    // get reference to interpreterGroup
+    InterpreterGroup interpreterGroup = null;
+    List<InterpreterSetting> settings = notebook.getInterpreterSettingManager().getInterpreterSettings(note1.getId());
+    for (InterpreterSetting setting : settings) {
+      if (setting.getName().equals("md")) {
+        interpreterGroup = setting.getOrCreateInterpreterGroup("anonymous", "sharedProcess");
+        break;
+      }
+    }
+
+    // start interpreter process
+    Paragraph p1 = note1.addNewParagraph(AuthenticationInfo.ANONYMOUS);
+    p1.setText("%md start remote interpreter process");
+    p1.setAuthenticationInfo(anonymous);
+    note1.run(p1.getId());
+
+    // wait for paragraph finished
+    while(true) {
+      if (p1.getStatus() == Job.Status.FINISHED) {
+        break;
+      }
+      Thread.sleep(100);
+    }
+
+    // add angularObject
+    interpreterGroup.getAngularObjectRegistry().add("object1", "value1", note1.getId(), null);
+
+    // create two sockets and open it
+    NotebookSocket sock1 = createWebSocket();
+    NotebookSocket sock2 = createWebSocket();
+
+    assertEquals(sock1, sock1);
+    assertNotEquals(sock1, sock2);
+
+    notebookServer.onOpen(sock1);
+    notebookServer.onOpen(sock2);
+    verify(sock1, times(0)).send(anyString()); // getNote, getAngularObject
+    // open the same notebook from sockets
+    notebookServer.onMessage(sock1, new Message(OP.GET_NOTE).put("id", note1.getId()).toJson());
+    notebookServer.onMessage(sock2, new Message(OP.GET_NOTE).put("id", note1.getId()).toJson());
+
+    reset(sock1);
+    reset(sock2);
+
+    // update object from sock1
+    notebookServer.onMessage(sock1,
+        new Message(OP.ANGULAR_OBJECT_UPDATED)
+        .put("noteId", note1.getId())
+        .put("name", "object1")
+        .put("value", "value1")
+        .put("interpreterGroupId", interpreterGroup.getId()).toJson());
+
+
+    // expect object is broadcasted except for where the update is created
+    verify(sock1, times(0)).send(anyString());
+    verify(sock2, times(1)).send(anyString());
+
+    notebook.removeNote(note1.getId(), anonymous);
+  }
+
+  @Test
+  public void testImportNotebook() throws IOException {
+    String msg = "{\"op\":\"IMPORT_NOTE\",\"data\":" +
+        "{\"note\":{\"paragraphs\": [{\"text\": \"Test " +
+        "paragraphs import\"," + "\"progressUpdateIntervalMs\":500," +
+        "\"config\":{},\"settings\":{}}]," +
+        "\"name\": \"Test Zeppelin notebook import\",\"config\": " +
+        "{}}}}";
+    Message messageReceived = notebookServer.deserializeMessage(msg);
+    Note note = null;
+    try {
+      note = notebookServer.importNote(null, null, notebook, messageReceived);
+    } catch (NullPointerException e) {
+      //broadcastNoteList(); failed nothing to worry.
+      LOG.error("Exception in NotebookServerTest while testImportNotebook, failed nothing to " +
+          "worry ", e);
+    }
+
+    assertNotEquals(null, notebook.getNote(note.getId()));
+    assertEquals("Test Zeppelin notebook import", notebook.getNote(note.getId()).getName());
+    assertEquals("Test paragraphs import", notebook.getNote(note.getId()).getParagraphs().get(0).getText());
+    notebook.removeNote(note.getId(), anonymous);
+  }
+
+  @Test
+  public void bindAngularObjectToRemoteForParagraphs() throws Exception {
+    //Given
+    final String varName = "name";
+    final String value = "DuyHai DOAN";
+    final Message messageReceived = new Message(OP.ANGULAR_OBJECT_CLIENT_BIND)
+            .put("noteId", "noteId")
+            .put("name", varName)
+            .put("value", value)
+            .put("paragraphId", "paragraphId");
+
+    final NotebookServer server = new NotebookServer();
+    final Notebook notebook = mock(Notebook.class);
+    final Note note = mock(Note.class, RETURNS_DEEP_STUBS);
+
+    when(notebook.getNote("noteId")).thenReturn(note);
+    final Paragraph paragraph = mock(Paragraph.class, RETURNS_DEEP_STUBS);
+    when(note.getParagraph("paragraphId")).thenReturn(paragraph);
+
+
+    final RemoteAngularObjectRegistry mdRegistry = mock(RemoteAngularObjectRegistry.class);
+    final InterpreterGroup mdGroup = new InterpreterGroup("mdGroup");
+    mdGroup.setAngularObjectRegistry(mdRegistry);
+
+    when(paragraph.getCurrentRepl().getInterpreterGroup()).thenReturn(mdGroup);
+
+    final AngularObject<String> ao1 = AngularObjectBuilder.build(varName, value, "noteId", "paragraphId");
+
+    when(mdRegistry.addAndNotifyRemoteProcess(varName, value, "noteId", "paragraphId")).thenReturn(ao1);
+
+    NotebookSocket conn = mock(NotebookSocket.class);
+    NotebookSocket otherConn = mock(NotebookSocket.class);
+
+    final String mdMsg1 =  server.serializeMessage(new Message(OP.ANGULAR_OBJECT_UPDATE)
+            .put("angularObject", ao1)
+            .put("interpreterGroupId", "mdGroup")
+            .put("noteId", "noteId")
+            .put("paragraphId", "paragraphId"));
+
+    server.noteSocketMap.put("noteId", asList(conn, otherConn));
+
+    // When
+    server.angularObjectClientBind(conn, new HashSet<String>(), notebook, messageReceived);
+
+    // Then
+    verify(mdRegistry, never()).addAndNotifyRemoteProcess(varName, value, "noteId", null);
+
+    verify(otherConn).send(mdMsg1);
+  }
+
+  @Test
+  public void bindAngularObjectToLocalForParagraphs() throws Exception {
+    //Given
+    final String varName = "name";
+    final String value = "DuyHai DOAN";
+    final Message messageReceived = new Message(OP.ANGULAR_OBJECT_CLIENT_BIND)
+            .put("noteId", "noteId")
+            .put("name", varName)
+            .put("value", value)
+            .put("paragraphId", "paragraphId");
+
+    final NotebookServer server = new NotebookServer();
+    final Notebook notebook = mock(Notebook.class);
+    final Note note = mock(Note.class, RETURNS_DEEP_STUBS);
+    when(notebook.getNote("noteId")).thenReturn(note);
+    final Paragraph paragraph = mock(Paragraph.class, RETURNS_DEEP_STUBS);
+    when(note.getParagraph("paragraphId")).thenReturn(paragraph);
+
+    final AngularObjectRegistry mdRegistry = mock(AngularObjectRegistry.class);
+    final InterpreterGroup mdGroup = new InterpreterGroup("mdGroup");
+    mdGroup.setAngularObjectRegistry(mdRegistry);
+
+    when(paragraph.getCurrentRepl().getInterpreterGroup()).thenReturn(mdGroup);
+
+
+    final AngularObject<String> ao1 = AngularObjectBuilder.build(varName, value, "noteId", "paragraphId");
+
+    when(mdRegistry.add(varName, value, "noteId", "paragraphId")).thenReturn(ao1);
+
+    NotebookSocket conn = mock(NotebookSocket.class);
+    NotebookSocket otherConn = mock(NotebookSocket.class);
+
+    final String mdMsg1 =  server.serializeMessage(new Message(OP.ANGULAR_OBJECT_UPDATE)
+            .put("angularObject", ao1)
+            .put("interpreterGroupId", "mdGroup")
+            .put("noteId", "noteId")
+            .put("paragraphId", "paragraphId"));
+
+    server.noteSocketMap.put("noteId", asList(conn, otherConn));
+
+    // When
+    server.angularObjectClientBind(conn, new HashSet<String>(), notebook, messageReceived);
+
+    // Then
+    verify(otherConn).send(mdMsg1);
+  }
+
+  @Test
+  public void unbindAngularObjectFromRemoteForParagraphs() throws Exception {
+    //Given
+    final String varName = "name";
+    final String value = "val";
+    final Message messageReceived = new Message(OP.ANGULAR_OBJECT_CLIENT_UNBIND)
+            .put("noteId", "noteId")
+            .put("name", varName)
+            .put("paragraphId", "paragraphId");
+
+    final NotebookServer server = new NotebookServer();
+    final Notebook notebook = mock(Notebook.class);
+    final Note note = mock(Note.class, RETURNS_DEEP_STUBS);
+    when(notebook.getNote("noteId")).thenReturn(note);
+    final Paragraph paragraph = mock(Paragraph.class, RETURNS_DEEP_STUBS);
+    when(note.getParagraph("paragraphId")).thenReturn(paragraph);
+
+    final RemoteAngularObjectRegistry mdRegistry = mock(RemoteAngularObjectRegistry.class);
+    final InterpreterGroup mdGroup = new InterpreterGroup("mdGroup");
+    mdGroup.setAngularObjectRegistry(mdRegistry);
+
+    when(paragraph.getCurrentRepl().getInterpreterGroup()).thenReturn(mdGroup);
+
+    final AngularObject<String> ao1 = AngularObjectBuilder.build(varName, value, "noteId", "paragraphId");
+    when(mdRegistry.removeAndNotifyRemoteProcess(varName, "noteId", "paragraphId")).thenReturn(ao1);
+    NotebookSocket conn = mock(NotebookSocket.class);
+    NotebookSocket otherConn = mock(NotebookSocket.class);
+
+    final String mdMsg1 =  server.serializeMessage(new Message(OP.ANGULAR_OBJECT_REMOVE)
+            .put("angularObject", ao1)
+            .put("interpreterGroupId", "mdGroup")
+            .put("noteId", "noteId")
+            .put("paragraphId", "paragraphId"));
+
+    server.noteSocketMap.put("noteId", asList(conn, otherConn));
+
+    // When
+    server.angularObjectClientUnbind(conn, new HashSet<String>(), notebook, messageReceived);
+
+    // Then
+    verify(mdRegistry, never()).removeAndNotifyRemoteProcess(varName, "noteId", null);
+
+    verify(otherConn).send(mdMsg1);
+  }
+
+  @Test
+  public void unbindAngularObjectFromLocalForParagraphs() throws Exception {
+    //Given
+    final String varName = "name";
+    final String value = "val";
+    final Message messageReceived = new Message(OP.ANGULAR_OBJECT_CLIENT_UNBIND)
+            .put("noteId", "noteId")
+            .put("name", varName)
+            .put("paragraphId", "paragraphId");
+
+    final NotebookServer server = new NotebookServer();
+    final Notebook notebook = mock(Notebook.class);
+    final Note note = mock(Note.class, RETURNS_DEEP_STUBS);
+    when(notebook.getNote("noteId")).thenReturn(note);
+    final Paragraph paragraph = mock(Paragraph.class, RETURNS_DEEP_STUBS);
+    when(note.getParagraph("paragraphId")).thenReturn(paragraph);
+
+    final AngularObjectRegistry mdRegistry = mock(AngularObjectRegistry.class);
+    final InterpreterGroup mdGroup = new InterpreterGroup("mdGroup");
+    mdGroup.setAngularObjectRegistry(mdRegistry);
+
+    when(paragraph.getCurrentRepl().getInterpreterGroup()).thenReturn(mdGroup);
+
+    final AngularObject<String> ao1 = AngularObjectBuilder.build(varName, value, "noteId", "paragraphId");
+
+    when(mdRegistry.remove(varName, "noteId", "paragraphId")).thenReturn(ao1);
+
+    NotebookSocket conn = mock(NotebookSocket.class);
+    NotebookSocket otherConn = mock(NotebookSocket.class);
+
+    final String mdMsg1 =  server.serializeMessage(new Message(OP.ANGULAR_OBJECT_REMOVE)
+            .put("angularObject", ao1)
+            .put("interpreterGroupId", "mdGroup")
+            .put("noteId", "noteId")
+            .put("paragraphId", "paragraphId"));
+    server.noteSocketMap.put("noteId", asList(conn, otherConn));
+
+    // When
+    server.angularObjectClientUnbind(conn, new HashSet<String>(), notebook, messageReceived);
+
+    // Then
+    verify(otherConn).send(mdMsg1);
+  }
+
+  @Test
+  public void testCreateNoteWithDefaultInterpreterId() throws IOException {
+    // create two sockets and open it
+    NotebookSocket sock1 = createWebSocket();
+    NotebookSocket sock2 = createWebSocket();
+
+    assertEquals(sock1, sock1);
+    assertNotEquals(sock1, sock2);
+
+    notebookServer.onOpen(sock1);
+    notebookServer.onOpen(sock2);
+
+    String noteName = "Note with millis " + System.currentTimeMillis();
+    String defaultInterpreterId = "";
+    List<InterpreterSetting> settings = notebook.getInterpreterSettingManager().get();
+    if (settings.size() > 1) {
+      defaultInterpreterId = settings.get(1).getId();
+    }
+    // create note from sock1
+    notebookServer.onMessage(sock1,
+        new Message(OP.NEW_NOTE)
+        .put("name", noteName)
+        .put("defaultInterpreterId", defaultInterpreterId).toJson());
+
+    // expect the events are broadcasted properly
+    verify(sock1, times(2)).send(anyString());
+
+    Note createdNote = null;
+    for (Note note : notebook.getAllNotes()) {
+      if (note.getName().equals(noteName)) {
+        createdNote = note;
+        break;
+      }
+    }
+
+    if (settings.size() > 1) {
+      assertEquals(notebook.getInterpreterSettingManager().getDefaultInterpreterSetting(
+              createdNote.getId()).getId(), defaultInterpreterId);
+    }
+    notebook.removeNote(createdNote.getId(), anonymous);
+  }
+
+  private NotebookSocket createWebSocket() {
+    NotebookSocket sock = mock(NotebookSocket.class);
+    when(sock.getRequest()).thenReturn(mockRequest);
+    return sock;
+  }
+
+}
+
