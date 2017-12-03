@@ -1,0 +1,27 @@
+[
+  {
+    "group": "flink",
+    "name": "flink",
+    "className": "com.smartsuites.flink.FlinkInterpreter",
+    "properties": {
+      "host": {
+        "envName": "host",
+        "propertyName": null,
+        "defaultValue": "local",
+        "description": "host name of running JobManager. 'local' runs flink in local mode.",
+        "type": "string"
+      },
+      "port": {
+        "envName": "port",
+        "propertyName": null,
+        "defaultValue": "6123",
+        "description": "port of running JobManager.",
+        "type": "number"
+      }
+    },
+    "editor": {
+      "language": "scala",
+      "editOnDblClick": false
+    }
+  }
+]
