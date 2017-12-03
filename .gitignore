@@ -6,3 +6,4 @@ local-repo
 smartsuites-interpreters/interpreter/
 *reduced-pom.xml
 smartsuites-server/src/main/resources/dist/
+smartsuites-distribution/distribution/notebook/
