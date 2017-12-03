@@ -5,3 +5,4 @@ local-repo
 .DS_Store
 smartsuites-interpreters/interpreter/
 *reduced-pom.xml
+smartsuites-server/src/main/resources/dist/
