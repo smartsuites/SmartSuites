@@ -1,0 +1,7 @@
+.idea
+*.iml
+target
+local-repo
+.DS_Store
+smartsuites-interpreters/interpreter/
+*reduced-pom.xml
