@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+  ~ Copyright (c) 2017. 联思智云（北京）科技有限公司. All rights reserved.
+  -->
+
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+	version="3.0">
+
+ <display-name>zeppelin-web</display-name>
+	<servlet>
+		<servlet-name>default</servlet-name>
+    <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+    <init-param>
+      <param-name>jersey.config.server.provider.packages</param-name>
+      <param-value>org.apache.zeppelin.rest</param-value>
+    </init-param>
+
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<context-param>
+		<param-name>configuration</param-name>
+		<param-value>deployment</param-value>
+	</context-param>
+
+  <session-config>
+    <cookie-config>
+      <http-only>true</http-only>
+      <secure>true</secure>
+    </cookie-config>
+  </session-config>
+</web-app>

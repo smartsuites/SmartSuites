@@ -1,0 +1,97 @@
+<!--
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<div class="interpreterHead">
+  <div class="header">
+    <div class="row">
+      <div class="col-md-12">
+        <h3 class="new_h3">
+          Notebook Repository
+        </h3>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        Manage your Notebook Repositories' settings.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--<div class="box width-full" *ngFor="let repo of notebookRepos | orderBy: 'name'">-->
+<div class="box width-full" *ngFor="let repo of notebookRepos">
+  <div id="{{repo.name | lowercase}}">
+    <div class="row interpreter">
+
+      <div class="col-md-12">
+        <h3 class="interpreter-title">{{repo.name}}</h3>
+        <span style="float:right" [hidden]="repo.settings.length <= 0">
+          <button class="btn btn-default btn-xs"
+                  (click)="edit = true;">
+            <span class="fa fa-pencil"></span> edit</button>
+        </span>
+      </div>
+    </div>
+    <div class="row interpreter">
+      <div class="col-md-12" [hidden]="repo.settings.length <= 0">
+        <h5>Settings</h5>
+        <form editable-form  #valueform="ngForm" (ngSubmit)="saveNotebookRepo(repo.className,valueform.value)">
+        <table class="table table-striped">
+          <thead>
+          <tr>
+            <th style="width:40%">name</th>
+            <th style="width:60%">value</th>
+          </tr>
+          </thead>
+            <tr *ngFor="let setting of repo.settings" style="background-color: white">
+              <td>{{setting.name}}</td>
+              <td>
+                <span class="btn-group" style="width: 100%">
+                  <!--<span [hidden]="setting.type != 'DROPDOWN'">-->
+                  <span [hidden]="setting.type != 'DROPDOWN'">
+                    <select name="{{setting.name}}"  [(ngModel)]="setting.selected" [disabled]="!edit">
+                        <option *ngFor="let item of setting.value" [value]='item.value'>{{item.name}}</option>
+                    </select>
+
+                    <!--<span editable-select="setting.selected"
+                          e-ng-options="s.value as s.name for s in setting.value"
+                          class="selectpicker" e-form="valueform">
+                            &lt;!&ndash;{{showDropdownSelected(setting)}}&ndash;&gt;
+                    </span>-->
+
+                  </span>
+                  <span [hidden]="setting.type != 'INPUT'">
+                    <input name="{{setting.name}}" value="{{setting.selected}}" [disabled]="!edit"/>
+                  </span>
+                </span>
+              </td>
+            </tr>
+        </table>
+          <span style="float:right" [hidden]=!edit>
+          <button type="submit" class="btn btn-primary btn-xs" style="float: right;">
+            <span class="fa fa-check"></span> Save
+          </button>
+          <button type="button" class="btn btn-default btn-xs" (click)="edit = false" style="float: right;margin-right: 5px">
+            <span class="fa fa-remove"></span> Cancel
+          </button>
+          </span>
+        </form>
+      </div>
+    </div>
+    <div class="row interpreter">
+      <div [hidden]="repo.settings.length != 0" class="col-md-12 gray40-message">
+        <em>Currently there are no settings for this Notebook Repository</em>
+      </div>
+    </div>
+  </div>
+</div>
