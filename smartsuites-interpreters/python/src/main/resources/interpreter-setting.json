@@ -1,0 +1,85 @@
+[
+  {
+    "group": "python",
+    "name": "python",
+    "className": "com.smartsuites.python.PythonInterpreter",
+    "properties": {
+      "zeppelin.python": {
+        "envName": null,
+        "propertyName": "zeppelin.python",
+        "defaultValue": "python",
+        "description": "Python directory. It is set to python by default.(assume python is in your $PATH)",
+        "type": "string"
+      },
+      "zeppelin.python.maxResult": {
+        "envName": null,
+        "propertyName": "zeppelin.python.maxResult",
+        "defaultValue": "1000",
+        "description": "Max number of dataframe rows to display.",
+        "type": "number"
+      },
+      "zeppelin.python.useIPython": {
+        "propertyName": "zeppelin.python.useIPython",
+        "defaultValue": true,
+        "description": "whether use IPython when it is available",
+        "type": "checkbox"
+      }
+    },
+    "editor": {
+      "language": "python",
+      "editOnDblClick": false
+    }
+  },
+  {
+    "group": "python",
+    "name": "ipython",
+    "className": "com.smartsuites.python.IPythonInterpreter",
+    "properties": {
+      "zeppelin.ipython.launch.timeout": {
+        "propertyName": "zeppelin.ipython.launch.timeout",
+        "defaultValue": "30000",
+        "description": "time out for ipython launch",
+        "type": "number"
+      }
+    },
+    "editor": {
+      "language": "python",
+      "editOnDblClick": false,
+      "completionKey": "TAB"
+    }
+  },
+  {
+    "group": "python",
+    "name": "sql",
+    "className": "com.smartsuites.python.PythonInterpreterPandasSql",
+    "properties": {
+    },
+    "editor":{
+      "language": "sql",
+      "editOnDblClick": false,
+      "completionKey": "TAB"
+    }
+  },
+  {
+    "group": "python",
+    "name": "conda",
+    "className": "com.smartsuites.python.PythonCondaInterpreter",
+    "properties": {
+    },
+    "editor": {
+      "language": "sh",
+      "editOnDblClick": false
+    }
+  },
+  {
+    "group": "python",
+    "name": "docker",
+    "className": "com.smartsuites.python.PythonDockerInterpreter",
+    "properties": {
+    },
+    "editor":{
+      "language": "sh",
+      "editOnDblClick": false
+    }
+  }
+]
