@@ -1,0 +1,20 @@
+[
+  {
+    "group": "dev",
+    "name": "dev",
+    "className": "com.smartsuites.helium.DevInterpreter",
+    "properties": {
+      "port": {
+        "envName": "PORT",
+        "propertyName": "port",
+        "defaultValue": "jdbc:postgresql://localhost:5432/",
+        "description": "The URL for JDBC.",
+        "type": "string"
+      }
+    },
+    "editor": {
+      "language": "helium",
+      "editOnDblClick": false
+    }
+  }
+]
