@@ -1,0 +1,12 @@
+[
+  {
+    "group": "angular",
+    "name": "angular",
+    "className": "com.smartsuites.angular.AngularInterpreter",
+    "properties": {
+    },
+    "editor": {
+      "editOnDblClick": true
+    }
+  }
+]
