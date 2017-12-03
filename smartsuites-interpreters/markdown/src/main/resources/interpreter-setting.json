@@ -1,0 +1,20 @@
+[
+  {
+    "group": "md",
+    "name": "md",
+    "className": "com.smartsuites.markdown.Markdown",
+    "properties": {
+      "markdown.parser.type": {
+        "envName": "MARKDOWN_PARSER_TYPE",
+        "propertyName": "markdown.parser.type",
+        "defaultValue": "pegdown",
+        "description": "Markdown Parser Type. Available values: pegdown, markdown4j. Default = pegdown",
+        "type": "string"
+      }
+    },
+    "editor": {
+      "language": "markdown",
+      "editOnDblClick": true
+    }
+  }
+]
