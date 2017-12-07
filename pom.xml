@@ -20,6 +20,7 @@
         <module>smartsuites-interpreters</module>
         <module>smartsuites-distribution</module>
         <module>smartsuites-spark</module>
+        <module>smartsuites-hub</module>
     </modules>
 
     <scm>
