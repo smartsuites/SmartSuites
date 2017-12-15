@@ -19,11 +19,11 @@ export class BaseUrlService {
   getWebsocketUrl():string {
     let wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:'
     //return wsProtocol + '//' + location.hostname + ':' + this.getPort() + this.skipTrailingSlash(location.pathname) + '/ws'
-    return wsProtocol + '//linux:8080/ws'
+    return wsProtocol + '//localhost:8080/ws'
   }
 
   getBase():string {
-    return location.protocol + '//linux:8080'
+    return location.protocol + '//localhost:8080'
     //return location.protocol + '//' + location.hostname + ':' + this.getPort() + location.pathname
   }
 

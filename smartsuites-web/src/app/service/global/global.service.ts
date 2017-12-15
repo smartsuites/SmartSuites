@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import {Ticket} from "../../model/Ticket";
 
+// Should Not Use Directly
 @Injectable()
 export class GlobalService {
 
@@ -8,12 +9,15 @@ export class GlobalService {
 
   zeppelinVersion:String
 
-  userName
+  login:boolean
 
-  author = "yufei.wu@live.com"
+  //userName
+
+  //author = "yufei.wu@live.com"
 
   constructor() {
     this.ticket = new Ticket()
+    this.login = false
   }
 
 }

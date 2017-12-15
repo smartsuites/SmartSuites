@@ -1,5 +1,120 @@
-<app-navbar></app-navbar>
-<div id="main" class="container-fluid">
+<nz-header>
+
+
+
+  <div class="mainmenu">
+
+    <div class="logo">
+      <!--<a class="navbar-logo" routerLink="/"  style="vertical-align: middle">
+        <img src="assets/images/zepLogoW.png" width="50" alt="Zeppelin"/>
+      </a>-->
+      <a class="navbar-title" routerLink="/">
+        <span>SmartSuites</span>
+      </a>
+    </div>
+
+    <ul nz-menu [nzTheme]="'light'" [nzMode]="'horizontal'">
+      <li nz-menu-item *ngIf="this.isLogin()"><a routerLink="/home"><i class="anticon anticon-home"></i> 首页</a></li>
+      <li nz-menu-item *ngIf="this.isLogin()"><a routerLink="/notebook"><i class="anticon anticon-book"></i> 笔记</a></li>
+      <li nz-menu-item *ngIf="this.isLogin()"><a routerLink="/interpreter"><i class="anticon anticon-area-chart"></i> 业务</a></li>
+      <li nz-menu-item *ngIf="this.isLogin()"><a routerLink="/jobmanager"><i class="anticon anticon-appstore"></i> 任务</a></li>
+      <li nz-menu-item *ngIf="this.isLogin()"><a routerLink="/interpreter"><i class="anticon anticon-export"></i> 发布</a></li>
+      <li nz-menu-item *ngIf="this.isLogin()"><a routerLink="/interpreter"><i class="anticon anticon-cloud-o"></i> HUB</a></li>
+      <li nz-submenu *ngIf="this.isLogin()">
+        <span title><i class="anticon anticon-setting"></i> 系统配置</span>
+        <ul>
+          <li nz-menu-item><a routerLink="/interpreter"><i class="anticon anticon-link"></i> 解析器配置</a></li>
+          <li nz-menu-item><a routerLink="/notebookRepos"><i class="anticon anticon-database"></i> 笔记仓库</a></li>
+          <li nz-menu-item><a routerLink="/credential"><i class="anticon anticon-team"></i> 用户管理</a></li>
+          <li nz-menu-item><a routerLink="/helium"><i class="anticon anticon-api"></i> Helium</a></li>
+          <li nz-menu-item><a routerLink="/configuration"><i class="anticon anticon-setting"></i> 参数配置</a></li>
+        </ul>
+      </li>
+
+
+      <li nz-submenu style="float: right">
+      <span title>
+        <nz-badge [nzStatus]="'processing'" *ngIf="connected"></nz-badge>
+        <nz-badge [nzStatus]="'error'" [nzText]="'未连接'" *ngIf="!connected"></nz-badge>
+        <span *ngIf="this.isLogin()">{{ticket.screenUsername}}</span><span *ngIf="!this.isLogin() && connected">已连接</span>
+        <!--<i class="anticon anticon-caret-down"></i>-->
+        <nz-avatar nzIcon="user" nzSrc="//zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" style="vertical-align: middle"></nz-avatar>
+      </span>
+        <ul>
+          <li nz-menu-item (click)="showPlatformModel()"><a><i class="anticon anticon-copyright"></i> 关于平台</a></li>
+          <li nz-menu-item><a href="https://www.baidu.com" target="_blank" rel="noopener noreferrer"><i class="anticon anticon-question-circle-o"></i> 在线帮助</a></li>
+          <li nz-menu-item *ngIf="this.isLogin()"><a routerLink="/configuration"><i class="anticon anticon-setting"></i> 用户配置</a></li>
+          <li nz-menu-item *ngIf="this.isLogin()"><a (click)="logout()"><i class="anticon anticon-logout"></i> 退出登录</a></li>
+        </ul>
+      </li>
+
+      <li nz-menu-item *ngIf="this.isLogin()" style="float: right">
+        <nz-badge nzDot>
+          <ng-template #content><i class="anticon anticon-notification"></i></ng-template>
+        </nz-badge>
+      </li>
+    </ul>
+
+  </div>
+
+  <!--<nz-row class="submenu">
+
+    <nz-breadcrumb [nzSeparator]="'>'">
+      <nz-breadcrumb-item>
+        <i class="anticon anticon-home"></i>
+      </nz-breadcrumb-item>
+      <nz-breadcrumb-item>
+        <a href=""><i class="anticon anticon-user"></i><span>Application List</span></a>
+      </nz-breadcrumb-item>
+      <nz-breadcrumb-item>
+        <a href="">Application</a>
+      </nz-breadcrumb-item>
+    </nz-breadcrumb>
+
+    <nz-input [nzType]="'search'" [nzPlaceHolder]="'input search text'" [(ngModel)]="_value" style="width: 220px; float:right; margin-left: 20px"></nz-input>
+
+    <div class="action" style="float: right;">
+      <button nz-button [nzType]="'primary'" [nzSize]="size" [nzShape]="'circle'" nz-tooltip="Most simple prompt text">
+        <i class="anticon anticon-download"></i>
+      </button>
+      <button nz-button [nzType]="'primary'" [nzSize]="size" nz-tooltip="Most simple prompt text">
+        <i class="anticon anticon-download"></i><span>Download</span>
+      </button>
+      <button nz-button [nzType]="'primary'" [nzSize]="size" nz-tooltip="Most simple prompt text">
+        <span>Normal</span>
+      </button>
+      <button nz-button [nzType]="'primary'" (click)="loadTwo($event)" [nzLoading]="isLoadingTwo">
+        <i class="anticon anticon-poweroff"></i>
+        <span>Click me!</span>
+      </button>
+    </div>
+
+  </nz-row>-->
+
+</nz-header>
+
+<nz-content>
   <router-outlet></router-outlet>
-</div>
-<ng-container #vc></ng-container>
+</nz-content>
+
+<nz-footer>
+  <p class="copyright" style="">CopyRight @2017 联思智云（北京）科技有限公司</p>
+</nz-footer>
+
+<nz-modal [nzVisible]="showPlatform" [nzTitle]="'关于 SmartSuites'" [nzContent]="modalContent" (nzOnCancel)="handleCancel($event)" (nzOnOk)="handleOk($event)">
+  <ng-template #modalContent>
+    <div>
+      <h3><i class="anticon anticon-info-circle-o"></i>  SmartSuites</h3>
+      <br/>
+      <span id="i18n-14">Version</span>
+      <span class="modal-body-about-version"> {{globalService.zeppelinVersion}} </span>
+      <br/>
+      <br/>
+      <a href="http://www.baidu.com" target="_blank"><span id="i18n-15">Get involved!</span></a><br/>
+      <br/>
+      <a href="http://www.baidu.com" target="_blank"><span id="i18n-16">CopyRight @2017 联思智云(北京)科技有限公司</span></a>
+    </div>
+  </ng-template>
+</nz-modal>
+
+<nz-back-top [nzVisibilityHeight]="100"></nz-back-top>

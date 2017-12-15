@@ -11,7 +11,73 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-<div data-ng-init="initHome()">
+
+<nz-row class="submenu">
+
+   <nz-breadcrumb [nzSeparator]="'>'">
+     <nz-breadcrumb-item>
+       <i class="anticon anticon-home"></i>
+     </nz-breadcrumb-item>
+     <nz-breadcrumb-item>
+       <a href=""><i class="anticon anticon-user"></i><span>Application List</span></a>
+     </nz-breadcrumb-item>
+     <nz-breadcrumb-item>
+       <a href="">Application</a>
+     </nz-breadcrumb-item>
+   </nz-breadcrumb>
+
+   <nz-input [nzType]="'search'" [nzPlaceHolder]="'input search text'" [(ngModel)]="_value" style="width: 220px; float:right; margin-left: 20px"></nz-input>
+
+   <div class="action" style="float: right;">
+     <button nz-button [nzType]="'primary'" [nzSize]="size" [nzShape]="'circle'" nz-tooltip="Most simple prompt text">
+       <i class="anticon anticon-download"></i>
+     </button>
+     <button nz-button [nzType]="'primary'" [nzSize]="size" nz-tooltip="Most simple prompt text">
+       <i class="anticon anticon-download"></i><span>Download</span>
+     </button>
+     <button nz-button [nzType]="'primary'" [nzSize]="size" nz-tooltip="Most simple prompt text">
+       <span>Normal</span>
+     </button>
+     <button nz-button [nzType]="'primary'" (click)="loadTwo($event)" [nzLoading]="isLoadingTwo">
+       <i class="anticon anticon-poweroff"></i>
+       <span>Click me!</span>
+     </button>
+   </div>
+
+ </nz-row>
+
+<ul nz-menu [nzMode]="'inline'" style="height: 100% ;width:200px">
+  <li nz-submenu>
+    <span title><i class="anticon anticon-user"></i>subnav 1</span>
+    <ul>
+      <li nz-menu-item>option1</li>
+      <li nz-menu-item>option2</li>
+      <li nz-menu-item>option3</li>
+      <li nz-menu-item>option4</li>
+    </ul>
+  </li>
+  <li nz-submenu>
+    <span title><i class="anticon anticon-laptop"></i>subnav 2</span>
+    <ul>
+      <li nz-menu-item>option5</li>
+      <li nz-menu-item>option6</li>
+      <li nz-menu-item>option7</li>
+      <li nz-menu-item>option8</li>
+    </ul>
+  </li>
+  <li nz-submenu>
+    <span title><i class="anticon anticon-notification"></i>subnav 3</span>
+    <ul>
+      <li nz-menu-item>option9</li>
+      <li nz-menu-item>option10</li>
+      <li nz-menu-item>option11</li>
+      <li nz-menu-item>option12</li>
+    </ul>
+  </li>
+</ul>
+
+
+<!--<div data-ng-init="initHome()">
   <div ng-show="home.staticHome" class="box width-full home">
     <div class="zeppelin">
       <div class="zeppelin2"></div>
@@ -38,7 +104,7 @@ limitations under the License.
               <i style="font-size: 15px;" class="fa fa-upload"></i> Import note</a></h5>
             <h5 ng-controller="NoteCreateCtrl as noteCreateCtrl"><a href="" data-toggle="modal" data-target="#noteCreateModal" style="text-decoration: none;" ng-click="noteCreateCtrl.getInterpreterSettings()">
               <i style="font-size: 15px;" class="glyphicon glyphicon-list-alt"></i> Create new note</a></h5>
-            <!--<ul id="notebook-names">
+            &lt;!&ndash;<ul id="notebook-names">
               <li class="filter-names" ng-include="'components/note-name-filter/note-name-filter.html'"></li>
               <li ng-repeat="note in home.notes.list | filter:query.q | orderBy:node:false:home.arrayOrderingSrv.noteComparator track by $index">
                 <i style="font-size: 10px;" class="icon-doc"></i>
@@ -52,7 +118,7 @@ limitations under the License.
                 <li ng-repeat="node in home.notes.flatList| filter:query.q | orderBy:home.arrayOrderingSrv.noteFlatListOrdering track by $index"
                     ng-include src="'app/home/notebook-template.html'" ng-class="note_folder_renderer"></li>
               </div>
-            </ul>-->
+            </ul>&ndash;&gt;
           </div>
         </div>
         <div class="col-md-6">
@@ -76,8 +142,8 @@ limitations under the License.
   </div>
 
 
-  <!-- Load notebook -->
-  <!--<div ng-show="home.notebookHome" id="{{currentParagraph.id}}_paragraphColumn_main"
+  &lt;!&ndash; Load notebook &ndash;&gt;
+  &lt;!&ndash;<div ng-show="home.notebookHome" id="{{currentParagraph.id}}_paragraphColumn_main"
        ng-repeat="currentParagraph in home.note.paragraphs"
        ng-controller="ParagraphCtrl"
        ng-init="init(currentParagraph, home.note)"
@@ -89,7 +155,7 @@ limitations under the License.
          ng-class="{'paragraph-space box paragraph-margin': !asIframe, 'focused': paragraphFocused}"
          ng-hide="currentParagraph.config.tableHide && home.viewOnly">
     </div>
-  </div>-->
+  </div>&ndash;&gt;
 
   <div style="clear:both;height:10px"></div>
-</div>
+</div>-->

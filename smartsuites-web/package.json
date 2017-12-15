@@ -31,6 +31,7 @@
     "json3": "^3.3.2",
     "lodash": "^4.17.4",
     "mathjax": "^2.7.2",
+    "ng-zorro-antd": "^0.6.6",
     "ng2-bootstrap-modal": "^1.0.1",
     "ng2-toastr": "^4.1.2",
     "nvd3": "^1.8.6",

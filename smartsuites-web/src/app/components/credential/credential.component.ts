@@ -1,8 +1,7 @@
 import {Component, OnInit, ViewContainerRef} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {BaseUrlService} from "../../service/base-url/base-url.service";
-import {ToastsManager} from "ng2-toastr";
-import {ToastService} from "../../service/toast/toast.service";
+import {NzNotificationService} from "ng-zorro-antd";
 
 @Component({
   selector: 'app-credential',
@@ -29,7 +28,7 @@ export class CredentialComponent implements OnInit {
 
   constructor(public httpClient:HttpClient,
               public baseUrlSrv:BaseUrlService,
-              public toastService: ToastService) {
+              public alertService: NzNotificationService) {
     // TODO
     //ngToast.dismiss()
     //this.toastService.toastr.success('You are awesome!', 'Success!');

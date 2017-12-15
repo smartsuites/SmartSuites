@@ -3,14 +3,14 @@ import {NavigationStart, Router} from "@angular/router";
 import {HttpClient} from "@angular/common/http";
 import {GlobalService} from "../global/global.service";
 import {BaseUrlService} from "../base-url/base-url.service";
+import {Ticket} from "../../model/Ticket";
 
 @Injectable()
 export class LoginService {
 
-  constructor(public router:Router,public httpClient:HttpClient,public globalService:GlobalService, public baseUrlSrv:BaseUrlService) {
-
+  constructor(private router:Router,private httpClient:HttpClient,private globalService:GlobalService, private baseUrlSrv:BaseUrlService) {
     let vm = this;
-
+    //如果没有登录则返回到login
     this.router.events.subscribe({
       next: function (x) {
         if(x instanceof  NavigationStart){
@@ -18,7 +18,7 @@ export class LoginService {
 
           }else{
             if(!vm.isLogin()){
-              //this.router.navigate(['/login']);
+              this.router.navigate(['/login']);
             }
           }
         }
@@ -28,15 +28,25 @@ export class LoginService {
     });
   }
 
+  // 检测是否登录
   isLogin():boolean{
-    if(this.globalService.ticket.principal == "anonymous")
-      return false;
-    return true;
+    return this.globalService.login;
   }
 
-  login():void {
+  // 获取展示的用户名
+  getLoginUsername():String{
+    return this.globalService.ticket.screenUsername
+  }
 
-    let config = {}
+  // 获取Ticket
+  getTicket():Ticket{
+    return this.globalService.ticket
+  }
+
+  // 登录
+  login():void {
+    this.globalService.login = true
+    /*let config = {}
     this.httpClient.get(this.baseUrlSrv.getRestApiBase() + '/security/ticket', config)
       .subscribe(
         response => {
@@ -55,10 +65,11 @@ export class LoginService {
             window.location.href = redirect
           }
         }
-      );
+      );*/
 
   }
 
+  // 注册用户
   register():void {
     //this.router.navigate(['/login']);
     /*this.http
@@ -79,13 +90,11 @@ export class LoginService {
       );*/
   }
 
-
+  // 退出登录
   logout():void{
-    if (this.globalService.userName !== '') {
-      this.globalService.userName = ''
-      this.globalService.ticket = null
-      this.router.navigate(['/'])
-    }
+    this.globalService.ticket = new Ticket
+    this.globalService.login = false
+    this.router.navigate(['/'])
   }
 
 }

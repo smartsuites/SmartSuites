@@ -16,7 +16,53 @@
 /* Navbar
 /* ------------------------------------------- */
 
-.navbar-brand.navbar-title {
+/************** Logo *****************/
+.logo{
+  /*float: left;
+  height: 63px;*/
+  width: 120px;
+  height: 31px;
+  background: #333;
+  border-radius: 6px;
+  margin: 16px 24px 16px 0;
+  float: left;
+}
+
+.navbar-title {
+  margin-top: -3px;
+  margin-right: 20px;
+}
+
+.navbar-title > span {
+  font-family: 'Patua One', cursive;
+  font-size: 28px;
+  color: white;
+}
+
+/************** Menu *****************/
+
+.mainmenu {
+  font-size: 15px !important;
+}
+
+.server-connected {
+  padding-top: 20px;
+  color: #00CC00;
+  font-size: 13px !important;
+}
+
+.server-disconnected {
+  padding-top: 20px;
+  color: rgba(240, 48, 0, 1);
+  font-size: 13px !important;
+}
+
+/************** submenu  **************/
+.submenu{
+  margin: 10px 20px 10px 20px;
+}
+
+/*.navbar-brand .navbar-title {
   margin-top: -3px;
   margin-right: 20px;
 }
@@ -60,17 +106,7 @@
   font-size: 14px;
 }
 
-.server-connected {
-  padding-top: 12px;
-  color: #00CC00;
-  font-size: 12px !important;
-}
 
-.server-disconnected {
-  padding-top: 12px;
-  color: rgba(240, 48, 0, 1);
-  font-size: 12px !important;
-}
 
 .navbar-search {
   font-size: 14px;
@@ -95,7 +131,7 @@
   }
 }
 
-/** required to pin, unpin `navbar-fixed-top` */
+!** required to pin, unpin `navbar-fixed-top` *!
 .navbar-fixed-top.headroom {
   position: fixed;
   top: 0;
@@ -104,7 +140,7 @@
   transition: all .2s ease-in-out;
 }
 .navbar-fixed-top.headroom--unpinned { top: -100px; }
-.navbar-fixed-top.headroom--pinned { top: 0; /** `navbar` top */ }
+.navbar-fixed-top.headroom--pinned { top: 0; !** `navbar` top *! }
 
 .navbar-inverse {
   background: #3071a9;
@@ -206,7 +242,7 @@ a.navbar-brand:hover {
 }
 
 
-/* About Dialog */
+!* About Dialog *!
 
 .modal-header-about {
   background-color: #3071a9;
@@ -252,4 +288,4 @@ a.navbar-brand:hover {
   color: #3071A9;
   font-size: 30px;
   margin: 0 auto;
-}
+}*/

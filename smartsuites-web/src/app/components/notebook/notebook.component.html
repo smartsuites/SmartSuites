@@ -1,3 +1,66 @@
-<p>
-  notebook works!
-</p>
+<nz-row class="submenu">
+
+  <div nz-col [nzSpan]="8" [nzOffset]="1">
+
+    <nz-breadcrumb [nzSeparator]="'>'">
+      <nz-breadcrumb-item>
+        <i class="anticon anticon-home"></i>
+      </nz-breadcrumb-item>
+      <nz-breadcrumb-item>
+        <a href="">笔记管理</a>
+      </nz-breadcrumb-item>
+    </nz-breadcrumb>
+
+  </div>
+
+  <div nz-col [nzSpan]="14">
+
+    <nz-input [nzType]="'search'" [nzPlaceHolder]="'input search text'" [(ngModel)]="_value" style="width: 220px; float:right; margin-left: 20px"></nz-input>
+
+    <div class="action" style="float: right;">
+      <button nz-button [nzType]="'primary'" [nzSize]="size" nz-tooltip="修改平台配置参数">
+        <i class="anticon anticon-edit"></i><span>新建笔记</span>
+      </button>
+    </div>
+
+  </div>
+
+</nz-row>
+
+<nz-row style="height: 100%">
+  <div nz-col [nzSpan]="3" style="height: 100%">
+    <ul nz-menu [nzMode]="'inline'" style="height:100%">
+      <li nz-submenu>
+        <span title><i class="anticon anticon-user"></i>subnav 1</span>
+        <ul>
+          <li nz-menu-item>option1</li>
+          <li nz-menu-item>option2</li>
+          <li nz-menu-item>option3</li>
+          <li nz-menu-item>option4</li>
+        </ul>
+      </li>
+      <li nz-submenu>
+        <span title><i class="anticon anticon-laptop"></i>subnav 2</span>
+        <ul>
+          <li nz-menu-item>option5</li>
+          <li nz-menu-item>option6</li>
+          <li nz-menu-item>option7</li>
+          <li nz-menu-item>option8</li>
+        </ul>
+      </li>
+      <li nz-submenu>
+        <span title><i class="anticon anticon-notification"></i>subnav 3</span>
+        <ul>
+          <li nz-menu-item>option9</li>
+          <li nz-menu-item>option10</li>
+          <li nz-menu-item>option11</li>
+          <li nz-menu-item>option12</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+  <div nz-col [nzSpan]="21" style="height: 100%">
+    content
+  </div>
+</nz-row>
+

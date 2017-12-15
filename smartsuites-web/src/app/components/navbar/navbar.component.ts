@@ -9,8 +9,6 @@ import {EventService} from "../../service/event/event.service";
 import {Router} from "@angular/router";
 import {Ticket} from "../../model/Ticket";
 import {NoteListService} from "../../service/note-list/note-list.service";
-import {DialogService} from "ng2-bootstrap-modal";
-import {ModalComponent} from "../modal/modal.component";
 
 @Component({
   selector: 'app-navbar',
@@ -52,7 +50,6 @@ export class NavbarComponent implements OnInit {
               public globalService:GlobalService,
               public eventSevice:EventService,
               public router:Router,
-              public dialogService:DialogService
               /*TRASH_FOLDER_ID*/) {
 
     let self = this;
@@ -195,7 +192,7 @@ export class NavbarComponent implements OnInit {
 
   showLoginWindowFunc () {
 
-    let disposable = this.dialogService.addDialog(ModalComponent, {
+    /*let disposable = this.dialogService.addDialog(ModalComponent, {
       title:'Confirm title',
       message:'Confirm message'})
       .subscribe((isConfirmed)=>{
@@ -206,12 +203,12 @@ export class NavbarComponent implements OnInit {
         else {
           alert('declined');
         }
-      });
+      });*/
     //We can close dialog calling disposable.unsubscribe();
     //If dialog was not closed manually close it by timeout
-    setTimeout(()=>{
+    /*setTimeout(()=>{
       disposable.unsubscribe();
-    },1000);
+    },1000);*/
 
     //this.router.navigate(['/login'])
     // TODO

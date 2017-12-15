@@ -19,30 +19,11 @@
       "testTsconfig": "tsconfig.spec.json",
       "prefix": "app",
       "styles": [
-        "../node_modules/bootstrap/dist/css/bootstrap.min.css",
-        "../node_modules/ng2-toastr/bundles/ng2-toastr.min.css",
-
-
         "styles.css"
       ],
       "scripts": [
         "../node_modules/systemjs/dist/system.js",
-        "../node_modules/jquery/dist/jquery.min.js",
-        "../node_modules/bootstrap/dist/js/bootstrap.min.js",
-        "../node_modules/ng2-toastr/bundles/ng2-toastr.min.js",
-
-        "../node_modules/ace-builds/src-noconflict/ace.js",
-        "../node_modules/ace-builds/src-noconflict/mode-scala.js",
-        "../node_modules/ace-builds/src-noconflict/mode-python.js",
-        "../node_modules/ace-builds/src-noconflict/mode-sql.js",
-        "../node_modules/ace-builds/src-noconflict/mode-markdown.js",
-        "../node_modules/ace-builds/src-noconflict/mode-pig.js",
-        "../node_modules/ace-builds/src-noconflict/mode-sh.js",
-        "../node_modules/ace-builds/src-noconflict/mode-r.js",
-        "../node_modules/ace-builds/src-noconflict/keybinding-emacs.js",
-        "../node_modules/ace-builds/src-noconflict/ext-language_tools.js",
-        "../node_modules/ace-builds/src-noconflict/theme-chrome.js"
-
+        "../node_modules/ng2-toastr/bundles/ng2-toastr.min.js"
       ],
       "environmentSource": "environments/environment.ts",
       "environments": {

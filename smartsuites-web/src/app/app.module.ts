@@ -20,7 +20,7 @@ import {RouterModule} from "@angular/router";
 import {SearchService} from "./service/search/search.service";
 import {GlobalService} from "./service/global/global.service";
 import {EventService} from "./service/event/event.service";
-import {FormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {HttpClientModule} from "@angular/common/http";
 import {AppRoutingModule} from "./route/app-routing.module";
 import {HomeComponent} from './components/home/home.component';
@@ -44,11 +44,10 @@ import {TabledataComponent} from './components/tabledata/tabledata.component';
 import {VisualizationComponent} from './components/visualization/visualization.component';
 import {BuiltinsComponent} from './components/visualization/builtins/builtins.component';
 import {LoginService} from "./service/login/login.service";
-import {ModalComponent} from './components/modal/modal.component';
-import {BootstrapModalModule} from "ng2-bootstrap-modal";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {ToastModule} from "ng2-toastr";
-import {ToastService} from "./service/toast/toast.service";
+import {NgIncludeDirective } from './directive/ng-include/ng-include.directive';
+import {NgZorroAntdModule} from "ng-zorro-antd";
 
 @NgModule({
   declarations: [
@@ -80,7 +79,7 @@ import {ToastService} from "./service/toast/toast.service";
     TabledataComponent,
     VisualizationComponent,
     BuiltinsComponent,
-    ModalComponent
+    NgIncludeDirective
   ],
   imports: [
     BrowserModule,
@@ -88,12 +87,14 @@ import {ToastService} from "./service/toast/toast.service";
     AppRoutingModule,
     RouterModule,
     HttpClientModule,
-    BootstrapModalModule.forRoot({container:document.body}),
     BrowserAnimationsModule,
-    ToastModule.forRoot()
+    // Toast
+    ToastModule.forRoot(),
+    // UI
+    NgZorroAntdModule.forRoot(),
+    ReactiveFormsModule
   ],
   entryComponents: [
-    ModalComponent
   ],
   providers: [
     ArrayOrderingService,
@@ -106,8 +107,7 @@ import {ToastService} from "./service/toast/toast.service";
     GlobalService,
     NoteRenameService,
     NoteActionService,
-    LoginService,
-    ToastService
+    LoginService
   ],
   bootstrap: [AppComponent]
 })

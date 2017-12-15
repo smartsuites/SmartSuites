@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {BaseUrlService} from "../../service/base-url/base-url.service";
+import {NzNotificationService} from "ng-zorro-antd";
 
 @Component({
   selector: 'app-configuration',
@@ -9,10 +10,11 @@ import {BaseUrlService} from "../../service/base-url/base-url.service";
 })
 export class ConfigurationComponent implements OnInit {
 
-  configrations = {}
+  configrations = []
 
   constructor(public httpClient:HttpClient,
-              public baseUrlSrv:BaseUrlService) { }
+              public baseUrlSrv:BaseUrlService,
+              public alertService:NzNotificationService) { }
 
   ngOnInit() {
     this.getConfigurations()
@@ -23,28 +25,30 @@ export class ConfigurationComponent implements OnInit {
     this.httpClient.get(this.baseUrlSrv.getRestApiBase() + '/configurations/all')
       .subscribe(
         response => {
-          self.configrations = response['body']
+          var params = response['body']
+          var keys = Object.keys(params)
+          for (var i = 0; i < keys.length; i ++) {
+            self.configrations.push({
+              key    : i,
+              name   : keys[i],
+              value  : params[keys[i]],
+              desc   : ''
+            })
+          }
+          //this.alertService.info('Get all configurations!', 'Success!')
         },
         errorResponse => {
-          console.log('Error %o', errorResponse)
-          /*if (status === 401) {
-            ngToast.danger({
-              content: 'You don\'t have permission on this page',
-              verticalPosition: 'bottom',
-              timeout: '3000'
-            })
+          console.log('Error %o', errorResponse.status)
+          if (errorResponse.status === 401) {
+            this.alertService.error('You don\'t have permission on this page!', 'Oops!');
+
             setTimeout(function () {
-              window.location = this.baseUrlSrv.getBase()
+              window.location.href= this.baseUrlSrv.getBase()
             }, 3000)
           }
-          console.log('Error %o %o', status, data.message)*/
-
+          console.log('Error %o %o', errorResponse.status, errorResponse.message)
         }
       );
-  }
-
-  getKeys(item){
-    return Object.keys(item);
   }
 
 }
