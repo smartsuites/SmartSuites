@@ -70,7 +70,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 /**
- * Zeppelin websocket service.
+ * Data Smart websocket service.
  * 主业务逻辑
  */
 public class NotebookServer extends WebSocketServlet
@@ -78,7 +78,7 @@ public class NotebookServer extends WebSocketServlet
     RemoteInterpreterProcessListener, ApplicationEventListener {
 
   /**
-   * Job manager service type
+   * 任务管理器服务类型
    */
   protected enum JOB_MANAGER_SERVICE {
     JOB_MANAGER_PAGE("JOB_MANAGER_PAGE");
