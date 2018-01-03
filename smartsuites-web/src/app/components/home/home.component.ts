@@ -4,7 +4,7 @@ import {WebsocketMessageService} from "../../service/websocket/websocket-message
 import {ArrayOrderingService} from "../../service/array-ordering/array-ordering.service";
 import {NoteActionService} from "../../service/note-action/note-action.service";
 import {GlobalService} from "../../service/global/global.service";
-import {EventService} from "../../service/event/event.service";
+import {EventService1} from "../../service/event/event.service";
 
 
 @Component({
@@ -36,7 +36,7 @@ export class HomeComponent implements OnInit {
               public arrayOrderingSrv:ArrayOrderingService,
               public noteActionService:NoteActionService,
               public globalService:GlobalService,
-              public eventService:EventService) { }
+              public eventService:EventService1) { }
 
   ngOnInit() {
     //TODO

@@ -1,137 +1,311 @@
-import {AfterViewInit, Component, OnInit, ViewChild, ViewContainerRef} from '@angular/core';
+/*
+ * Copyright (c) 2018. 联思智云（北京）科技有限公司. All rights reserved.
+ */
+
+import {Component, AfterViewInit, ElementRef, Renderer, ViewChild, OnDestroy, OnInit} from '@angular/core';
 import {GlobalService} from "./service/global/global.service";
-import {ArrayOrderingService} from "./service/array-ordering/array-ordering.service";
-import {EventService} from "./service/event/event.service";
-import {BaseUrlService} from "./service/base-url/base-url.service";
 import {LoginService} from "./service/login/login.service";
-import {WebsocketEventService} from "./service/websocket/websocket-event.service";
-import {NzModalService, NzNotificationService} from "ng-zorro-antd";
-import {Ticket} from "./model/Ticket";
 import {WebsocketMessageService} from "./service/websocket/websocket-message.service";
 import {SearchService} from "./service/search/search.service";
+import {EventService1} from "./service/event/event.service";
+import {BaseUrlService} from "./service/base-url/base-url.service";
 import {HttpClient} from "@angular/common/http";
-import {NoteListService} from "./service/note-list/note-list.service";
 import {Router} from "@angular/router";
+import {WebsocketEventService} from "./service/websocket/websocket-event.service";
+import {NoteListService} from "./service/note-list/note-list.service";
+import {MessageService} from "primeng/components/common/messageservice";
+import {Ticket} from "./model/Ticket";
+
+enum MenuOrientation {
+  STATIC,
+  OVERLAY,
+  SLIM,
+  HORIZONTAL
+}
+
+declare var jQuery: any;
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit,AfterViewInit{
+export class AppComponent implements OnInit,AfterViewInit, OnDestroy {
 
-  looknfeel = 'default'
+  layoutCompact = true;
 
-  // websocket connect state
-  connected
+  layoutMode: MenuOrientation = MenuOrientation.HORIZONTAL;
 
-  // 查询字符串
-  query = {q: ''}
+  darkMenu = false;
 
-  TRASH_FOLDER_ID
+  profileMode = 'inline';
 
-  isFilterNote
+  rotateMenuButton: boolean;
 
-  isActive
+  topbarMenuActive: boolean;
 
-  logout
+  overlayMenuActive: boolean;
 
-  search
+  staticMenuDesktopInactive: boolean;
 
-  notes
+  staticMenuMobileActive: boolean;
 
-  showLoginWindow
+  rightPanelActive: boolean;
 
-  isDrawNavbarNoteList
+  rightPanelClick: boolean;
+
+  layoutMenuScroller: HTMLDivElement;
+
+  menuClick: boolean;
+
+  topbarItemClick: boolean;
+
+  activeTopbarItem: any;
+
+  resetMenu: boolean;
+
+  menuHoverActive: boolean;
+
+  @ViewChild('layoutMenuScroller') layoutMenuScrollerViewChild: ElementRef;
+
+  constructor(public renderer: Renderer,
+              private globalService:GlobalService,
+              private loginService:LoginService,
+              private websocketMsgSrv:WebsocketMessageService,
+              private searchForm:SearchService,
+              private eventService:EventService1,
+              private baseUrlService:BaseUrlService,
+              private httpClient:HttpClient,
+              private router:Router,
+              private websocketEventService:WebsocketEventService,
+              private messageService: MessageService,
+              private noteListFactory:NoteListService) {
+    this.ticket = globalService.ticket
+    this.notes = this.noteListFactory.notes
+  }
+
+  ngAfterViewInit() {
+    this.layoutMenuScroller = <HTMLDivElement> this.layoutMenuScrollerViewChild.nativeElement;
+
+    setTimeout(() => {
+      jQuery(this.layoutMenuScroller).nanoScroller({flash: true});
+    }, 10);
+  }
+
+  onLayoutClick() {
+    if (!this.topbarItemClick) {
+      this.activeTopbarItem = null;
+      this.topbarMenuActive = false;
+    }
+
+    if (!this.menuClick) {
+      if (this.isHorizontal() || this.isSlim()) {
+        this.resetMenu = true;
+      }
+
+      if (this.overlayMenuActive || this.staticMenuMobileActive) {
+        this.hideOverlayMenu();
+      }
+
+      this.menuHoverActive = false;
+    }
+
+    if (!this.rightPanelClick) {
+      this.rightPanelActive = false;
+    }
+
+    this.topbarItemClick = false;
+    this.menuClick = false;
+    this.rightPanelClick = false;
+  }
+
+  onMenuButtonClick(event) {
+    this.menuClick = true;
+    this.rotateMenuButton = !this.rotateMenuButton;
+    this.topbarMenuActive = false;
+
+    if (this.layoutMode === MenuOrientation.OVERLAY) {
+      this.overlayMenuActive = !this.overlayMenuActive;
+    } else {
+      if (this.isDesktop()) {
+        this.staticMenuDesktopInactive = !this.staticMenuDesktopInactive;
+      } else {
+        this.staticMenuMobileActive = !this.staticMenuMobileActive;
+      }
+    }
+
+    event.preventDefault();
+  }
+
+  onMenuClick($event) {
+    this.menuClick = true;
+    this.resetMenu = false;
+
+    if (!this.isHorizontal()) {
+      setTimeout(() => {
+        jQuery(this.layoutMenuScroller).nanoScroller();
+      }, 500);
+    }
+  }
+
+  onTopbarMenuButtonClick(event) {
+    this.topbarItemClick = true;
+    this.topbarMenuActive = !this.topbarMenuActive;
+
+    this.hideOverlayMenu();
+
+    event.preventDefault();
+  }
+
+  onTopbarItemClick(event, item) {
+    this.topbarItemClick = true;
+
+    if (this.activeTopbarItem === item) {
+      this.activeTopbarItem = null; } else {
+      this.activeTopbarItem = item; }
+
+    event.preventDefault();
+  }
+
+  onRightPanelButtonClick(event) {
+    this.rightPanelClick = true;
+    this.rightPanelActive = !this.rightPanelActive;
+    event.preventDefault();
+  }
+
+  onRightPanelClick() {
+    this.rightPanelClick = true;
+  }
+
+  hideOverlayMenu() {
+    this.rotateMenuButton = false;
+    this.overlayMenuActive = false;
+    this.staticMenuMobileActive = false;
+  }
+
+  isTablet() {
+    const width = window.innerWidth;
+    return width <= 1024 && width > 640;
+  }
+
+  isDesktop() {
+    return window.innerWidth > 1024;
+  }
+
+  isMobile() {
+    return window.innerWidth <= 640;
+  }
+
+  isOverlay() {
+    return this.layoutMode === MenuOrientation.OVERLAY;
+  }
+
+  isHorizontal() {
+    return this.layoutMode === MenuOrientation.HORIZONTAL;
+  }
+
+  isSlim() {
+    return this.layoutMode === MenuOrientation.SLIM;
+  }
+
+  changeToStaticMenu() {
+    this.layoutMode = MenuOrientation.STATIC;
+  }
+
+  changeToOverlayMenu() {
+    this.layoutMode = MenuOrientation.OVERLAY;
+  }
+
+  changeToHorizontalMenu() {
+    this.layoutMode = MenuOrientation.HORIZONTAL;
+  }
+
+  changeToSlimMenu() {
+    this.layoutMode = MenuOrientation.SLIM;
+  }
+
+  ngOnDestroy() {
+    jQuery(this.layoutMenuScroller).nanoScroller({flash: true});
+  }
+
+  //************ BUSSINESS **************
 
   //用户的Token
   ticket:Ticket
 
-  showPlatform = false
+  //ws connect
+  connected = false
 
-  ngAfterViewInit(): void {
+  //对分析人员保存的Note集合
+  notes
+
+  looknfeel = 'default'
+
+  isLogin():boolean{
+    return this.loginService.isLogin()
   }
 
-  showPlatformModel(){
-    this.showPlatform = true
+  // 获取版本号
+  getPlatfromVersion () {
+    this.httpClient.get(this.baseUrlService.getRestApiBase() + '/version')
+      .subscribe(
+        response => {
+          this.globalService.dataSmartVersion = response['body']
+        },
+        errorResponse => {
+          console.log('Error %o %o', status, errorResponse.message)
+        }
+      );
   }
 
-  handleOk = (e) => {
-    this.showPlatform = false;
-  }
-
-  handleCancel = (e) => {
-    this.showPlatform = false;
-  }
-
-  constructor(private globalService:GlobalService,
-              /*private arrayOrderingSrv:ArrayOrderingService,*/
-              private websocketMsgSrv:WebsocketMessageService,
-              private searchForm:SearchService,
-              private eventService:EventService,
-              private baseUrlService:BaseUrlService,
-              private loginService:LoginService,
-              private httpClient:HttpClient,
-              private router:Router,
-              private websocketEventService:WebsocketEventService,
-              private alertService:NzNotificationService,
-              private noteListFactory:NoteListService
-              ) {
-    let self = this;
-    this.ticket = globalService.ticket
-    this.connected = websocketMsgSrv.isConnected()
-    this.notes = this.noteListFactory.notes
-
-    // TODO
-    //this.TRASH_FOLDER_ID = TRASH_FOLDER_ID
-    this.isFilterNote = this.isFilterNoteFunc
-    this.isActive = this.isActiveFunc
-    this.logout = this.logoutFunc
-    this.search = this.searchFunc
-
-    //this.showLoginWindow = this.showLoginWindowFunc
+  noteName(note) {
+    /*if (!_.isEmpty(note)) {
+      return this.arrayOrderingSrv.getNoteName(note)
+    }*/
   }
 
   ngOnInit(): void {
-
     let self = this;
+
+    this.getPlatfromVersion()
 
     // 监听Websocket的连接状态
     this.eventService.subscribe('setConnectedStatus', function (msg) {
       self.connected = msg
     })
 
-    // 平台启动加载Notes
-    this.eventService.subscribe('platformStartup', function (msg) {
-      self.loadNotes()
-    })
-
-    // 加载Notes
+    // 用于监听笔记加载消息，异步加载Notes
     this.eventService.subscribe('setNoteMenu', function (notes) {
+      console.log(notes)
       self.noteListFactory.setNotes(notes)
-      self.initNotebookListEventListener()
+      self.eventService.broadcast("noteComplete")
     })
 
-    this.getZeppelinVersion()
+    // 监听登录状态
+    this.eventService.subscribe('loginSuccess', function (msg) {
 
-    this.isDrawNavbarNoteList = false
+      /**/
 
-    // TODO
-    /*angular.element('#notebook-list').perfectScrollbar({suppressScrollX: true})
+      //TODO 根据Role加载不同的菜单
+      //如果是分析人员
+      if(self.loginService.isAnalyst()){
 
-    angular.element(document).click(function () {
-      this.query.q = ''
-    })*/
+        console.log(">>>>>>>>>>>>>>")
+        self.listConfigurations()
+        self.getHomeNote()
+        self.loadNotes()
 
-    this.eventService.subscribe('loginSuccess', function (event, param) {
-      this.globalService.ticket.screenUsername = this.globalService.ticket.principal
-      this.listConfigurations()
-      this.loadNotes()
-      this.getHomeNote()
+      }else if(self.loginService.isBusiness()){
+
+        self.eventService.broadcast('businessMenu')
+
+      }else if(self.loginService.isManager()){
+
+        self.eventService.broadcast('managerMenu')
+
+      }
+
     })
-
-
-    this.loginService.login()
 
     this.eventService.subscribe('setIframe', function (event, data) {
       if (!event.defaultPrevented) {
@@ -152,56 +326,9 @@ export class AppComponent implements OnInit,AfterViewInit{
       this.eventService.broadcast('setLookAndFeel', 'default')
     })
 
-    /*BootstrapDialog.defaultOptions.onshown = function () {
-      angular.element('#' + this.id).find('.btn:last').focus()
-    }
-
-    // Remove BootstrapDialog animation
-    BootstrapDialog.configDefaultOptions({animate: false})*/
-
+    //this.loginService.login()
   }
 
-  isLogin():boolean{
-    return this.loginService.isLogin()
-  }
-
-  noteName(note) {
-    /*if (!_.isEmpty(note)) {
-      return this.arrayOrderingSrv.getNoteName(note)
-    }*/
-  }
-
-  // 获取版本号
-  getZeppelinVersion () {
-    this.httpClient.get(this.baseUrlService.getRestApiBase() + '/version')
-      .subscribe(
-        response => {
-          this.globalService.zeppelinVersion = response['body']
-        },
-        errorResponse => {
-          console.log('Error %o %o', status, errorResponse.message)
-        }
-      );
-  }
-
-  isFilterNoteFunc (note) {
-
-    // TODO
-    /*if (!$scope.query.q) {
-      return true
-    }
-
-    let noteName = note.name
-    if (noteName.toLowerCase().indexOf($scope.query.q.toLowerCase()) > -1) {
-      return true
-    }*/
-    return false
-  }
-
-  isActiveFunc (noteId) {
-    // TODO
-    /*return ($routeParams.noteId === noteId)*/
-  }
 
   listConfigurations () {
     this.websocketMsgSrv.listConfigurations()
@@ -213,94 +340,6 @@ export class AppComponent implements OnInit,AfterViewInit{
 
   getHomeNote () {
     this.websocketMsgSrv.getHomeNote()
-  }
-
-  logoutFunc () {
-    //let logoutURL = this.baseUrlSrv.getRestApiBase() + '/login/logout'
-
-    let vm = this
-
-    // for firefox and safari
-    //logoutURL = logoutURL.replace('//', '//false:false@')
-
-    // TODO
-    /*vm.httpClient.post(logoutURL).error(function () {
-      // force authcBasic (if configured) to logout
-      vm.httpClient.post(logoutURL).error(function () {
-        vm.globalService.userName = ''
-        vm.globalService.ticket.principal = ''
-        vm.globalService.ticket.screenUsername = ''
-        vm.globalService.ticket.ticket = ''
-        vm.globalService.ticket.roles = ''
-
-        // TODO show
-        BootstrapDialog.show({
-          message: 'Logout Success'
-        })
-        setTimeout(function () {
-          window.location = vm.baseUrlSrv.getBase()
-        }, 1000)
-      })
-    })*/
-  }
-
-  searchFunc (searchTerm) {
-    this.router.navigate(['/search/' + searchTerm])
-  }
-
-  showLoginWindowFunc () {
-
-    /*let disposable = this.dialogService.addDialog(ModalComponent, {
-      title:'Confirm title',
-      message:'Confirm message'})
-      .subscribe((isConfirmed)=>{
-        //We get dialog result
-        if(isConfirmed) {
-          alert('accepted');
-        }
-        else {
-          alert('declined');
-        }
-      });*/
-    //We can close dialog calling disposable.unsubscribe();
-    //If dialog was not closed manually close it by timeout
-    /*setTimeout(()=>{
-      disposable.unsubscribe();
-    },1000);
-*/
-    //this.router.navigate(['/login'])
-    // TODO
-    /*setTimeout(function () {
-      angular.element('#userName').focus()
-    }, 500)*/
-  }
-
-  /*
-   ** Performance optimization for Browser Render.
-   */
-  initNotebookListEventListener () {
-    // TODO
-    /*angular.element(document).ready(function () {
-      angular.element('.notebook-list-dropdown').on('show.bs.dropdown', function () {
-        $scope.isDrawNavbarNoteList = true
-      })
-
-      angular.element('.notebook-list-dropdown').on('hide.bs.dropdown', function () {
-        $scope.isDrawNavbarNoteList = false
-      })
-    })*/
-  }
-
-  calculateTooltipPlacement(note) {
-    if (note !== undefined && note.name !== undefined) {
-      let length = note.name.length
-      if (length < 2) {
-        return 'top-left'
-      } else if (length > 7) {
-        return 'top-right'
-      }
-    }
-    return 'top'
   }
 
 }

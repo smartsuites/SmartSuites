@@ -7,13 +7,13 @@ export class GlobalService {
 
   ticket:Ticket;
 
-  zeppelinVersion:String
+  dataSmartVersion:String
 
   login:boolean
 
-  //userName
+  role:string
 
-  //author = "yufei.wu@live.com"
+  isMac:boolean
 
   constructor() {
     this.ticket = new Ticket()

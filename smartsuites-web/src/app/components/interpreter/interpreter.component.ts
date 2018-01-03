@@ -3,7 +3,7 @@ import {HttpClient} from "@angular/common/http";
 import {BaseUrlService} from "../../service/base-url/base-url.service";
 import {Router} from "@angular/router";
 import {GlobalService} from "../../service/global/global.service";
-import {EventService} from "../../service/event/event.service";
+import {EventService1} from "../../service/event/event.service";
 
 @Component({
   selector: 'app-interpreter',
@@ -34,7 +34,7 @@ export class InterpreterComponent implements OnInit {
               public baseUrlSrv:BaseUrlService,
               public router:Router,
               public globalService:GlobalService,
-              public eventService:EventService) { }
+              public eventService:EventService1) { }
 
   ngOnInit() {
 

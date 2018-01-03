@@ -1,3 +1,328 @@
-<p>
-  paragraph works!
-</p>
+<div class="ui-g" id="{{paragraph.id}}_container" ng-class="{'paragraph': !asIframe, 'paragraphAsIframe': asIframe}">
+  <!-- control -->
+  <div class="ui-g-12" style="margin-bottom: 8px">
+    <div style="float: left;" (dblclick)="this.editParagraphTitle()" class="paragraphTitle" *ngIf="paragraph.config.title" id="{{paragraph.id}}_title">
+      <input type="text" pInputText placeholder="Name" [(ngModel)]="paragraph.title" [ngClass]="{'showpmodel':!titleEditor, 'editpmodel':titleEditor}" [disabled]="!titleEditor" (blur)="this.showParagraphTitle();this.setTitle(paragraph)">
+    </div>
+
+    <div style="float: right;" id="{{paragraph.id}}_control">
+
+      <!--<span>
+        <span ng-show="paragraph.runtimeInfos.jobUrl.values.length == 1">
+          <a href="{{paragraph.runtimeInfos.jobUrl.values[0]}}" target="_blank" style="text-decoration: none;"
+             tooltip-placement="top" uib-tooltip="{{paragraph.runtimeInfos.jobUrl.tooltip}}">
+            <span class="fa fa-tasks"></span>
+            {{paragraph.runtimeInfos.jobUrl.label}}
+          </a>
+        </span>
+        <span class="dropdown" ng-show="paragraph.runtimeInfos.jobUrl.values.length > 1">
+          <span style="cursor:pointer;color:#3071A9" tooltip-placement="top"
+                uib-tooltip="{{paragraph.runtimeInfos.jobUrl.tooltip}}"
+                data-toggle="dropdown" type="button">
+            <span class="fa fa-tasks"></span>
+            {{paragraph.runtimeInfos.jobUrl.label}}S
+          </span>
+          <ul class="dropdown-menu" role="menu" style="width:200px;z-index:1002">
+            <li ng-class="{'option-disabled': !noteOperationsAllowed()}"
+                ng-repeat="url in paragraph.runtimeInfos.jobUrl.values">
+              <a href="{{url}}" target="_blank"><span class="fa fa-external-link-square"></span> Jobs #{{$index}}</a>
+            </li>
+          </ul>
+        </span>
+      </span>-->
+      <span>
+        {{paragraph.status}}
+      </span>
+      <span *ngIf="paragraph.status === 'RUNNING' && paragraph.executor !== 'SPELL'">
+        {{getProgress()}}%
+      </span>
+      <button pButton type="button" pTooltip="运行片段" tooltipPosition="bottom" icon="fa-play"
+              (click)="this.runParagraphFromButton(this.getEditorValue())"
+              *ngIf="paragraph.status!='RUNNING' && paragraph.status!='PENDING' && paragraph.config.enabled"></button>
+
+      <button pButton type="button" pTooltip="取消运行" tooltipPosition="bottom" icon="fa-play"
+              (click)="this.cancelParagraph(paragraph)"
+              *ngIf="paragraph.status=='RUNNING' || paragraph.status=='PENDING'"></button>
+
+      <!--<span *ngIf="paragraph.runtimeInfos.jobUrl.length == 1">
+        <a href="{{paragraph.runtimeInfos.jobUrl[0]}}" target="_blank"><span class="fa fa-tasks"></span> Spark job </a>
+      </span>-->
+
+      <!--<span class="dropdown" ng-show="paragraph.runtimeInfos.jobUrl.length > 1">
+        <span class="fa fa-tasks" style="cursor:pointer;color:#3071A9" tooltip-placement="top" uib-tooltip="Run this paragraph (Shift+Enter)"
+              data-toggle="dropdown"
+              type="button">  Spark Jobs
+        </span>
+        <ul class="dropdown-menu" role="menu" style="width:200px;z-index:1002">
+           <li ng-class="{'option-disabled': !noteOperationsAllowed()}" ng-repeat="url in paragraph.runtimeInfos.jobUrl">
+             <a href="{{url}}" target="_blank"><span class="fa fa-external-link-square"></span> Jobs #{{$index}}</a>
+           </li>
+        </ul>
+      </span>-->
+
+      <button pButton type="button" pTooltip="{{(paragraph.config.editorHide ? '显示' : '隐藏')}}代码" tooltipPosition="bottom" icon="fa-arrows-alt"
+              (click)="this.toggleEditor(paragraph)"></button>
+
+      <button pButton type="button" pTooltip="{{(paragraph.config.tableHide ? '显示' : '隐藏')}}输出" tooltipPosition="bottom" icon="fa-columns"
+              (click)="this.toggleOutput(paragraph)"></button>
+
+      <button pButton type="button" pTooltip="全屏模式" tooltipPosition="bottom" icon="fa-desktop" (click)="display = true"></button>
+      <p-splitButton label="Setting" pTooltip="片段配置" tooltipPosition="bottom" icon="fa-cog" [model]="items"></p-splitButton>
+
+
+
+      <!--<ul class="dropdown-menu dropdown-menu-right" role="menu" style="width:270px;z-index:1002">
+        <li ng-controller="clipboardCtrl" ng-click="$event.stopPropagation()" style="text-align:center;margin-top:4px;">
+          <a  ngclipboard
+              ngclipboard-success="complete($event)"
+              ngclipboard-error="clipError($event)"
+              data-clipboard-text="{{paragraph.id}}"
+              tooltip-placement="top"
+              uib-tooltip="{{tooltip}}">
+            <span>{{paragraph.id}}</span>
+          </a>
+        </li>
+        <li role="separator" class="divider"></li>
+        <li style="padding-top:8px"
+            ng-if="paragraph.config.runOnSelectionChange == true || paragraph.config.runOnSelectionChange == false">
+          <span ng-if="paragraph.config.runOnSelectionChange == true" class="fa fa-toggle-on shortcut-icon" style="padding:3px 8px 8px 20px"></span>
+          <span ng-if="paragraph.config.runOnSelectionChange == false" class="fa fa-toggle-off shortcut-icon" style="padding:3px 8px 8px 20px"></span>Run on selection change
+          <form style="display:inline; float:right">
+            <input type="checkbox"
+                   style="width:16px; margin-right:20px"
+                   tooltip-placement="top" uib-tooltip="Even if you uncheck this, still can run the paragraph by pressing Enter"
+                   ng-checked="{{paragraph.config.runOnSelectionChange}}"
+                   ng-click="turnOnAutoRun(paragraph)"/>
+          </form>
+        </li>
+        <li>
+          <a ng-click="$event.stopPropagation()" class="dropdown">
+            <span style="margin-top: 2px;" class="fa fa-arrows-h shortcut-icon"></span>
+            <select style="margin-left:5px;float: right" ng-model="paragraph.config.colWidth"
+                    class="selectpicker"
+                    ng-change="changeColWidth(paragraph, paragraph.config.colWidth)"
+                    ng-options="col for col in colWidthOption"></select>
+            Width
+          </a>
+        </li>
+        <li>
+          <a ng-click="$event.stopPropagation()" class="dropdown">
+            <span class="fa fa-text-height shortcut-icon"></span>
+            <select style="margin-left:5px;float: right" ng-model="paragraph.config.fontSize"
+                    class="selectpicker"
+                    ng-change="changeFontSize(paragraph, paragraph.config.fontSize)"
+                    ng-options="s for s in fontSizeOption"></select>
+            Font size
+          </a>
+        </li>
+        <li>
+          <a ng-click="moveUp(paragraph)" ng-hide="$first"><span class="icon-arrow-up shortcut-icon"></span>
+            <span class="shortcut-keys">Ctrl+{{ isMac ? 'Option' : 'Alt'}}+K</span>
+            Move up
+          </a>
+        </li>
+        <li>
+          <a ng-click="moveDown(paragraph)" ng-hide="$last"><span class="icon-arrow-down shortcut-icon"></span>
+            <span class="shortcut-keys">Ctrl+{{ isMac ? 'Option' : 'Alt'}}+J</span>
+            Move down
+          </a>
+        </li>
+        <li>
+          <a ng-click="insertNew('below')"><span class="icon-plus shortcut-icon"></span>
+            <span class="shortcut-keys">Ctrl+{{ isMac ? 'Option' : 'Alt'}}+B</span>
+            Insert new
+          </a>
+        </li>
+        <li>
+          <a ng-click="copyParagraph(getEditorValue())"><span class="fa fa-copy shortcut-icon"></span>
+            <span class="shortcut-keys">Ctrl+Shift+C</span>
+            Clone paragraph
+          </a>
+        </li>
+        <li>
+          &lt;!&ndash; paragraph handler &ndash;&gt;
+          <a ng-click="hideTitle(paragraph)"
+             ng-show="paragraph.config.title"><span class="fa fa-font shortcut-icon"></span>
+            <span class="shortcut-keys">Ctrl+{{ isMac ? 'Option' : 'Alt'}}+T</span>
+            Hide title
+          </a>
+          <a ng-click="showTitle(paragraph)"
+             ng-show="!paragraph.config.title"><span class="fa fa-font shortcut-icon"></span>
+            <span class="shortcut-keys">Ctrl+{{ isMac ? 'Option' : 'Alt'}}+T</span>
+            Show title
+          </a>
+        </li>
+        <li>
+          <a ng-click="hideLineNumbers(paragraph)"
+             ng-show="paragraph.config.lineNumbers"><span class="fa fa-list-ol shortcut-icon"></span>
+            <span class="shortcut-keys">Ctrl+{{ isMac ? 'Option' : 'Alt'}}+M</span>
+            Hide line numbers
+          </a>
+          <a ng-click="showLineNumbers(paragraph)"
+             ng-show="!paragraph.config.lineNumbers"><span class="fa fa-list-ol shortcut-icon"></span>
+            <span class="shortcut-keys">Ctrl+{{ isMac ? 'Option' : 'Alt'}}+M</span>
+            Show line numbers
+          </a>
+        </li>
+        <li>
+          <a ng-click="toggleEnableDisable(paragraph)"><span class="icon-control-play shortcut-icon"></span>
+            <span class="shortcut-keys">Ctrl+ {{ isMac ? 'Option' : 'Alt'}}+R</span>
+            {{paragraph.config.enabled ? "Disable" : "Enable"}} run
+          </a>
+        </li>
+        <li>
+          <a ng-click="goToSingleParagraph()"><span class="icon-share-alt shortcut-icon"></span>
+            <span class="shortcut-keys">Ctrl+{{ isMac ? 'Option' : 'Alt'}}+W</span>
+            Link this paragraph
+          </a>
+        </li>
+        <li>
+          <a ng-click="clearParagraphOutput(paragraph)"><span class="fa fa-eraser shortcut-icon"></span>
+            <span class="shortcut-keys">Ctrl+{{ isMac ? 'Option' : 'Alt'}}+L</span>
+            Clear output
+          </a>
+        </li>
+        <li>
+          &lt;!&ndash; remove paragraph &ndash;&gt;
+          <a ng-click="removeParagraph(paragraph)" ng-if="note.paragraphs.length > 1"><span class="fa fa-times shortcut-icon"></span>
+            <span class="shortcut-keys">Ctrl+{{ isMac ? 'Option' : 'Alt'}}+D</span>
+            Remove
+          </a>
+        </li>
+      </ul>-->
+
+
+    </div>
+  </div>
+  <!-- editor -->
+  <div class="ui-g-12" *ngIf="!paragraph.config.editorHide && !viewOnly">
+    <p-sidebar [(visible)]="display" [fullScreen]="true">
+
+    </p-sidebar>
+
+    <!--<code-editor
+      paragraph-id="paragraph.id"
+      paragraph-context="paragraph"
+      dirty-text="dirtyText"
+      original-text="originalText"
+      on-load="aceLoaded"
+      revision-view="revisionView"
+      ng-click="onEditorClick()"
+    ></code-editor>-->
+
+    <div ace-editor #editor id="{{paragraph.id}}_editor"
+         [(text)]="text"
+         [mode]="'sql'"
+         [theme]="'eclipse'"
+         [options]="options"
+         [readOnly]="false"
+         [autoUpdateContent]="true"
+         [durationBeforeCallback]="1000"
+         (textChanged)="onChange($event)"
+         style="min-height: 200px; width:100%; overflow: auto;" (dblclick)="this.onEditorClick()"></div>
+
+  </div>
+  <!-- Processor Bar -->
+  <div class="ui-g-12">
+    <div id="{{paragraph.id}}_runControl" class="runControl">
+      <div id="{{paragraph.id}}_progress" class="progress" *ngIf="paragraph.status=='RUNNING'">
+
+        <p-progressBar [value]="this.getProgress()" *ngIf="this.getProgress()>0 && this.getProgress()<100 && paragraph.status=='RUNNING'"></p-progressBar>
+        <p-progressBar [value]="100" *ngIf="(this.getProgress()<=0 || this.getProgress()>=100) && (paragraph.status=='RUNNING' )"></p-progressBar>
+
+      </div>
+    </div>
+  </div>
+  <!-- form -->
+  <!--<div class="ui-g-12">
+    <form id="{{paragraph.id}}_form" role="form"
+          *ngIf="!paragraph.config.tableHide"
+          class=" paragraphForm form-horizontal row">
+      <div class="form-group ui-sm-6 ui-md-6 ui-lg-4"
+           *ngFor="formulaire in paragraph.settings.forms | toArray"
+           ng-init="loadForm(formulaire, paragraph.settings.params)">
+
+        <label class="control-label input-sm" ng-class="{'disable': paragraph.status == 'RUNNING' || paragraph.status == 'PENDING' }">{{formulaire.name}}</label>
+        <div>
+          <input class="form-control input-sm"
+                 ng-if="paragraph.settings.forms[formulaire.name].type == 'TextBox'"
+                 ng-enter="runParagraphFromButton(getEditorValue())"
+                 ng-model="paragraph.settings.params[formulaire.name]"
+                 ng-class="{'disable': paragraph.status == 'RUNNING' || paragraph.status == 'PENDING' }"
+                 name="{{formulaire.name}}" />
+        </div>
+        <div ng-if="paragraph.config.runOnSelectionChange == true">
+          <select class="form-control input-sm"
+                  ng-if="paragraph.settings.forms[formulaire.name].type == 'Select'"
+                  ng-change="runParagraphFromButton(getEditorValue())"
+                  ng-model="paragraph.settings.params[formulaire.name]"
+                  ng-class="{'disable': paragraph.status == 'RUNNING' || paragraph.status == 'PENDING' }"
+                  name="{{formulaire.name}}"
+                  ng-options="option.value as (option.displayName||option.value) for option in paragraph.settings.forms[formulaire.name].options">
+          </select>
+        </div>
+        <div ng-if="paragraph.config.runOnSelectionChange == false">
+          <select class="form-control input-sm"
+                  ng-if="paragraph.settings.forms[formulaire.name].type == 'Select'"
+                  ng-enter="runParagraphFromButton(getEditorValue())"
+                  ng-model="paragraph.settings.params[formulaire.name]"
+                  ng-class="{'disable': paragraph.status == 'RUNNING' || paragraph.status == 'PENDING' }"
+                  name="{{formulaire.name}}"
+                  ng-options="option.value as (option.displayName||option.value) for option in paragraph.settings.forms[formulaire.name].options">
+          </select>
+        </div>
+        <div ng-if="paragraph.config.runOnSelectionChange == true &&
+                paragraph.settings.forms[formulaire.name].type == 'CheckBox'">
+          <label ng-repeat="option in paragraph.settings.forms[formulaire.name].options"
+                 class="checkbox-item input-sm">
+            <input type="checkbox"
+                   ng-class="{'disable': paragraph.status == 'RUNNING' || paragraph.status == 'PENDING' }"
+                   ng-checked="paragraph.settings.params[formulaire.name].indexOf(option.value) > -1"
+                   ng-click="toggleCheckbox(formulaire, option, false); runParagraphFromButton(getEditorValue())"/> {{option.displayName||option.value}}
+          </label>
+        </div>
+        <div ng-if="paragraph.config.runOnSelectionChange == false &&
+                paragraph.settings.forms[formulaire.name].type == 'CheckBox'">
+          <label ng-repeat="option in paragraph.settings.forms[formulaire.name].options"
+                 class="checkbox-item input-sm">
+            <input type="checkbox"
+                   ng-class="{'disable': paragraph.status == 'RUNNING' || paragraph.status == 'PENDING' }"
+                   ng-checked="paragraph.settings.params[formulaire.name].indexOf(option.value) > -1"
+                   ng-enter="runParagraphFromButton(getEditorValue())"
+                   ng-click="toggleCheckbox(formulaire, option, false)"/> {{option.displayName||option.value}}
+          </label>
+        </div>
+      </div>
+    </form>
+  </div>-->
+  <!-- result -->
+  <div class="ui-g-12">
+
+    <!--<div class="tableDisplay"
+         *ngIf="!paragraph.config.tableHide"
+         ng-controller="ResultCtrl"
+         *ngFor="let result of paragraph.results.msg track by $index"
+         ng-init="init(result, paragraph.config.results[$index], paragraph, $index)"
+         ng-include src="'app/notebook/paragraph/result/result.html'">
+    </div>-->
+
+    <div id="{{paragraph.id}}_error" class="error text">
+      {{paragraph.errorMessage}}
+    </div>
+  </div>
+  <!-- footer -->
+  <div class="ui-g-12" *ngIf="!asIframe" style="margin-top: 8px">
+
+    <div *ngIf="!paragraph.config.tableHide && !viewOnly" id="{{paragraph.id}}_executionTime" class="executionTime">
+      {{this.getExecutionTime(paragraph)}}
+    </div>
+    <div *ngIf="paragraph.status === 'RUNNING'" class="paragraphFooterElapsed">
+      <div id="{{paragraph.id}}_elapsedTime" class="elapsedTime">
+        {{this.getElapsedTime(paragraph)}}
+      </div>
+    </div>
+
+  </div>
+
+</div>
+

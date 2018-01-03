@@ -5,7 +5,7 @@ import {SearchService} from "../../service/search/search.service";
 import {HttpClient} from "@angular/common/http";
 import {BaseUrlService} from "../../service/base-url/base-url.service";
 import {GlobalService} from "../../service/global/global.service";
-import {EventService} from "../../service/event/event.service";
+import {EventService1} from "../../service/event/event.service";
 import {Router} from "@angular/router";
 import {Ticket} from "../../model/Ticket";
 import {NoteListService} from "../../service/note-list/note-list.service";
@@ -48,7 +48,7 @@ export class NavbarComponent implements OnInit {
               public httpClient:HttpClient,
               public noteListFactory:NoteListService,
               public globalService:GlobalService,
-              public eventSevice:EventService,
+              public eventSevice:EventService1,
               public router:Router,
               /*TRASH_FOLDER_ID*/) {
 
@@ -118,7 +118,7 @@ export class NavbarComponent implements OnInit {
     this.httpClient.get(this.baseUrlSrv.getRestApiBase() + '/version')
       .subscribe(
         response => {
-          this.globalService.zeppelinVersion = response['body']
+          this.globalService.dataSmartVersion = response['body']
         },
         errorResponse => {
           console.log('Error %o %o', status, errorResponse.message)

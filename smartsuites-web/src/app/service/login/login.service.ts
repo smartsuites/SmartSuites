@@ -4,21 +4,27 @@ import {HttpClient} from "@angular/common/http";
 import {GlobalService} from "../global/global.service";
 import {BaseUrlService} from "../base-url/base-url.service";
 import {Ticket} from "../../model/Ticket";
+import {EventService1} from "../event/event.service";
 
 @Injectable()
 export class LoginService {
 
-  constructor(private router:Router,private httpClient:HttpClient,private globalService:GlobalService, private baseUrlSrv:BaseUrlService) {
+  constructor(private router:Router,
+              private httpClient:HttpClient,
+              private globalService:GlobalService,
+              private baseUrlSrv:BaseUrlService,
+              private eventService:EventService1) {
+
     let vm = this;
     //如果没有登录则返回到login
     this.router.events.subscribe({
       next: function (x) {
         if(x instanceof  NavigationStart){
           if( x.url.trim()=="/login" || x.url.trim()=="/register"){
-
+            // DO NOTHING
           }else{
             if(!vm.isLogin()){
-              this.router.navigate(['/login']);
+              vm.router.navigate(['/login']);
             }
           }
         }
@@ -43,9 +49,31 @@ export class LoginService {
     return this.globalService.ticket
   }
 
+  setRole(role:string){
+    this.globalService.role = role
+  }
+
+  getRole(){
+    return this.globalService.role
+  }
+
+  isAnalyst():boolean {
+    return this.globalService.role == 'analyst'
+  }
+
+  isBusiness():boolean {
+    return this.globalService.role == 'business'
+  }
+
+  isManager():boolean {
+    return this.globalService.role == 'manager'
+  }
+
   // 登录
   login():void {
     this.globalService.login = true
+    this.router.navigate(['/home']);
+    this.eventService.broadcast("loginSuccess")
     /*let config = {}
     this.httpClient.get(this.baseUrlSrv.getRestApiBase() + '/security/ticket', config)
       .subscribe(
@@ -94,7 +122,7 @@ export class LoginService {
   logout():void{
     this.globalService.ticket = new Ticket
     this.globalService.login = false
-    this.router.navigate(['/'])
+    this.router.navigate(['/login'])
   }
 
 }

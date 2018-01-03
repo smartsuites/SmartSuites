@@ -1,7 +1,22 @@
 import { Component, OnInit } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {BaseUrlService} from "../../service/base-url/base-url.service";
-import {NzNotificationService} from "ng-zorro-antd";
+import {MessageService} from "primeng/components/common/messageservice";
+//import {NzNotificationService} from "ng-zorro-antd";
+
+class Item{
+  key    : number;
+  name   : string;
+  value  : string;
+  desc   : string;
+
+  constructor(key: number, name: string, value: string, desc: string) {
+    this.key = key;
+    this.name = name;
+    this.value = value;
+    this.desc = desc;
+  }
+}
 
 @Component({
   selector: 'app-configuration',
@@ -10,11 +25,13 @@ import {NzNotificationService} from "ng-zorro-antd";
 })
 export class ConfigurationComponent implements OnInit {
 
-  configrations = []
+  selectedItem: Item;
+
+  configrations : Item[] = []
 
   constructor(public httpClient:HttpClient,
               public baseUrlSrv:BaseUrlService,
-              public alertService:NzNotificationService) { }
+              public messageService:MessageService) { }
 
   ngOnInit() {
     this.getConfigurations()
@@ -27,20 +44,18 @@ export class ConfigurationComponent implements OnInit {
         response => {
           var params = response['body']
           var keys = Object.keys(params)
+          var configs:Item[] = []
           for (var i = 0; i < keys.length; i ++) {
-            self.configrations.push({
-              key    : i,
-              name   : keys[i],
-              value  : params[keys[i]],
-              desc   : ''
-            })
+            configs.push(new Item(i,keys[i],params[keys[i]],""))
           }
+          self.configrations = configs
+
           //this.alertService.info('Get all configurations!', 'Success!')
         },
         errorResponse => {
           console.log('Error %o', errorResponse.status)
           if (errorResponse.status === 401) {
-            this.alertService.error('You don\'t have permission on this page!', 'Oops!');
+            //this.alertService.error('You don\'t have permission on this page!', 'Oops!');
 
             setTimeout(function () {
               window.location.href= this.baseUrlSrv.getBase()

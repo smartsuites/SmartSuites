@@ -2,15 +2,43 @@
 @import url(fonts/custom-font.css);
 @import url(fonts/google-fonts.css);
 
-/************** submenu  **************/
-.submenu{
-  padding: 8px 0px 8px 0px;
-  background-color: #ECECEC;
+/************** Login  **************/
+.show-pictures li,.show-pictures img{
+  width: 100% !important;
 }
 
-.submenu nz-breadcrumb {
-  float: left;
-  margin-top: 7px;
+.show-pictures .ui-widget-content{
+  border: none;
+}
+
+.show-pictures .ui-corner-all {
+  -moz-border-radius: 0px;
+  -webkit-border-radius: 0px;
+  border-radius: 0px;
+}
+
+.show-pictures .ui-galleria-caption{
+  left:0px;
+}
+
+/*************** Configure **************/
+.configuration td span{
+  width: 100%;
+  word-wrap: break-word;
+}
+
+/*************** interpreterBindings **************/
+.interpreterBindings .ui-panel-content{
+  padding: 0px !important;
+}
+
+.paragraphTitle .ui-inputtext:disabled {
+  background-color: #ffffff;
+}
+
+/************** notebook ******************/
+.notebook .ui-g-1, .notebook .ui-g-2, .notebook .ui-g-3, .notebook .ui-g-4, .notebook .ui-g-5, .notebook .ui-g-6, .notebook .ui-g-7, .notebook .ui-g-8, .notebook .ui-g-9, .notebook .ui-g-10, .notebook .ui-g-11, .notebook .ui-g-12 {
+  padding: 0px;
 }
 
 /* You can add global styles to this file, and also import other style files */

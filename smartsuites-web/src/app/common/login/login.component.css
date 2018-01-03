@@ -1,4 +1,4 @@
-.login-form {
+/*.login-form {
   max-width: 300px;
 }
 
@@ -8,8 +8,8 @@
 
 .login-form-button {
   width: 100%;
-}
+}*/
 
-nz-row{
-  margin-top: 5%;
+.login-body{
+  height:450px;
 }

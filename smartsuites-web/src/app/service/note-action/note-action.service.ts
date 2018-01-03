@@ -3,124 +3,112 @@ import {WebsocketMessageService} from "../websocket/websocket-message.service";
 import {Router} from "@angular/router";
 import {NoteRenameService} from "../note-rename/note-rename.service";
 import {NoteListService} from "../note-list/note-list.service";
+//import {NzModalService} from "ng-zorro-antd";
 
 @Injectable()
 export class NoteActionService {
 
-  constructor(public websocketMsgSrv:WebsocketMessageService,
-              public router:Router,
-              public noteRenameService:NoteRenameService,
-              public noteListFactory:NoteListService) { }
+  constructor(private websocketMsgSrv:WebsocketMessageService,
+              private router:Router,
+              private noteRenameService:NoteRenameService,
+              private noteListFactory:NoteListService,
+              /*private modalService:NzModalService*/) { }
 
   moveNoteToTrash(noteId, redirectToHome) {
-    /*BootstrapDialog.confirm({
+    /*this.modalService.confirm({
       closable: true,
       title: 'Move this note to trash?',
-      message: 'This note will be moved to <strong>trash</strong>.',
-      callback: function (result) {
-        if (result) {
-          this.websocketMsgSrv.moveNoteToTrash(noteId)
-          if (redirectToHome) {
-            this.router.navigate(['/'])
-          }
+      content: 'This note will be moved to <strong>trash</strong>.',
+      onOk(){
+        this.websocketMsgSrv.moveNoteToTrash(noteId)
+        if (redirectToHome) {
+          this.router.navigate(['/'])
         }
       }
     })*/
   }
 
   moveFolderToTrash(folderId) {
-    /*BootstrapDialog.confirm({
+    /*this.modalService.confirm({
       closable: true,
       title: 'Move this folder to trash?',
-      message: 'This folder will be moved to <strong>trash</strong>.',
-      callback: function (result) {
-        if (result) {
-          this.websocketMsgSrv.moveFolderToTrash(folderId)
-        }
+      content: 'This folder will be moved to <strong>trash</strong>.',
+      onOk(){
+        this.websocketMsgSrv.moveFolderToTrash(folderId)
       }
     })*/
   }
 
   removeNote = function (noteId, redirectToHome) {
-    /*BootstrapDialog.confirm({
-      type: BootstrapDialog.TYPE_WARNING,
+    this.modalService.confirm({
+      iconType: 'warning',
       closable: true,
       title: 'WARNING! This note will be removed permanently',
-      message: 'This cannot be undone. Are you sure?',
-      callback: function (result) {
-        if (result) {
-          this.websocketMsgSrv.deleteNote(noteId)
-          if (redirectToHome) {
-            this.router.navigate(['/'])
-          }
+      content: 'This cannot be undone. Are you sure?',
+      onOk(){
+        this.websocketMsgSrv.deleteNote(noteId)
+        if (redirectToHome) {
+          this.router.navigate(['/'])
         }
       }
-    })*/
+    })
   }
 
   removeFolder(folderId) {
-    /*BootstrapDialog.confirm({
-      type: BootstrapDialog.TYPE_WARNING,
+    /*this.modalService.confirm({
+      iconType: 'warning',
       closable: true,
       title: 'WARNING! This folder will be removed permanently',
-      message: 'This cannot be undone. Are you sure?',
-      callback: function (result) {
-        if (result) {
-          this.websocketMsgSrv.removeFolder(folderId)
-        }
+      content: 'This cannot be undone. Are you sure?',
+      onOk(){
+        this.websocketMsgSrv.removeFolder(folderId)
       }
     })*/
   }
 
   restoreAll = function () {
-    /*BootstrapDialog.confirm({
+    /*this.modalService.confirm({
       closable: true,
       title: 'Are you sure want to restore all notes in the trash?',
-      message: 'Folders and notes in the trash will be ' +
+      content: 'Folders and notes in the trash will be ' +
       '<strong>merged</strong> into their original position.',
-      callback: function (result) {
-        if (result) {
-          this.websocketMsgSrv.restoreAll()
-        }
+      onOk(){
+        this.websocketMsgSrv.restoreAll()
       }
     })*/
   }
 
   emptyTrash = function () {
-    /*BootstrapDialog.confirm({
-      type: BootstrapDialog.TYPE_WARNING,
+    /*this.modalService.confirm({
+      iconType: 'warning',
       closable: true,
       title: 'WARNING! Notes under trash will be removed permanently',
-      message: 'This cannot be undone. Are you sure?',
-      callback: function (result) {
-        if (result) {
-          this.websocketMsgSrv.emptyTrash()
-        }
+      content: 'This cannot be undone. Are you sure?',
+      onOk(){
+        this.websocketMsgSrv.emptyTrash()
       }
     })*/
   }
 
   clearAllParagraphOutput = function (noteId) {
-    /*BootstrapDialog.confirm({
+    /*this.modalService.confirm({
       closable: true,
       title: '',
-      message: 'Do you want to clear all output?',
-      callback: function (result) {
-        if (result) {
-          this.websocketMsgSrv.clearAllParagraphOutput(noteId)
-        }
+      content: 'Do you want to clear all output?',
+      onOk() {
+        this.websocketMsgSrv.clearAllParagraphOutput(noteId)
       }
     })*/
   }
 
   renameNote(noteId, notePath) {
-    this.noteRenameService.openRenameModal({
+    /*this.noteRenameService.openRenameModal({
       title: 'Rename note',
       oldName: notePath,
       callback: function (newName) {
         this.websocketMsgSrv.renameNote(noteId, newName)
       }
-    })
+    })*/
   }
 
   renameFolder(folderId) {

@@ -1,7 +1,7 @@
 import {EventEmitter, Injectable, OnInit} from '@angular/core';
 import {BaseUrlService} from "../base-url/base-url.service";
 import {Router} from "@angular/router";
-import {EventService} from "../event/event.service";
+import {EventService1} from "../event/event.service";
 import {GlobalService} from "../global/global.service";
 import {$WebSocket, WebSocketSendMode} from "angular2-websocket/angular2-websocket";
 
@@ -17,7 +17,7 @@ export class WebsocketEventService{
   // 平台初始启动
   platformFirstLoad = true;
 
-  constructor(public baseUrlSrv:BaseUrlService, public router:Router, public eventService:EventService, public globalService:GlobalService) {
+  constructor(public baseUrlSrv:BaseUrlService, public router:Router, public eventService:EventService1, public globalService:GlobalService) {
 
     this.websocket = new $WebSocket(this.baseUrlSrv.getWebsocketUrl())
 
@@ -53,12 +53,12 @@ export class WebsocketEventService{
         let op = payload.op
         let data = payload.data
         if (op === 'NOTE') {
-          // Home加载Notes
+          // 加载具体的Note信息
           vm.eventService.broadcast('setNoteContent', data.note)
         } else if (op === 'NEW_NOTE') {
           vm.router.navigate(['/notebook/' + data.note.id])
         } else if (op === 'NOTES_INFO') {
-          // NavBar 加载Notes
+          // 启动加载Notes
           vm.eventService.broadcast('setNoteMenu', data.notes)
         } else if (op === 'LIST_NOTE_JOBS') {
           // TODO $rootScope.$emit('jobmanager:set-jobs', data.noteJobs)
@@ -140,6 +140,7 @@ export class WebsocketEventService{
         } else if (op === 'NOTE_REVISION') {
           vm.eventService.broadcast('noteRevision', data)
         } else if (op === 'INTERPRETER_BINDINGS') {
+          //获取当前Note的Bing信息
           vm.eventService.broadcast('interpreterBindings', data)
         } else if (op === 'ERROR_INFO') {
           //TODO show

@@ -1,0 +1,80 @@
+
+<div class="show-pictures">
+  <p-galleria [images]="images" autoPlay="true" panelWidth="100%" panelHeight="{{height}}" [showFilmstrip]="false" [showCaption]="true"></p-galleria>
+</div>
+
+<div class="login-body">
+  <!--<div class="login-image"></div>-->
+  <div class="card login-panel ui-fluid" style="height:450px">
+
+    <!-- 登录 -->
+    <div class="login-panel-content" *ngIf="formType==0">
+      <div class="ui-g">
+        <div class="ui-g-3" style="text-align:left;">
+          <img src="assets/layout/images/login/icon-login.svg"/>
+        </div>
+        <div class="ui-g-9" style="text-align:right;">
+          <h2 class="welcome-text">欢迎您</h2>
+          <span class="guest-sign-in">登陆 DATASMART 数据平台</span>
+        </div>
+        <div class="ui-g-12" style="text-align:left;">
+          <label class="login-label">用户名称</label>
+          <div class="login-input">
+            <input type="text" class="ui-inputtext ui-widget ui-state-default ui-corner-all"/>
+          </div>
+        </div>
+        <div class="ui-g-12" style="text-align:left;">
+          <label class="login-label">用户密码</label>
+          <div class="login-input">
+            <input type="password" class="ui-inputtext ui-widget ui-state-default ui-corner-all"/>
+          </div>
+        </div>
+        <div class="ui-g-12" style="text-align:left;">
+          <label class="login-label">用户角色</label>
+          <div style="color: black">
+            <p-dropdown [options]="roles" [(ngModel)]="selectedRole" [autoWidth]="false"></p-dropdown>
+          </div>
+        </div>
+
+        <div class="ui-g-12 ui-md-6 button-pane">
+          <button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only"
+                  role="button" aria-disabled="false" (click)="this._submitLoginForm()">
+            <span class="ui-button-text ui-c">登  录</span>
+          </button>
+        </div>
+        <div class="ui-g-12 ui-md-6 link-pane">
+          <a (click)="this.showForgetForm()">忘记密码?</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 找回密码 -->
+    <div class="login-panel-content" *ngIf="formType==2">
+      <div class="ui-g">
+        <div class="ui-g-3" style="text-align:left;">
+          <img src="assets/layout/images/login/icon-login.svg"/>
+        </div>
+        <div class="ui-g-9" style="text-align:right;">
+          <h2 class="welcome-text">欢迎您</h2>
+          <span class="guest-sign-in">找回 DATASMART 数据平台密码</span>
+        </div>
+        <div class="ui-g-12" style="text-align:left;">
+          <label class="login-label">用户邮箱</label>
+          <div class="login-input">
+            <input type="text" class="ui-inputtext ui-widget ui-state-default ui-corner-all"/>
+          </div>
+        </div>
+        <div class="ui-g-12 ui-md-6 button-pane">
+          <button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only"
+                  role="button" aria-disabled="false">
+            <span class="ui-button-text ui-c">找回密码</span>
+          </button>
+        </div>
+        <div class="ui-g-12 ui-md-6 link-pane">
+          <a (click)="this.showLoginForm()">返回登录</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

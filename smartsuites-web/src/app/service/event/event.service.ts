@@ -3,7 +3,7 @@ import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {Observable} from "rxjs/Observable";
 
 @Injectable()
-export class EventService {
+export class EventService1 {
 
   private _topic
 

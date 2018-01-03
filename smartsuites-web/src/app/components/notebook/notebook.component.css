@@ -1,0 +1,57 @@
+
+.editmodel {
+  padding: 0px;
+  font-size: 30px;
+  font-weight: 500;
+  width: 100%;
+  margin-bottom: 10px;
+  margin-left: 5px;
+}
+
+.showmodel {
+  padding: 0px;
+  font-size: 30px;
+  font-weight: 500;
+  width: 100%;
+  border: none;
+  background-color: #eff2f6;
+  box-shadow: none;
+  margin-bottom: 10px;
+  margin-left: 5px;
+}
+
+.ui-inputtext:disabled {
+  background-color: #eff2f6 !important;
+}
+
+.interpreterBindings ul li {
+  padding: 15px 15px;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.interpreterBindings ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+
+
+.notebook .card .card-w-title{
+  padding:8px;
+}
+
+.notebook .card{
+  margin-bottom: 0px;
+}
+
+.notebook .new-paragraph:hover{
+  text-align: center;
+  background-color: #83b8d2;
+  font-size: 8px;
+}
+
+.notebook .new-paragraph{
+  text-align: center;
+  font-size: 8px;
+}
