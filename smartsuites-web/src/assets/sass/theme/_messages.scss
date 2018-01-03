@@ -1,0 +1,150 @@
+body {
+    .ui-messages {
+        .ui-messages-icon {
+            .ui-messages-icon {
+                font-size: 2em;
+            }
+        }
+        
+        &.ui-messages-info {
+            display: none;
+            background-color: $infoMessageBgColor;
+            border-color: $infoMessageBorderColor;
+            color: $infoMessageTextColor;
+            
+            .ui-messages-icon {
+                color: darken($infoMessageBgColor, 30%);
+            }
+            
+            .ui-messages-close {
+                .fa {
+                    color:  $infoMessageTextColor;
+                }
+            }
+        }
+        
+        &.ui-messages-warn {
+            background-color: $warnMessageBgColor;
+            border-color: $warnMessageBorderColor;
+            color: $warnMessageTextColor;
+            
+            .ui-messages-icon {
+                color: darken($warnMessageBgColor, 30%);
+            }
+                        
+            .ui-messages-close {
+                .fa {
+                    color:  $warnMessageTextColor;
+                }
+            }
+        }
+        
+        &.ui-messages-error {
+            background-color: $errorMessageBgColor;
+            border-color: $errorMessageBorderColor;
+            color: $errorMessageTextColor;
+            
+            .ui-messages-icon {
+                color: darken($errorMessageBgColor, 30%);
+            }
+            
+            .ui-messages-close {
+                .fa {
+                    color:  $errorMessageTextColor;
+                }
+            }
+        }
+        
+        &.ui-messages-success {
+            background-color: $successMessageBgColor;
+            border-color: $successMessageBorderColor;
+            color: $successMessageTextColor;
+            
+            .ui-messages-icon {
+                color: darken($successMessageBgColor, 20%);
+            }
+
+            .ui-messages-close {
+                .fa {
+                    color:  $successMessageTextColor;
+                }
+            }
+        }
+        
+        .ui-messages-close {
+            @include opacity(.2);
+            font-size: 1.5em;
+            
+            &:hover {
+                @include opacity(.5);
+            }
+        }
+    }
+        
+    .ui-growl {
+        top: 85px;
+        
+        .ui-growl-item-container {
+            @include opacity(.95);
+            @include overlay-shadow();
+            border: 1px solid;
+            
+            .ui-growl-message {
+                margin-left: 4em;
+            }
+
+            .ui-growl-image {
+                font-size: 2.769em;
+            }
+            
+            .ui-growl-icon-close {
+                @include opacity(.2);
+                
+                &:hover {
+                    @include opacity(.5);
+                }
+            }
+            
+            &.ui-growl-message-info {
+                background-color: $infoMessageBgColor;
+                border-color: $infoMessageBorderColor;
+                color: $infoMessageTextColor;
+                
+                .ui-growl-image {
+                    color: darken($infoMessageBgColor, 30%);
+                }
+            }  
+            
+            &.ui-growl-message-warn {
+                background-color: $warnMessageBgColor;
+                border-color: $warnMessageBorderColor;
+                color: $warnMessageTextColor;
+                
+                .ui-growl-image {
+                    color: darken($warnMessageBgColor, 30%);
+                }
+            }
+            
+            &.ui-growl-message-error {
+                background-color: $errorMessageBgColor;
+                border-color: $errorMessageBorderColor;
+                color: $errorMessageTextColor;
+                
+                .ui-growl-image {
+                    color: darken($errorMessageBgColor, 30%);
+                }
+            }
+            
+            &.ui-growl-message-success {
+                background-color: $successMessageBgColor;
+                border-color: $successMessageBorderColor;
+                color: $successMessageTextColor;
+                
+                .ui-growl-image {
+                    color: darken($successMessageBgColor, 20%);
+                }
+            }  
+        }
+    }
+    
+}

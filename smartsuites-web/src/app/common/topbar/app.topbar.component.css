@@ -1,0 +1,11 @@
+.active-top-connected{
+  color: #74fd74;
+}
+
+.active-top-disconnected{
+  color: red;
+}
+
+.connectStatus{
+  font-size: larger;
+}

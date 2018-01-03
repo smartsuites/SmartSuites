@@ -1,0 +1,51 @@
+<div class="profile" [ngClass]="{'profile-expanded':active}">
+  <a href="#" (click)="onClick($event)">
+    <img class="profile-image" src="assets/layout/images/avatar5.png" />
+    <span class="profile-name">用户ID: {{this.loginSerivce.getLoginUsername()}}</span>
+    <i class="fa fa-fw fa-caret-down"></i>
+    <span class="profile-role">分析人员</span>
+  </a>
+</div>
+
+<ul id="profile-menu" class="layout-menu" [@menu]="active ? 'visible' : 'hidden'">
+  <li role="menuitem">
+    <a href="#" [attr.tabindex]="!active ? '-1' : null">
+      <i class="fa fa-fw fa-user"></i>
+      <span>用户配置</span>
+    </a>
+    <div class="layout-menu-tooltip">
+      <div class="layout-menu-tooltip-arrow"></div>
+      <div class="layout-menu-tooltip-text">Profile</div>
+    </div>
+  </li>
+  <!--<li role="menuitem">
+    <a href="#" [attr.tabindex]="!active ? '-1' : null">
+      <i class="fa fa-fw fa-user-secret"></i>
+      <span>Privacy</span>
+    </a>
+    <div class="layout-menu-tooltip">
+      <div class="layout-menu-tooltip-arrow"></div>
+      <div class="layout-menu-tooltip-text">Privacy</div>
+    </div>
+  </li>
+  <li role="menuitem">
+    <a href="#" [attr.tabindex]="!active ? '-1' : null">
+      <i class="fa fa-fw fa-cog"></i>
+      <span>平台配置</span>
+    </a>
+    <div class="layout-menu-tooltip">
+      <div class="layout-menu-tooltip-arrow"></div>
+      <div class="layout-menu-tooltip-text">平台配置</div>
+    </div>
+  </li>-->
+  <li role="menuitem">
+    <a href="#" [attr.tabindex]="!active ? '-1' : null" (click)="this.loginSerivce.logout()">
+      <i class="fa fa-fw fa-sign-out"></i>
+      <span>退出登录</span>
+    </a>
+    <div class="layout-menu-tooltip">
+      <div class="layout-menu-tooltip-arrow"></div>
+      <div class="layout-menu-tooltip-text">退出登录</div>
+    </div>
+  </li>
+</ul>

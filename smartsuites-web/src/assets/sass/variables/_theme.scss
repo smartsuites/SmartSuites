@@ -1,0 +1,116 @@
+@import './_common';
+
+/* Icons */
+$iconFontSize:1em;
+$iconWidth:1.1em;
+
+/* Error */
+$errorColor:#a94442;
+$disabledColor:#eeeeee;
+
+/*  Invalid Input */
+$inputInvalidBorderColor:#b94a48;
+$inputInvalidBgColor:#ffffff;
+
+/* Headers */
+$headerPadding: 0.714em 1.071em;
+
+/* Contents */
+$contentPadding: 1.071em;
+$contentBorderColor:#dddddd;
+$contentBgColor:#ffffff;
+$contentLineHeight:1.43;
+
+/* Forms */
+$inputBgColor:#ffffff;
+$inputPadding: 0.429em 0.857em;
+$inputBorderColor:#cccccc;
+$inputHoverBorderColor:#cccccc;
+$inputGroupAddonBgColor:#e6e6e6;
+
+/* Buttons */
+$buttonTextColor:#ffffff;
+$toggleButtonBgColor:#ffffff;
+$toggleButtonBorderColor:#cccccc;
+$toggleButtonHoverBgColor:#e6e6e6;
+$toggleButtonHoverBorderColor:#adadad;
+
+/* List Items */
+$listItemPadding:0.429em 1.429em;
+$listItemHoverBgColor:#f5f5f5;
+$listItemHoverTextColor:#292B2C;
+
+/* Messages */
+$infoMessageBgColor:#d9edf7;
+$infoMessageBorderColor:#bce8f1;
+$infoMessageTextColor:#31708f;
+$successMessageBgColor:#dff0d8;
+$successMessageBorderColor:#d6e9c6;
+$successMessageTextColor:#3c763d;
+$warnMessageBgColor:#fcf8e3;
+$warnMessageBorderColor:#faebcc;
+$warnMessageTextColor:#8a6d3b;
+$errorMessageBgColor:#f2dede;
+$errorMessageBorderColor:#ebccd1;
+$errorMessageTextColor:#a94442;
+$fatalMessageBgColor:#999999;
+$fatalMessageBorderColor:#6b6b6b;
+$fatalMessageTextColor:#ffffff;
+
+/* Overlays */
+$overlayBorderColor:#cccccc;
+
+/* Data */
+$datatableHeaderBgColor:#ffffff;
+$datatableFooterBgColor:#ffffff;
+$datatableCellBorderColor:#dddddd;
+$datatableCellPadding:0.643em;
+$paginatorBgColor:#ffffff;
+
+/* TabView */
+$tabHeaderPadding:.6em 1em;
+
+/* Panel */
+$panelContentBorderColor:#DCE1E7;
+
+/* Buttons */
+$successButtonBgColor:#5cb85c;
+$successButtonBorderColor:#4cae4c;
+$successButtonTextColor:#ffffff;
+$successButtonHoverBgColor:#449d44;
+$successButtonHoverBorderColor:#398439;
+$successButtonFocusBgColor:#449d44;
+$successButtonFocusBorderColor:#398439;
+$successButtonActiveBgColor:#449d44;
+$successButtonActiveBorderColor:#398439;
+
+$infoButtonBgColor:#5bc0de;
+$infoButtonBorderColor:#46b8da;
+$infoButtonTextColor:#ffffff;
+$infoButtonHoverBgColor:#31b0d5;
+$infoButtonHoverBorderColor:#269abc;
+$infoButtonFocusBgColor:#31b0d5;
+$infoButtonFocusBorderColor:#269abc;
+$infoButtonActiveBgColor:#269abc;
+$infoButtonActiveBorderColor:#1b6d85;
+
+$warningButtonBgColor:#f0ad4e;
+$warningButtonBorderColor:#eea236;
+$warningButtonTextColor:#ffffff;
+$warningButtonHoverBgColor:#ec971f;
+$warningButtonHoverBorderColor:#d58512;
+$warningButtonFocusBgColor:#ec971f;
+$warningButtonFocusBorderColor:#d58512;
+$warningButtonActiveBgColor:#d58512;
+$warningButtonActiveBorderColor:#985f0d;
+
+$dangerButtonBgColor:#d9534f;
+$dangerButtonBorderColor:#d43f3a;
+$dangerButtonTextColor:#ffffff;
+$dangerButtonHoverBgColor:#c9302c;
+$dangerButtonHoverBorderColor:#ac2925;
+$dangerButtonFocusBgColor:#c9302c;
+$dangerButtonFocusBorderColor:#ac2925;
+$dangerButtonActiveBgColor:#ac2925;
+$dangerButtonActiveBorderColor:#761c19;
+

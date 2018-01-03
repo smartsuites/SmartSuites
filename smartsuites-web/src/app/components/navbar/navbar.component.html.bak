@@ -1,0 +1,161 @@
+
+<!--
+  ~ Copyright (c) 2017. 联思智云（北京）科技有限公司. All rights reserved.
+  -->
+
+<div tolerance="10" offset="30" class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand navbar-logo" routerLink="/">
+        <img style="margin-top: -7px;" src="assets/images/zepLogoW.png" width="50" alt="Zeppelin"/>
+      </a>
+      <a class="navbar-brand navbar-title" routerLink="/">
+        <span>SmartSuites</span>
+      </a>
+    </div>
+
+    <!--TODO-->
+    <!--<div class="collapse navbar-collapse" ng-controller="NavCtrl as navbar">-->
+    <div class="collapse navbar-collapse">
+      <ul class="nav navbar-nav" *ngIf="ticket">
+
+        <!-- menu: Notebook -->
+        <li class="dropdown notebook-list-dropdown" uib-dropdown>
+          <a class="navbar-menu navbar-menu-notebook dropdown-toggle"
+             data-toggle="dropdown" uib-dropdown-toggle>
+            <span>Notebook</span>
+            <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu">
+
+            <!--<li ng-controller="NoteCreateCtrl as noteCreateCtrl">-->
+            <li>
+              <a href="" data-toggle="modal" data-target="#noteCreateModal" (click)="noteCreateCtrl.getInterpreterSettings()">
+                <i class="fa fa-plus"></i>
+                Create new note
+              </a>
+            </li>
+            <li class="divider hidden-xs"></li>
+
+            <!-- 生成已有的Note列表 -->
+            <div id="notebook-list" class="scrollbar-container">
+
+              <input type="text"
+                     class="note-name-query form-control"
+                     (click)="$event.stopPropagation()"
+                     placeholder="Filter"
+                     [(ngModel)]="query.q"/>
+
+              <div *ngIf="!query.q || query.q === ''">
+                <!--<li *ngFor="let node of notes.root.children | orderBy:node:false:navbar.arrayOrderingSrv.noteComparator track by node.id"-->
+                <li *ngFor="let node of notes.root.children" [ngClass]="{'active' : isActive(node.id)}"
+                    ng-include="'components/navbar/navbar-note-list-elem.html'" >
+                  jjjjjjjjjjjjj
+                </li>
+              </div>
+              <div *ngIf="query.q">
+                <!--<li *ngFor="let node of navbar.notes.flatList | filter : query.q | orderBy:navbar.arrayOrderingSrv.noteFlatListOrdering track by node.id"-->
+                <li *ngFor="let node of navbar.notes.flatList" [ngClass]="{'active' : isActive(node.id)}"
+                  ng-include="'components/navbar/navbar-note-list-elem.html'">
+                  sdds
+                </li>
+              </div>
+            </div>
+          </ul>
+        </li>
+        <!-- menu: Job -->
+        <li>
+          <a class="navbar-menu navbar-menu-job" routerLink="/jobmanager">
+            <span>Job</span>
+          </a>
+        </li>
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right" style="margin-right:5px;">
+
+        <!-- search -->
+        <li class="nav-component" *ngIf="ticket">
+
+          <form role="search" data-ng-model="navbar.searchForm"
+                style="display: inline-block; margin: 0px"
+                class="navbar-form"
+                (ngSubmit)="search(navbar.searchForm.searchTerm)">
+
+            <div class="input-group">
+              <input type="text" name="searchTerm" [(ngModel)]="searchForm.searchTerm" ng-disabled="!connected" class="form-control navbar-search" placeholder="Search your notes" id="navbar-search">
+              <span class="input-group-btn">
+                <button type="submit" class="btn btn-default" ng-disabled="!connected || !searchForm.searchTerm" disabled="disabled">
+                  <i class="glyphicon glyphicon-search"></i>
+                </button>
+              </span>
+            </div>
+
+          </form>
+        </li>
+
+        <li style="margin-left: 10px;">
+          <div class="dropdown">
+            <i *ngIf="connected" class="fa fa-circle server-connected" uib-tooltip="WebSocket Connected" tooltip-placement="bottom" style="margin-top: 7px; margin-right: 0px; vertical-align: top"></i>
+            <i *ngIf="!connected" class="fa fa-circle server-disconnected" uib-tooltip="WebSocket Disconnected" tooltip-placement="bottom" style="margin-top: 7px; vertical-align: top"></i>
+            <button *ngIf="ticket" class="nav-btn dropdown-toggle" type="button" data-toggle="dropdown" style="margin:11px 5px 0 0; padding-left: 0px;">
+              <span class="username">{{ticket.screenUsername}}</span>
+              <span class="caret" style="margin-bottom: 8px"></span>
+            </button>
+            <span *ngIf="!ticket" style="margin: 5px;"></span>
+            <ul class="dropdown-menu">
+              <li><a href="" data-toggle="modal" data-target="#aboutModal">About SmartSuites</a></li>
+              <li role="separator" style="margin: 5px 0;" class="divider"></li>
+              <li><a routerLink="/interpreter">Interpreter</a></li>
+              <li><a routerLink="/notebookRepos">Notebook Repos</a></li>
+              <li><a routerLink="/credential">Credential</a></li>
+              <li><a routerLink="/helium">Helium</a></li>
+              <li><a routerLink="/configuration">Configuration</a></li>
+              <li *ngIf="ticket.principal && ticket.principal !== 'anonymous'" role="separator" style="margin: 5px 0;" class="divider"></li>
+              <li *ngIf="ticket.principal && ticket.principal !== 'anonymous'"><a (click)="logout()">Logout</a>
+              </li>
+            </ul>
+          </div>
+        </li>
+        <li class="nav-component" *ngIf="!ticket">
+          <button class="btn nav-login-btn" data-toggle="modal" data-target="#loginModal" (click)="showLoginWindowFunc()">Login</button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- about dialog -->
+<div id="aboutModal" class="modal fade" role="dialog" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <!-- about dialog header -->
+      <div class="modal-header modal-header-about">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">关于 SmartSuites</h4>
+      </div>
+
+      <!-- about dialog body -->
+      <div class="modal-body modal-body-about">
+        <div class="hidden-xs col-sm-4 logo">
+          <img src="assets/images/zepLogo.png" alt="Apache Zeppelin" title="Apache Zeppelin"/>
+        </div>
+        <div class="col-xs-12 col-sm-8 content">
+          <h3>SmartSuites</h3>
+          <br/>
+          <span id="i18n-14">Version</span>
+          <span class="modal-body-about-version"> {{globalService.zeppelinVersion}} </span>
+          <br/>
+          <br/>
+          <a href="http://www.baidu.com" target="_blank"><span id="i18n-15">Get involved!</span></a><br/>
+          <br/>
+          <a href="http://www.baidu.com" target="_blank"><span id="i18n-16">CopyRight @2017 联思智云(北京)科技有限公司</span></a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

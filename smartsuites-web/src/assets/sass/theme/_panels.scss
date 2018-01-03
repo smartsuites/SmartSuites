@@ -1,0 +1,325 @@
+body {
+    .ui-panel {
+        padding: 0;
+        border: 0 none;
+        
+        .ui-panel-titlebar {
+            border: 1px solid $headerBorderColor;
+            border-bottom: 1px solid $headerBorderColor;
+            padding: $headerPadding;
+            @include border-radius-top($borderRadius);
+            @include border-radius-bottom(0px);
+            
+            .ui-panel-title {
+                line-height: 1.5em;
+                margin: 0;
+                font-size: 1.143em;
+            }
+            
+            .ui-panel-titlebar-icon {
+                margin: 0;
+                font-size: $fontSize + 3;
+                color: $headerIconColor;
+                border: 1px solid transparent;
+                @include transition(color $transitionDuration);
+                
+                &:hover {
+                    color: $headerIconHoverColor;
+                }
+            }
+        }
+        
+        .ui-panel-content {
+            border: 1px solid $panelContentBorderColor;
+            border-top: 0 none;
+            line-height: $contentLineHeight;
+            padding: $contentPadding;
+        }
+        
+        .ui-panel-footer {
+            padding: $headerPadding;
+            border: 1px solid $contentBorderColor;
+            border-top: 0 none;
+            margin: 0;
+        }
+        
+        &.ui-panel-collapsed-h {
+            .ui-panel-titlebar {
+                padding-left: 40px;
+            }
+        }
+    }
+    
+    .ui-fieldset {         
+        padding: 0 0 .5em 0;
+               
+        .ui-fieldset-legend {
+            color: $headerTextColor;
+            background-color: $headerBgColor;
+            margin-left: .714em;
+            border: 1px solid $headerBorderColor;
+            
+            .ui-fieldset-toggler {
+                float: none;
+                display: inline-block;
+                vertical-align: middle;
+                margin: 0 0.286em;
+                height: $fontSize;
+                margin-top: 0;
+                padding: 0;
+                color: $headerIconColor;
+            }
+        }
+        
+        &.ui-fieldset-toggleable {
+            .ui-fieldset-legend {
+                &:hover, &:focus {
+                    background-color: $headerHoverBgColor;
+                    border-color: $headerHoverBorderColor;
+                    
+                    .ui-fieldset-toggler {
+                        color: $headerIconHoverColor;
+                    }
+                }
+            }
+        }
+        
+        .ui-fieldset-content {
+            padding: $contentPadding;
+        }
+    }
+    
+    .ui-notificationbar {
+        background-color: $primaryColor;
+        color: #ffffff;
+    }
+    
+    .ui-accordion {
+        .ui-accordion-header {
+            background-color: $headerBgColor;
+            padding: 0;
+            color: $textColor;
+            font-size: $fontSize;
+            border: 1px solid $headerBorderColor;
+            margin-bottom: 0;
+            font-weight: bold;
+            margin-top: 0.357em;
+            
+            &:not(.ui-state-active):not(.ui-state-disabled) > a:hover {
+                border-color: $headerHoverBorderColor;
+                background-color: $headerHoverBgColor;
+            }
+                        
+            &.ui-state-active {
+                @include border-radius-bottom(0);
+            }
+            
+            > a {
+                padding: $headerPadding;
+                font-size: $fontSize + 2;
+                color: $textColor;
+                outline: 0 none;   
+                
+                &:focus {
+                    border-color: $headerHoverBorderColor;
+                    background-color: $headerHoverBgColor;
+                } 
+                
+                .ui-accordion-header-text {
+                    vertical-align: middle;
+                }
+                
+                .ui-accordion-toggle-icon {
+                    color: $textColor;
+                    vertical-align: middle;
+                    
+                    &.fa-caret-right {
+                        @include icon_override("\f054");
+                        font-size: $fontSize + 2;
+                        
+                    }
+                    
+                    &.fa-caret-down {
+                        @include icon_override("\f078");
+                        font-size: $fontSize + 2;
+                    }
+                }
+            }
+        }
+        
+        .ui-accordion-content {
+            padding: $contentPadding;
+        }
+    }
+    
+    .ui-tabview {
+        padding: 0;
+        
+        &.ui-tabview-top, &.ui-tabview-bottom, &.ui-tabview-left, &.ui-tabview-right {
+            border: 0 none;
+            background: transparent;
+            
+            .ui-tabview-nav {
+                padding: 0;
+                border: 0 none;
+                background: $contentBgColor;
+                @include border-radius(0);
+                
+                li {
+                    position: static;
+                    @include border-radius(0);
+                    margin: 0;
+                    box-sizing: border-box;
+                    background: $contentBgColor;
+                    border: 1px solid transparent;
+                    
+                    a {
+                        padding: $headerPadding;
+                        color: $primaryColor;
+                        font-weight: normal;
+                        
+                        .ui-tabview-left-icon {
+                            margin-right: .25em;
+                        }
+                        
+                        .ui-tabview-right-icon {
+                            margin-left: .25em;
+                        }
+                    }
+                    
+                    .ui-tabview-close {
+                        margin-top: .65em;
+                    }
+                    
+                    &:not(.ui-state-active):not(.ui-state-disabled):hover {
+                        background-color: $headerBgColor;
+                        
+                        .fa-times {
+                            color: $headerIconHoverColor;
+                        }
+                    }
+                                        
+                    &.ui-state-active {
+                        border: 1px solid $headerBorderColor;
+                        background-color: #ffffff;
+                    }
+                }
+            }
+        }
+        
+        
+        &.ui-tabview-top {
+            .ui-tabview-nav {
+                li {
+                    margin-right: 2px;
+                    border-bottom: 1px solid $headerBorderColor;
+                    @include border-radius-top($borderRadius);
+                    @include border-radius-bottom(0);
+                    
+                    &.ui-state-active {
+                        border-bottom-color: $contentBgColor;
+                    }
+                }
+            }
+            
+            .ui-tabview-panels {
+                border-top: 1px solid $contentBorderColor;
+                margin-top: -1px;
+            }
+        }
+        
+        &.ui-tabview-left,&.ui-tabs-right {
+            .ui-tabview-nav {
+                width: 25%;
+                
+                li {
+                    width: 100%;
+                }
+            }  
+        }
+        
+        &.ui-tabview-left {
+            .ui-tabview-nav {
+                li {
+                    margin-bottom: 2px;
+                    border-right: 1px solid $headerBorderColor;
+                    @include border-radius-left($borderRadius);
+                    @include border-radius-right(0);
+                    
+                    &.ui-state-active {
+                        border-right-color: $contentBgColor;
+                    }
+                }
+            }
+                        
+            .ui-tabview-panels {
+                position: relative;
+                left: -1px;
+                border-left: 1px solid $contentBorderColor;
+            }
+        }
+        
+        &.ui-tabview-right {
+            .ui-tabview-nav {
+                li {
+                    margin-bottom: 2px;
+                    border-left: 1px solid $headerBorderColor;
+                    @include border-radius-right($borderRadius);
+                    @include border-radius-left(0);
+                    
+                    &.ui-state-active {
+                        border-left-color: $contentBgColor;
+                    }
+                }
+            }
+                        
+            .ui-tabview-panels {
+                position: relative;
+                right: -1px;
+                border-right: 1px solid $contentBorderColor;
+            }
+        }
+        
+        &.ui-tabview-bottom {
+            .ui-tabview-nav {
+                li {
+                    margin-right: 2px;
+                    border-top-color: transparent;    
+                    @include border-radius-bottom($borderRadius);
+                    @include border-radius-top(0);
+                    
+                    &.ui-state-active {
+                        border-top-color: $contentBgColor; 
+                    }
+                }
+            }
+            
+            .ui-tabview-panels {
+                border-bottom: 1px solid $contentBorderColor;
+                margin-bottom: 1px;
+            }  
+        }
+        
+        .ui-tabs-panel {
+            padding: $contentPadding;
+        }
+    }
+    
+    .ui-toolbar {
+        background-color: $headerBgColor;
+        border-color: $contentBorderColor;
+        padding: $headerPadding;
+    }
+}
+
+@media (max-width: 640px) {
+    body {
+        .ui-panelgrid {
+            .ui-grid-responsive {
+                .ui-grid-row {
+                    border: 0 none;
+                }
+            }
+        }
+    }
+}
