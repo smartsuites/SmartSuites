@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {AfterViewInit, Component, ElementRef, OnInit, Renderer2, ViewChild} from '@angular/core';
 import {EventService1} from "../../service/event/event.service";
 import {WebsocketMessageService} from "../../service/websocket/websocket-message.service";
 import {ActivatedRoute, Params, Router} from "@angular/router";
@@ -12,7 +12,11 @@ import {SaveAsService} from "../../service/save-as/save-as.service";
 import {isParagraphRunning} from "./paragraph/paragraph.status";
 import {ArrayOrderingService} from "../../service/array-ordering/array-ordering.service";
 import {Car} from "../../demo/domain/car";
-import {isUndefined} from "util";
+import * as moment from "moment";
+import {Constants} from "../../model/Constants";
+import {MessageService} from "primeng/components/common/messageservice";
+import {CommonService} from "../../service/common/common.service";
+import {ConfirmationService} from "primeng/primeng";
 
 @Component({
   selector: 'app-notebook',
@@ -20,6 +24,7 @@ import {isUndefined} from "util";
   styleUrls: ['./notebook.component.css']
 })
 export class NotebookComponent implements OnInit {
+
 
   /**************** 更新Note名称 START ***************/
   titleEditor = false
@@ -45,19 +50,16 @@ export class NotebookComponent implements OnInit {
 
   /**************** 更新Note名称 END ***************/
 
-  //TODO
-  TRASH_FOLDER_ID
-
   //当前Note的ID
   noteId
 
   //当前的Note实例
-  note
+  note:any
 
   //是否切换编辑状态
   editorToggled = false
 
-  //TODO ?
+  //是否显示输出
   tableToggled = false
 
   //是否只读
@@ -66,8 +68,21 @@ export class NotebookComponent implements OnInit {
   //是否显示配置
   showSetting = false
 
-  //当前Note三种模式
+  //当前Note三种显示模式
   looknfeelOption = ['default', 'simple', 'report']
+
+  looknfeelOptionItems = [
+    {label: 'default', icon: 'fa-bullseye', command: () => {
+        //this.update();
+      }},
+    {label: 'simple', icon: 'fa-bullseye', command: () => {
+        //this.delete();
+      }},
+    {label: 'report', icon: 'fa-bullseye', command: () => {
+        //this.delete();
+      }
+    }
+  ];
 
   //Cron的表达式
   cronOption = [
@@ -82,38 +97,44 @@ export class NotebookComponent implements OnInit {
   ]
 
   formatRevisionDate(date) {
-    //return moment.unix(date).format('MMMM Do YYYY, h:mm a')
+    return moment.unix(date).format('MMMM Do YYYY, h:mm a')
   }
 
-  paragraphUrl
-
-  asIframe
-
+  // 当前Note的解析器绑定
   interpreterSettings = []
   interpreterBindings = []
-  interpreterBindingsOrig = []
 
+  // Note是否更新
   isNoteDirty = null
+
+  // 自动保存
   saveTimer = null
+
+  // TODO
   paragraphWarningDialog = {}
 
-  permissions
-  isOwner
-
-  allowLeave
-
+  // 是否连接到后台
   connectedOnce = false
+
+  // 检测Path是否为修订版本
   isRevisionPath(path) {
     let pattern = new RegExp('^.*\/notebook\/[a-zA-Z0-9_]*\/revision\/[a-zA-Z0-9_]*')
     return pattern.test(path)
   }
 
+  // 当前Note的所有版本
   noteRevisions = []
+
+  // 当前的版本
   currentRevision = 'Head'
+
+  // 是否为修订版本视图
   revisionView = this.isRevisionPath(this.location.path())
 
-  showPermissions
+  // 当前修订版本号
+  revisionId
 
+  // 查询对象
   search = {
     searchText: '',
     occurrencesExists: false,
@@ -127,16 +148,50 @@ export class NotebookComponent implements OnInit {
     searchBoxWidth: 350,
     left: '0px'
   }
+
+  // 当前查询的片段索引
   currentSearchParagraph = 0
+
+
+  permissionsOrig
+
+  permissions
+
+  paragraphUrl
+
+  asIframe
+
+  interpreterBindingsOrig = []
+
+  isOwner
+
+  allowLeave
+
+  showPermissions
 
   isAnonymous
 
+  getNoteRevisions(noteRevisions){
+
+    let noteRev = [];
+
+    for(let rev of noteRevisions){
+      noteRev.push({
+        revision: rev,
+        time: this.formatRevisionDate(rev.time),
+        message:rev.message
+      })
+    }
+    return noteRev
+  }
+
+  // 名称
   /*$scope.$watch('note', function (value) {
     $rootScope.pageTitle = value ? value.name : 'Zeppelin'
   }, true)*/
 
   getCronOptionNameFromValue(value) {
-    if (!value) {
+    if (!value || value == undefined) {
       return ''
     }
 
@@ -148,6 +203,7 @@ export class NotebookComponent implements OnInit {
     return value
   }
 
+  // 显示非权限用户
   blockAnonUsers() {
     let zeppelinVersion = this.globalService.dataSmartVersion
     let url = 'https://zeppelin.apache.org/docs/' + zeppelinVersion + '/security/notebook_authorization.html'
@@ -155,19 +211,37 @@ export class NotebookComponent implements OnInit {
       '<a data-toggle="tooltip" data-placement="top" title="Learn more" target="_blank" href=' + url + '>' +
       '<i class="icon-question" />' +
       '</a>'
-    /*BootstrapDialog.show({
-      closable: false,
-      closeByBackdrop: false,
-      closeByKeyboard: false,
-      title: 'No permission',
-      message: content,
-      buttons: [{
-        label: 'Close',
-        action: function (dialog) {
-          dialog.close()
-        }
-      }]
-    })*/
+    this.messageService.add({severity:'warn', summary:'权限拒绝', detail:content});
+  }
+
+  /** 初始化笔记 */
+  initNotebook():void {
+    this.noteVarShareService.clear()
+    if (this.revisionId) {
+      this.websocketMsgSrv.getNoteByRevision(this.noteId, this.revisionId)
+    } else {
+      this.websocketMsgSrv.getNote(this.noteId)
+    }
+
+    this.websocketMsgSrv.listRevisionHistory(this.noteId)
+
+    // TODO 滑动到具体的地方
+    /*let currentRoute = $route.current
+    if (currentRoute) {
+      setTimeout(
+        function () {
+          let routeParams = currentRoute.params
+          let $id = angular.element('#' + routeParams.paragraph + '_container')
+
+          if ($id.length > 0) {
+            // adjust for navbar
+            let top = $id.offset().top - 103
+            angular.element('html, body').scrollTo({top: top, left: 0})
+          }
+        },
+        1000
+      )
+    }*/
   }
 
 
@@ -175,19 +249,21 @@ export class NotebookComponent implements OnInit {
     if (!this.note) {
       return
     }
-    /*for (let i = 0; i < this.note.paragraphs.length; i++) {
+    for (let i = 0; i < this.note.paragraphs.length; i++) {
       let paragraphId = this.note.paragraphs[i].id
-      if (jQuery.contains(angular.element('#' + paragraphId + '_container')[0], clickEvent.target)) {
+      if (this.commonService._jQuery.contains(this.elementRef.nativeElement.querySelector('#' + paragraphId + '_container'), clickEvent.target)) {
 
         // 发送片段聚焦事件，
-        $scope.$broadcast('focusParagraph', paragraphId, 0, true)
+        let paraInfo = {
+          paragraphId:paragraphId,
+          cursorPos:0,
+          mouseEvent:true
+        }
+        this.eventService.broadcast("noteComplete",paraInfo)
         break
       }
-    }*/
+    }
   }
-
-  // register mouseevent handler for focus paragraph
-  //document.addEventListener('click', $scope.focusParagraphOnClick)
 
   keyboardShortcut(keyEvent) {
     // handle keyevent
@@ -195,9 +271,6 @@ export class NotebookComponent implements OnInit {
       this.eventService.broadcast('keyEvent', keyEvent)
     }
   }
-
-  // register mouseevent handler for focus paragraph
-  //document.addEventListener('keydown', this.keyboardShortcut)
 
   //片段双击事件
   paragraphOnDoubleClick(paragraphId) {
@@ -215,7 +288,7 @@ export class NotebookComponent implements OnInit {
   }
 
   isTrash(note) {
-    return note ? note.name.split('/')[0] === this.TRASH_FOLDER_ID : false
+    return note ? note.name.split('/')[0] === Constants.TRASH_FOLDER_ID : false
   }
 
   // Export notebook
@@ -227,48 +300,48 @@ export class NotebookComponent implements OnInit {
   // Clone note
   cloneNote(noteId) {
     let self = this;
-    /*BootstrapDialog.confirm({
-      closable: true,
-      title: '',
+
+    this.confirmationService.confirm({
       message: 'Do you want to clone this note?',
-      callback: function (result) {
-        if (result) {
-          self.websocketMsgSrv.cloneNote(noteId)
-          $location.path('/')
-        }
-      }
-    })*/
+      header: 'Confirmation',
+      icon: 'fa fa-question-circle',
+      accept: () => {
+        self.websocketMsgSrv.cloneNote(noteId,'cloned-'+self.noteName)
+        this.messageService.add({severity:'info', summary:'Success', detail:'Cloned SuccessFully!'});
+      },
+      reject: () => {}
+    });
   }
 
   // checkpoint/commit notebook
   checkpointNote(commitMessage) {
     let self = this;
-    /*BootstrapDialog.confirm({
-      closable: true,
-      title: '',
+
+    this.confirmationService.confirm({
       message: 'Commit note to current repository?',
-      callback: function (result) {
-        if (result) {
-          self.websocketMsgSrv.checkpointNote($routeParams.noteId, commitMessage)
-        }
-      }
-    })
-    document.getElementById('note.checkpoint.message').value = ''*/
+      header: 'Confirmation',
+      icon: 'fa fa-question-circle',
+      accept: () => {
+        self.websocketMsgSrv.checkpointNote(self.noteId, commitMessage)
+      },
+      reject: () => {}
+    });
+    //document.getElementById('note.checkpoint.message').value = ''
   }
 
   // set notebook head to given revision
   setNoteRevision() {
     let self = this;
-    /*BootstrapDialog.confirm({
-      closable: true,
-      title: '',
+
+    this.confirmationService.confirm({
       message: 'Set notebook head to current revision?',
-      callback: function (result) {
-        if (result) {
-          websocketMsgSrv.setNoteRevision($routeParams.noteId, $routeParams.revisionId)
-        }
-      }
-    })*/
+      header: 'Confirmation',
+      icon: 'fa fa-question-circle',
+      accept: () => {
+        self.websocketMsgSrv.setNoteRevision(self.noteId, self.revisionId)
+      },
+      reject: () => {}
+    });
   }
 
   visitRevision(revision) {
@@ -279,45 +352,43 @@ export class NotebookComponent implements OnInit {
         this.location.go('/notebook/' + this.noteId + '/revision/' + revision.id)
       }
     } else {
-      /*ngToast.danger({content: 'There is a problem with this Revision',
-        verticalPosition: 'top',
-        dismissOnTimeout: false
-      })*/
+      this.messageService.add({severity:'error', summary:'Success', detail:'There is a problem with this Revision!'});
     }
   }
 
   runAllParagraphs(noteId) {
-    /*BootstrapDialog.confirm({
-      closable: true,
-      title: '',
+    let self = this;
+    this.confirmationService.confirm({
       message: 'Run all paragraphs?',
-      callback: function (result) {
-        if (result) {
-          const paragraphs = $scope.note.paragraphs.map(p => {
-            return {
-              id: p.id,
-              title: p.title,
-              paragraph: p.text,
-              config: p.config,
-              params: p.settings.params
-            }
-          })
-          websocketMsgSrv.runAllParagraphs(noteId, paragraphs)
-        }
-      }
-    })*/
+      header: 'Confirmation',
+      icon: 'fa fa-question-circle',
+      accept: () => {
+        const paragraphs = self.note.paragraphs.map(p => {
+          return {
+            id: p.id,
+            title: p.title,
+            paragraph: p.text,
+            config: p.config,
+            params: p.settings.params
+          }
+        })
+        self.websocketMsgSrv.runAllParagraphs(noteId, paragraphs)
+      },
+      reject: () => {}
+    });
   }
 
   saveNote() {
-    /*if (this.note && this.note.paragraphs) {
-      _.forEach(this.note.paragraphs, function (par) {
-        angular
-          .element('#' + par.id + '_paragraphColumn_main')
+
+    if (this.note && this.note.paragraphs) {
+      for(let par of this.note.paragraphs){
+        /*this.elementRef.nativeElement
+          .querySelector('#' + par.id + '_paragraphColumn_main')
           .scope()
-          .saveParagraph(par)
-      })
+          .saveParagraph(par)*/
+      }
       this.isNoteDirty = null
-    }*/
+    }
   }
 
   clearAllParagraphOutput(noteId) {
@@ -375,6 +446,7 @@ export class NotebookComponent implements OnInit {
 
   killSaveTimer() {
     if (this.saveTimer) {
+      // TODO 停止Timer
       //$timeout.cancel(this.saveTimer)
       this.saveTimer = null
     }
@@ -394,7 +466,7 @@ export class NotebookComponent implements OnInit {
     if (this.revisionView === true) {
       this.eventService.broadcast('setLookAndFeel', this.note.config.looknfeel)
     } else {
-      //this.setConfig()
+      this.setConfig()
     }
   }
 
@@ -408,38 +480,51 @@ export class NotebookComponent implements OnInit {
       this.note.config.cronExecutingUser = ''
     }
     this.note.config.cron = cronExpr
-    //this.setConfig()
+    this.setConfig()
   }
 
   /** Set the username of the user to be used to execute all notes in notebook **/
   setCronExecutingUser(cronExecutingUser) {
     this.note.config.cronExecutingUser = cronExecutingUser
-    //this.setConfig()
+    this.setConfig()
   }
 
   /** Set release resource for this note **/
   setReleaseResource(value) {
     this.note.config.releaseresource = value
-    //this.setConfig()
+    this.setConfig()
   }
 
   /** Update note config **/
-  setConfig(config) {
+  setConfig(config?) {
     if (config) {
       this.note.config = config
     }
     this.websocketMsgSrv.updateNote(this.note.id, this.note.name, this.note.config)
   }
 
+  //初始化外观
+  initializeLookAndFeel():void {
+    if (!this.note.config.looknfeel) {
+      this.note.config.looknfeel = 'default'
+    } else {
+      this.viewOnly = this.note.config.looknfeel === 'report' ? true : false
+    }
 
+    if (this.note.paragraphs && this.note.paragraphs[0]) {
+      this.note.paragraphs[0].focus = true
+    }
+    this.eventService.broadcast('setLookAndFeel', this.note.config.looknfeel)
+  }
 
   cleanParagraphExcept(paragraphId, note) {
-    /*let noteCopy = {}
-    noteCopy.id = note.id
-    noteCopy.name = note.name
-    noteCopy.config = note.config
-    noteCopy.info = note.info
-    noteCopy.paragraphs = []
+    let noteCopy = {
+      id: note.id,
+      name:note.name,
+      config:note.config,
+      info:note.info,
+      paragraphs: []
+    }
     for (let i = 0; i < note.paragraphs.length; i++) {
       if (note.paragraphs[i].id === paragraphId) {
         noteCopy.paragraphs[0] = note.paragraphs[i]
@@ -451,7 +536,7 @@ export class NotebookComponent implements OnInit {
         break
       }
     }
-    return noteCopy*/
+    return noteCopy
   }
 
   addPara(paragraph, index) {
@@ -460,6 +545,12 @@ export class NotebookComponent implements OnInit {
       if (para.id === paragraph.id) {
         para.focus = true
 
+        let paraInfo = {
+          paragraphId:para.id,
+          cursorPos:0,
+          mouseEvent:false
+        }
+        this.eventService.broadcast('focusParagraph', paraInfo)
         // we need `$timeout` since angular DOM might not be initialized
         //$timeout(() => { this.eventService.broadcast('focusParagraph', para.id, 0, false) })
       }
@@ -468,12 +559,17 @@ export class NotebookComponent implements OnInit {
 
   removePara(paragraphId) {
     let removeIdx
-    /*_.each(this.note.paragraphs, function (para, idx) {
+    this.note.paragraphs.each(function (para, idx) {
       if (para.id === paragraphId) {
         removeIdx = idx
       }
-    })*/
+    })
     return this.note.paragraphs.splice(removeIdx, 1)
+  }
+
+  //获取binding信息
+  getInterpreterBindings():void {
+    this.websocketMsgSrv.getInterpreterBindings(this.note.id)
   }
 
   interpreterSelectionListeners = {
@@ -488,19 +584,17 @@ export class NotebookComponent implements OnInit {
   }
 
   closeSetting() {
+    let self = this;
     if (this.isSettingDirty()) {
-      /*BootstrapDialog.confirm({
-        closable: true,
-        title: '',
+      this.confirmationService.confirm({
         message: 'Interpreter setting changes will be discarded.',
-        callback: function (result) {
-          if (result) {
-            $scope.$apply(function () {
-              $scope.showSetting = false
-            })
-          }
-        }
-      })*/
+        header: 'Confirmation',
+        icon: 'fa fa-question-circle',
+        accept: () => {
+          self.showSetting = false
+        },
+        reject: () => {}
+      });
     } else {
       this.showSetting = false
     }
@@ -518,12 +612,15 @@ export class NotebookComponent implements OnInit {
     this.websocketMsgSrv.saveInterpreterBindings(this.note.id, selectedSettingIds)
     console.log('Interpreter bindings %o saved', selectedSettingIds)
 
-    /*_.forEach(this.note.paragraphs, function (n, key) {
+    this.note.paragraphs.forEach((val, idx, array) => {
+      // val: 当前值
+      // idx：当前index
+      // array: Array
       let regExp = /^\s*%/g
-      if (n.text && !regExp.exec(n.text)) {
-        self.eventService.broadcast('saveInterpreterBindings', n.id)
+      if (val.text && !regExp.exec(val.text)) {
+        self.eventService.broadcast('saveInterpreterBindings', val.id)
       }
-    })*/
+    });
 
     this.showSetting = false
   }
@@ -543,30 +640,110 @@ export class NotebookComponent implements OnInit {
     this.getPermissions(console.log())
   }
 
-  closePermissions() {
-    if (this.isPermissionsDirty()) {
-      /*BootstrapDialog.confirm({
-        closable: true,
-        title: '',
-        message: 'Changes will be discarded.',
-        callback: function (result) {
-          if (result) {
-            $scope.$apply(function () {
-              $scope.showPermissions = false
-            })
+  // 获取Note的权限
+  getPermissions(callback):void {
+    let self = this;
+    this.httpClient.get(this.baseUrlSrv.getRestApiBase() + '/notebook/'+ this.note.id + '/permissions')
+      .subscribe(
+        response => {
+
+          self.permissions = response['body']
+          self.permissionsOrig = Object.assign({},self.permissions) // to check dirty
+
+          let selectJson = {
+            tokenSeparators: [',', ' '],
+            ajax: {
+              url: function (params) {
+                if (!params.term) {
+                  return false
+                }
+                return self.baseUrlSrv.getRestApiBase() + '/security/userlist/' + params.term
+              },
+              delay: 250,
+              processResults: function (data, params) {
+                let results = []
+
+                if (data.body.users.length !== 0) {
+                  let users = []
+                  for (let len = 0; len < data.body.users.length; len++) {
+                    users.push({
+                      'id': data.body.users[len],
+                      'text': data.body.users[len]
+                    })
+                  }
+                  results.push({
+                    'text': 'Users :',
+                    'children': users
+                  })
+                }
+                if (data.body.roles.length !== 0) {
+                  let roles = []
+                  for (let len = 0; len < data.body.roles.length; len++) {
+                    roles.push({
+                      'id': data.body.roles[len],
+                      'text': data.body.roles[len]
+                    })
+                  }
+                  results.push({
+                    'text': 'Roles :',
+                    'children': roles
+                  })
+                }
+                return {
+                  results: results,
+                  pagination: {
+                    more: false
+                  }
+                }
+              },
+              cache: false
+            },
+            width: ' ',
+            tags: true,
+            minimumInputLength: 3
+          }
+
+          self.setIamOwner()
+          /*angular.element('#selectOwners').select2(selectJson)
+          angular.element('#selectReaders').select2(selectJson)
+          angular.element('#selectRunners').select2(selectJson)
+          angular.element('#selectWriters').select2(selectJson)*/
+          if (callback) {
+            callback()
+          }
+        },
+        errorResponse => {
+          let redirect = errorResponse.headers('Location')
+          if (errorResponse.status === 401 && redirect !== undefined) {
+            // Handle page redirect
+            window.location.href = redirect
           }
         }
-      })*/
+      );
+  }
+
+  closePermissions() {
+    let self = this;
+    if (this.isPermissionsDirty()) {
+      this.confirmationService.confirm({
+        message: 'Changes will be discarded.',
+        header: 'Confirmation',
+        icon: 'fa fa-question-circle',
+        accept: () => {
+          self.showPermissions = false
+        },
+        reject: () => {}
+      });
     } else {
       this.showPermissions = false
     }
   }
 
   convertPermissionsToArray () {
-    /*$scope.permissions.owners = angular.element('#selectOwners').val()
-    $scope.permissions.readers = angular.element('#selectReaders').val()
-    $scope.permissions.runners = angular.element('#selectRunners').val()
-    $scope.permissions.writers = angular.element('#selectWriters').val()
+    /*this.permissions.owners = angular.element('#selectOwners').val()
+    this.permissions.readers = angular.element('#selectReaders').val()
+    this.permissions.runners = angular.element('#selectRunners').val()
+    this.permissions.writers = angular.element('#selectWriters').val()
     angular.element('.permissionsForm select').find('option:not([is-select2="false"])').remove()*/
   }
 
@@ -663,7 +840,11 @@ export class NotebookComponent implements OnInit {
       this.markAllOccurrencesAndHighlightFirst()
       return
     }
-    this.eventService.broadcast('replaceCurrent', this.search.searchText, this.search.replaceText)
+    let search = {
+      searchText: this.search.searchText,
+      replaceText: this.search.replaceText
+    }
+    this.eventService.broadcast('replaceCurrent', search)
     if (this.search.needToSendNextOccurrenceAfterReplace) {
       this.sendNextOccurrenceMessage()
       this.search.needToSendNextOccurrenceAfterReplace = false
@@ -677,7 +858,11 @@ export class NotebookComponent implements OnInit {
     if (this.search.occurrencesHidden) {
       this.markAllOccurrencesAndHighlightFirst()
     }
-    this.eventService.broadcast('replaceAll', this.search.searchText, this.search.replaceText)
+    let search = {
+      searchText: this.search.searchText,
+      replaceText: this.search.replaceText
+    }
+    this.eventService.broadcast('replaceAll', search)
     this.markAllOccurrencesAndHighlightFirst()
   }
 
@@ -709,119 +894,107 @@ export class NotebookComponent implements OnInit {
   }
 
   restartInterpreter(interpreter) {
-    /*const thisConfirm = BootstrapDialog.confirm({
-      closable: false,
-      closeByBackdrop: false,
-      closeByKeyboard: false,
-      title: '',
+    let self = this;
+    const thisConfirm = this.confirmationService.confirm({
       message: 'Do you want to restart ' + interpreter.name + ' interpreter?',
-      callback: function(result) {
-        if (result) {
-          let payload = {
-            'noteId': $scope.note.id
-          }
-
-          thisConfirm.$modalFooter.find('button').addClass('disabled')
-          thisConfirm.$modalFooter.find('button:contains("OK")')
-            .html('<i class="fa fa-circle-o-notch fa-spin"></i> Saving Setting')
-
-          $http.put(baseUrlSrv.getRestApiBase() + '/interpreter/setting/restart/' + interpreter.id, payload)
-            .success(function(data, status, headers, config) {
-              let index = _.findIndex($scope.interpreterSettings, {'id': interpreter.id})
-              $scope.interpreterSettings[index] = data.body
-              thisConfirm.close()
-            }).error(function (data, status, headers, config) {
-            thisConfirm.close()
-            console.log('Error %o %o', status, data.message)
-            BootstrapDialog.show({
-              title: 'Error restart interpreter.',
-              message: data.message
-            })
-          })
-          return false
+      header: 'Confirmation',
+      icon: 'fa fa-question-circle',
+      accept: () => {
+        let payload = {
+          'noteId': self.note.id
         }
-      }
-    })*/
+
+        /*thisConfirm.$modalFooter.find('button').addClass('disabled')
+        thisConfirm.$modalFooter.find('button:contains("OK")')
+          .html('<i class="fa fa-circle-o-notch fa-spin"></i> Saving Setting')*/
+
+
+        self.httpClient.put(this.baseUrlSrv.getRestApiBase() + '/interpreter/setting/restart/' + interpreter.id, payload)
+          .subscribe(
+            response => {
+              //let index = self.interpreterSettings.findIndex({'id': interpreter.id})
+              //self.interpreterSettings[index] = response['body']
+              //thisConfirm.close()
+            },
+            errorResponse => {
+
+              //thisConfirm.close()
+              console.log('Error %o %o', status, errorResponse)
+              this.messageService.add({severity:'error', summary:'Error restart interpreter.', detail:errorResponse['message']});
+            }
+          );
+        return false
+      },
+      reject: () => {}
+    });
+
   }
 
   savePermissions() {
+    let self = this;
     if (this.isAnonymous || this.globalService.ticket.principal.trim().length === 0) {
       this.blockAnonUsers()
     }
     this.convertPermissionsToArray()
     if (this.isOwnerEmpty()) {
-      /*BootstrapDialog.show({
-        closable: false,
-        title: 'Setting Owners Permissions',
+
+      this.confirmationService.confirm({
         message: 'Please fill the [Owners] field. If not, it will set as current user.\n\n' +
-        'Current user : [ ' + $rootScope.ticket.principal + ']',
-        buttons: [
-          {
-            label: 'Set',
-            action: function(dialog) {
-              dialog.close()
-              $scope.permissions.owners = [$rootScope.ticket.principal]
-              $scope.setPermissions()
-            }
-          },
-          {
-            label: 'Cancel',
-            action: function(dialog) {
-              dialog.close()
-              $scope.openPermissions()
-            }
-          }
-        ]
-      })*/
+        'Current user : [ ' + self.globalService.ticket.principal + ']',
+        header: 'Setting Owners Permissions',
+        icon: 'fa fa-question-circle',
+        accept: () => {
+          self.permissions.owners = [self.globalService.ticket.principal]
+          self.setPermissions()
+        },
+        reject: () => {
+          self.openPermissions()
+        }
+      });
+
     } else {
       this.setPermissions()
     }
   }
 
   setPermissions() {
-    /*$http.put(this.baseUrlSrv.getRestApiBase() + '/notebook/' + this..note.id + '/permissions',
-      $scope.permissions, {withCredentials: true})
-      .success(function (data, status, headers, config) {
-        getPermissions(function () {
-          console.log('Note permissions %o saved', $scope.permissions)
-          BootstrapDialog.alert({
-            closable: true,
-            title: 'Permissions Saved Successfully',
-            message: 'Owners : ' + $scope.permissions.owners + '\n\n' + 'Readers : ' +
-            $scope.permissions.readers + '\n\n' + 'Runners : ' + $scope.permissions.runners +
-            '\n\n' + 'Writers  : ' + $scope.permissions.writers
+    let self = this;
+    self.httpClient.put(this.baseUrlSrv.getRestApiBase() + '/notebook/' + self.note.id + '/permissions', self.permissions)
+      .subscribe(
+        response => {
+          self.getPermissions(function () {
+            console.log('Note permissions %o saved', self.permissions)
+
+            this.confirmationService.confirm({
+              message: 'Owners : ' + self.permissions.owners + '\n\n' + 'Readers : ' +
+              self.permissions.readers + '\n\n' + 'Runners : ' + self.permissions.runners +
+              '\n\n' + 'Writers  : ' + self.permissions.writers,
+              header: 'Permissions Saved Successfully',
+              icon: 'fa fa-question-circle',
+              accept: () => {
+              },
+              reject: () => {
+              }
+            });
+            self.showPermissions = false
           })
-          $scope.showPermissions = false
-        })
-      })
-      .error(function (data, status, headers, config) {
-        console.log('Error %o %o', status, data.message)
-        BootstrapDialog.show({
-          closable: false,
-          closeByBackdrop: false,
-          closeByKeyboard: false,
-          title: 'Insufficient privileges',
-          message: data.message,
-          buttons: [
-            {
-              label: 'Login',
-              action: function (dialog) {
-                dialog.close()
-                angular.element('#loginModal').modal({
-                  show: 'true'
-                })
-              }
+        },
+        errorResponse => {
+          console.log('Error %o %o', status, errorResponse)
+          this.confirmationService.confirm({
+            message: errorResponse,
+            header: 'Permissions Saved Successfully',
+            icon: 'fa fa-question-circle',
+            accept: () => {
             },
-            {
-              label: 'Cancel',
-              action: function (dialog) {
-                dialog.close()
-                $location.path('/')
-              }
+            reject: () => {
             }
-          ]
-        })
-      })*/
+          });
+
+
+          this.messageService.add({severity:'error', summary:'Error restart interpreter.', detail:errorResponse['message']});
+        }
+      );
   }
 
   togglePermissions() {
@@ -843,43 +1016,53 @@ export class NotebookComponent implements OnInit {
     }
   }
 
+  setIamOwner():boolean {
+    if (this.permissions.owners.length > 0 && this.permissions.owners.indexOf(this.globalService.ticket.principal) < 0) {
+      this.isOwner = false
+      return false
+    }
+    this.isOwner = true
+    return true
+  }
+
   toggleNotePersonalizedMode() {
+    let self = this;
     let personalizedMode = this.note.config.personalizedMode
     if (this.isOwner) {
-      /*BootstrapDialog.confirm({
-        closable: true,
-        title: 'Setting the result display',
-        message: function (dialog) {
-          let modeText = $scope.note.config.personalizedMode === 'true' ? 'collaborate' : 'personalize'
-          return 'Do you want to <span class="text-info">' + modeText + '</span> your analysis?'
-        },
-        callback: function (result) {
-          if (result) {
-            if ($scope.note.config.personalizedMode === undefined) {
-              $scope.note.config.personalizedMode = 'false'
-            }
-            $scope.note.config.personalizedMode = personalizedMode === 'true' ? 'false' : 'true'
-            websocketMsgSrv.updatePersonalizedMode($scope.note.id, $scope.note.config.personalizedMode)
+
+      let modeText = self.note.config.personalizedMode === 'true' ? 'collaborate' : 'personalize'
+
+      self.confirmationService.confirm({
+        message: 'Do you want to <span class="text-info">' + modeText + '</span> your analysis?',
+        header: 'Setting the result display',
+        icon: 'fa fa-question-circle',
+        accept: () => {
+          if (self.note.config.personalizedMode === undefined) {
+            self.note.config.personalizedMode = 'false'
           }
+          self.note.config.personalizedMode = personalizedMode === 'true' ? 'false' : 'true'
+          self.websocketMsgSrv.updatePersonalizedMode(self.note.id, self.note.config.personalizedMode)
+        },
+        reject: () => {
         }
-      })*/
+      });
     }
   }
 
   isSettingDirty() {
-    /*if (angular.equals($scope.interpreterBindings, $scope.interpreterBindingsOrig)) {
+    if (this.interpreterBindings == this.interpreterBindingsOrig) {
       return false
     } else {
       return true
-    }*/
+    }
   }
 
   isPermissionsDirty() {
-    /*if (angular.equals($scope.permissions, $scope.permissionsOrig)) {
+    if (this.permissions == this.permissionsOrig) {
       return false
     } else {
       return true
-    }*/
+    }
   }
 
   /*angular.element(document).click(function () {
@@ -900,34 +1083,36 @@ export class NotebookComponent implements OnInit {
     }
   }
 
+  insertNew(paragraphId,position) {
+    let para ={
+      paragraphId:paragraphId,
+      position:position
+    }
+    this.eventService.broadcast('insertParagraph', para)
+  }
+
   showParagraphWarning(next) {
+    let self = this;
     /*if (this.paragraphWarningDialog.opened !== true) {
-      this.paragraphWarningDialog = BootstrapDialog.show({
-        closable: false,
-        closeByBackdrop: false,
-        closeByKeyboard: false,
-        title: 'Do you want to leave this site?',
+
+      this.paragraphWarningDialog = self.confirmationService.confirm({
         message: 'Changes that you have made will not be saved.',
-        buttons: [{
-          label: 'Stay',
-          action: function (dialog) {
-            dialog.close()
-          }
-        }, {
-          label: 'Leave',
-          action: function (dialog) {
-            dialog.close()
-            let locationToRedirect = next['$$route']['originalPath']
-            Object.keys(next.pathParams).map(key => {
-              locationToRedirect = locationToRedirect.replace(':' + key,
-                next.pathParams[key])
-            })
-            $scope.allowLeave = true
-            $location.path(locationToRedirect)
-          }
-        }]
-      })
+        header: 'Do you want to leave this site?',
+        icon: 'fa fa-question-circle',
+        accept: () => {
+          /!*let locationToRedirect = next['$$route']['originalPath']
+          Object.keys(next.pathParams).map(key => {
+            locationToRedirect = locationToRedirect.replace(':' + key,
+              next.pathParams[key])
+          })
+          $scope.allowLeave = true
+          $location.path(locationToRedirect)*!/
+        },
+        reject: () => {
+        }
+      });
     }*/
+
   }
 
   /*angular.element(window).bind('resize', function () {
@@ -942,13 +1127,23 @@ export class NotebookComponent implements OnInit {
               private router:Router,
               private httpClient:HttpClient,
               private baseUrlSrv:BaseUrlService,
-              private globalService:GlobalService,
+              public globalService:GlobalService,
               private location:Location,
               private noteActionService:NoteActionService,
               private saveAsService:SaveAsService,
-              private arrayOrderingSrv:ArrayOrderingService) {
+              private arrayOrderingSrv:ArrayOrderingService,
+              private messageService:MessageService,
+              private commonService:CommonService,
+              private elementRef:ElementRef,
+              private renderer:Renderer2,
+              private confirmationService: ConfirmationService) {
 
-    this.note = {}
+    this.note = {
+      name:'',
+      paragraphs:[],
+      config:{},
+      info:{}
+    }
   }
 
   orderListCars: Car[];
@@ -961,504 +1156,384 @@ export class NotebookComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.orderListCars = [
-      {vin: 'r3278r2', year: 2010, brand: 'Audi', color: 'Black'},
-      {vin: 'jhto2g2', year: 2015, brand: 'BMW', color: 'White'},
-      {vin: 'h453w54', year: 2012, brand: 'Honda', color: 'Blue'},
-      {vin: 'g43gwwg', year: 1998, brand: 'Renault', color: 'White'},
-      {vin: 'gf45wg5', year: 2011, brand: 'VW', color: 'Red'},
-      {vin: 'bhv5y5w', year: 2015, brand: 'Jaguar', color: 'Blue'},
-      {vin: 'ybw5fsd', year: 2012, brand: 'Ford', color: 'Yellow'},
-      {vin: '45665e5', year: 2011, brand: 'Mercedes', color: 'Brown'},
-      {vin: 'he6sb5v', year: 2015, brand: 'Ford', color: 'Black'}
-    ];
-
     let self = this;
-    this.route.params.subscribe((params: Params) => {
-      this.noteId = params['noteId']
 
-      //设置Note内容获取到的回调
-      this.eventService.subscribe('setNoteContent', function (note) {
-        self.initNoteContent(note)
+    // register mouseevent handler for focus paragraph
+    document.addEventListener('click', self.focusParagraphOnClick)
+
+    // register mouseevent handler for focus paragraph
+    //document.addEventListener('keydown', self.keyboardShortcut)
+    document.addEventListener('keydown', function(keyEvent){
+      if (!self.viewOnly && !self.revisionView) {
+        self.eventService.broadcast('keyEvent', keyEvent)
+      }
+    })
+
+    window.addEventListener('resize', function () {
+      const actionbarHeight = document.getElementById('actionbar').lastElementChild.clientHeight
+      /*angular.element(document.getElementById('content')).css('padding-top', actionbarHeight - 20)*/
+    })
+
+    // 监听Websocket的连接状态
+    this.eventService.subscribe('setConnectedStatus', function (msg) {
+      if (self.connectedOnce && msg) {
+
+        // 初始化NoteBook
+        self.initNotebook()
+      }
+      self.connectedOnce = true
+    })
+
+    this.eventService.subscribe('listRevisionHistory', function (data) {
+      console.debug('received list of revisions %o', data)
+      self.noteRevisions = data.revisionList
+      self.noteRevisions.splice(0, 0, {
+        id: 'Head',
+        message: 'Head'
       })
-
-      //设置Bingding信息获取到的回调
-      this.eventService.subscribe('interpreterBindings', function (data) {
-        self.callbackInterpreterBindings(data)
-      })
-
-      // 监听Websocket的连接状态
-      this.eventService.subscribe('setConnectedStatus', function (msg) {
-        if (self.connectedOnce && msg) {
-          self.initNotebook()
-        }
-        self.connectedOnce = true
-      })
-
-      this.eventService.subscribe('listRevisionHistory', function (data) {
-        console.debug('received list of revisions %o', data)
-        /*this.noteRevisions = data.revisionList
-        this.noteRevisions.splice(0, 0, {
-          id: 'Head',
-          message: 'Head'
-        })
-        if ($routeParams.revisionId) {
-          let index = _.findIndex(this.noteRevisions, {'id': $routeParams.revisionId})
-          if (index > -1) {
-            this.currentRevision = this.noteRevisions[index].message
-          }
+      if (self.revisionId) {
+        /*let index = self.noteRevisions.findIndex( {'id': self.revisionId})
+        if (index > -1) {
+          this.currentRevision = self.noteRevisions[index].message
         }*/
-      })
+      }
+    })
 
-      this.eventService.subscribe('noteRevision', function (data) {
-        console.log('received note revision %o', data)
-        if (data.note) {
-          this.note = data.note
-          this.initializeLookAndFeel()
-        } else {
-          self.location.go('/')
-        }
-      })
-
-      this.eventService.subscribe('setNoteRevisionResult', function (data) {
-        console.log('received set note revision result %o', data)
-        if (data.status) {
-          self.location.go('/notebook/' + self.noteId)
-        }
-      })
-
-      this.eventService.subscribe('addParagraph', function (event, paragraph, index) {
-        if (self.paragraphUrl || self.revisionView === true) {
-          return
-        }
-        self.addPara(paragraph, index)
-      })
-
-      this.eventService.subscribe('removeParagraph', function (event, paragraphId) {
-        if (self.paragraphUrl || self.revisionView === true) {
-          return
-        }
-        self.removePara(paragraphId)
-      })
-
-      this.eventService.subscribe('moveParagraph', function (event, paragraphId, newIdx) {
-        if (self.revisionView === true) {
-          return
-        }
-        let removedPara = self.removePara(paragraphId)
-        if (removedPara && removedPara.length === 1) {
-          self.addPara(removedPara[0], newIdx)
-        }
-      })
-
-      this.eventService.subscribe('updateNote', function (event, name, config, info) {
-        /** update Note name */
-        if (name !== self.note.name) {
-          console.log('change note name to : %o', self.note.name)
-          self.note.name = name
-        }
-        self.note.config = config
-        self.note.info = info
+    this.eventService.subscribe('noteRevision', function (data) {
+      console.log('received note revision %o', data)
+      if (data.note) {
+        self.note = data.note
         self.initializeLookAndFeel()
-      })
+      } else {
+        self.location.go('/')
+      }
+    })
 
-      this.eventService.subscribe('occurrencesExists', function(event, count) {
-        self.search.occurrencesCount += count
-        if (self.search.needHighlightFirst) {
-          self.sendNextOccurrenceMessage()
-          self.search.needHighlightFirst = false
+    this.eventService.subscribe('setNoteRevisionResult', function (data) {
+      console.log('received set note revision result %o', data)
+      if (data.status) {
+        self.location.go('/notebook/' + self.noteId)
+      }
+    })
+
+    this.eventService.subscribe('addParagraph', function (data) {
+      if (self.paragraphUrl || self.revisionView === true) {
+        return
+      }
+      self.addPara(data.paragraph, data.index)
+    })
+
+    this.eventService.subscribe('removeParagraph', function (data) {
+      if (self.paragraphUrl || self.revisionView === true) {
+        return
+      }
+      self.removePara(data.paragraphId)
+    })
+
+    this.eventService.subscribe('moveParagraph', function (data) {
+      if (self.revisionView === true) {
+        return
+      }
+      let removedPara = self.removePara(data.paragraphId)
+      if (removedPara && removedPara.length === 1) {
+        self.addPara(removedPara[0], data.newIdx)
+      }
+    })
+
+    this.eventService.subscribe('updateNote', function (data) {
+      /** update Note name */
+      if (data.name !== self.note.name) {
+        console.log('change note name to : %o', self.note.name)
+        self.note.name = data.name
+      }
+      self.note.config = data.config
+      self.note.info = data.info
+      self.initializeLookAndFeel()
+    })
+
+    //设置Bingding信息获取到的回调
+    this.eventService.subscribe('interpreterBindings', function (data) {
+      self.interpreterBindings = data.interpreterBindings
+      Object.assign(self.interpreterBindingsOrig,self.interpreterBindings) // to check dirty
+
+      let selected = false
+      let key
+      let setting
+
+      for (key in self.interpreterBindings) {
+        setting = self.interpreterBindings[key]
+        if (setting.selected) {
+          selected = true
+          break
         }
-      })
+      }
 
-      this.eventService.subscribe('noNextOccurrence', function(event) {
-        this.increaseCurrentSearchParagraph()
-        this.sendNextOccurrenceMessage()
-      })
-
-      this.eventService.subscribe('noPrevOccurrence', function(event) {
-        self.decreaseCurrentSearchParagraph()
-        self.sendPrevOccurrenceMessage()
-      })
-
-      this.eventService.subscribe('editorClicked', function() {
-        self.search.occurrencesHidden = true
-        self.eventService.broadcast('unmarkAll')
-      })
-
-      this.eventService.subscribe('occurrencesCountChanged', function(event, cnt) {
-        self.search.occurrencesCount += cnt
-        if (self.search.occurrencesCount === 0) {
-          self.search.currentOccurrence = 0
-        } else {
-          self.search.currentOccurrence += cnt + 1
-          if (self.search.currentOccurrence > self.search.occurrencesCount) {
-            self.search.currentOccurrence = 1
+      if (!selected) {
+        // make default selection
+        let selectedIntp = {}
+        for (key in self.interpreterBindings) {
+          setting = self.interpreterBindings[key]
+          if (!selectedIntp[setting.name]) {
+            setting.selected = true
+            selectedIntp[setting.name] = true
           }
         }
-      })
+        self.showSetting = true
+      }
+    })
 
-      this.eventService.subscribe('noNextOccurrenceAfterReplace', function() {
-        self.search.occurrencesCount = 0
+    this.eventService.subscribe('occurrencesExists', function(data) {
+      self.search.occurrencesCount += data.count
+      if (self.search.needHighlightFirst) {
+        self.sendNextOccurrenceMessage()
         self.search.needHighlightFirst = false
-        self.search.needToSendNextOccurrenceAfterReplace = false
-        self.eventService.broadcast('checkOccurrences')
-        self.increaseCurrentSearchParagraph()
-        if (self.search.occurrencesCount > 0) {
-          self.search.needToSendNextOccurrenceAfterReplace = true
-        }
-      })
+      }
+    })
 
-      this.eventService.subscribe('toggleSearchBox', function() {
-        /*let elem = angular.element('#searchGroup')
-        if (self.search.searchBoxOpened) {
-          elem.removeClass('open')
+    this.eventService.subscribe('noNextOccurrence', function(event) {
+      self.increaseCurrentSearchParagraph()
+      self.sendNextOccurrenceMessage()
+    })
+
+    this.eventService.subscribe('noPrevOccurrence', function(event) {
+      self.decreaseCurrentSearchParagraph()
+      self.sendPrevOccurrenceMessage()
+    })
+
+    this.eventService.subscribe('editorClicked', function() {
+      self.search.occurrencesHidden = true
+      self.eventService.broadcast('unmarkAll')
+    })
+
+    this.eventService.subscribe('occurrencesCountChanged', function(data) {
+      self.search.occurrencesCount += data.cnt
+      if (self.search.occurrencesCount === 0) {
+        self.search.currentOccurrence = 0
+      } else {
+        self.search.currentOccurrence += data.cnt + 1
+        if (self.search.currentOccurrence > self.search.occurrencesCount) {
+          self.search.currentOccurrence = 1
+        }
+      }
+    })
+
+    this.eventService.subscribe('noNextOccurrenceAfterReplace', function() {
+      self.search.occurrencesCount = 0
+      self.search.needHighlightFirst = false
+      self.search.needToSendNextOccurrenceAfterReplace = false
+      self.eventService.broadcast('checkOccurrences')
+      self.increaseCurrentSearchParagraph()
+      if (self.search.occurrencesCount > 0) {
+        self.search.needToSendNextOccurrenceAfterReplace = true
+      }
+    })
+
+    this.eventService.subscribe('toggleSearchBox', function() {
+      /*let elem = angular.element('#searchGroup')
+      if (self.search.searchBoxOpened) {
+        elem.removeClass('open')
+      } else {
+        elem.addClass('open')
+      }
+      $timeout(self.makeSearchBoxVisible())*/
+    })
+
+    this.eventService.subscribe('moveParagraphUp', function (paragraph) {
+      let newIndex = -1
+      for (let i = 0; i < self.note.paragraphs.length; i++) {
+        if (self.note.paragraphs[i].id === paragraph.id) {
+          newIndex = i - 1
+          break
+        }
+      }
+      if (newIndex < 0 || newIndex >= self.note.paragraphs.length) {
+        return
+      }
+      // save dirtyText of moving paragraphs.
+      let prevParagraph = self.note.paragraphs[newIndex]
+      /*angular
+        .element('#' + paragraph.id + '_paragraphColumn_main')
+        .scope()
+        .saveParagraph(paragraph)
+      angular
+        .element('#' + prevParagraph.id + '_paragraphColumn_main')
+        .scope()
+        .saveParagraph(prevParagraph)*/
+      self.websocketMsgSrv.moveParagraph(paragraph.id, newIndex)
+    })
+
+    this.eventService.subscribe('moveParagraphDown', function (data) {
+      let newIndex = -1
+      for (let i = 0; i < self.note.paragraphs.length; i++) {
+        if (self.note.paragraphs[i].id === data.paragraph.id) {
+          newIndex = i + 1
+          break
+        }
+      }
+
+      if (newIndex < 0 || newIndex >= self.note.paragraphs.length) {
+        return
+      }
+      // save dirtyText of moving paragraphs.
+      let nextParagraph = self.note.paragraphs[newIndex]
+      /*angular
+        .element('#' + paragraph.id + '_paragraphColumn_main')
+        .scope()
+        .saveParagraph(paragraph)
+      angular
+        .element('#' + nextParagraph.id + '_paragraphColumn_main')
+        .scope()
+        .saveParagraph(nextParagraph)*/
+      self.websocketMsgSrv.moveParagraph(data.paragraph.id, newIndex)
+    })
+
+    this.eventService.subscribe('moveFocusToPreviousParagraph', function (data) {
+      let focus = false
+      for (let i = self.note.paragraphs.length - 1; i >= 0; i--) {
+        if (focus === false) {
+          if (self.note.paragraphs[i].id === data.currentParagraphId) {
+            focus = true
+            continue
+          }
         } else {
-          elem.addClass('open')
+          self.eventService.broadcast('focusParagraph', self.note.paragraphs[i].id, -1)
+          break
         }
-        $timeout(self.makeSearchBoxVisible())*/
-      })
+      }
+    })
 
-      this.eventService.subscribe('moveParagraphUp', function (paragraph) {
-        let newIndex = -1
-        for (let i = 0; i < self.note.paragraphs.length; i++) {
-          if (self.note.paragraphs[i].id === paragraph.id) {
-            newIndex = i - 1
-            break
+    this.eventService.subscribe('moveFocusToNextParagraph', function (data) {
+      let focus = false
+      for (let i = 0; i < self.note.paragraphs.length; i++) {
+        if (focus === false) {
+          if (self.note.paragraphs[i].id === data.currentParagraphId) {
+            focus = true
+            continue
           }
+        } else {
+          self.eventService.broadcast('focusParagraph', self.note.paragraphs[i].id, 0)
+          break
         }
-        if (newIndex < 0 || newIndex >= self.note.paragraphs.length) {
-          return
-        }
-        // save dirtyText of moving paragraphs.
-        let prevParagraph = self.note.paragraphs[newIndex]
-        /*angular
-          .element('#' + paragraph.id + '_paragraphColumn_main')
-          .scope()
-          .saveParagraph(paragraph)
-        angular
-          .element('#' + prevParagraph.id + '_paragraphColumn_main')
-          .scope()
-          .saveParagraph(prevParagraph)*/
-        self.websocketMsgSrv.moveParagraph(paragraph.id, newIndex)
-      })
+      }
+    })
 
-      this.eventService.subscribe('moveParagraphDown', function (event, paragraph) {
-        let newIndex = -1
-        for (let i = 0; i < self.note.paragraphs.length; i++) {
-          if (self.note.paragraphs[i].id === paragraph.id) {
+    this.eventService.subscribe('insertParagraph', function (data) {
+      if (self.revisionView === true) {
+        return
+      }
+      let newIndex = -1
+      for (let i = 0; i < self.note.paragraphs.length; i++) {
+        if (self.note.paragraphs[i].id === data.paragraphId) {
+          // determine position of where to add new paragraph; default is below
+          if (data.position === 'above') {
+            newIndex = i
+          } else {
             newIndex = i + 1
-            break
           }
+          break
         }
+      }
 
-        if (newIndex < 0 || newIndex >= self.note.paragraphs.length) {
-          return
-        }
-        // save dirtyText of moving paragraphs.
-        let nextParagraph = self.note.paragraphs[newIndex]
-        /*angular
-          .element('#' + paragraph.id + '_paragraphColumn_main')
-          .scope()
-          .saveParagraph(paragraph)
-        angular
-          .element('#' + nextParagraph.id + '_paragraphColumn_main')
-          .scope()
-          .saveParagraph(nextParagraph)*/
-        self.websocketMsgSrv.moveParagraph(paragraph.id, newIndex)
-      })
+      if (newIndex < 0 || newIndex > self.note.paragraphs.length) {
+        return
+      }
+      self.websocketMsgSrv.insertParagraph(newIndex)
+    })
 
-      this.eventService.subscribe('moveFocusToPreviousParagraph', function (event, currentParagraphId) {
-        let focus = false
-        for (let i = self.note.paragraphs.length - 1; i >= 0; i--) {
-          if (focus === false) {
-            if (self.note.paragraphs[i].id === currentParagraphId) {
-              focus = true
-              continue
-            }
+    //设置Note内容获取到的回调
+    this.eventService.subscribe('setNoteContent', function (note) {
+      if (note === undefined) {
+        this.router.navigate(['/login']);
+      }
+      self.note = note
+      self.noteName = self.getNoteName(self.note)
+
+      if (self.paragraphUrl) {
+        self.note = self.cleanParagraphExcept(self.paragraphUrl, self.note)
+
+        //$scope.$broadcast('$unBindKeyEvent', $scope.$unBindKeyEvent)
+
+        self.eventService.broadcast('setIframe', self.asIframe)
+
+        self.initializeLookAndFeel()
+        return
+      }
+
+      self.initializeLookAndFeel()
+
+      // open interpreter binding setting when there're none selected
+      self.getInterpreterBindings()
+      self.getPermissions(console.log())
+      let isPersonalized = self.note.config.personalizedMode
+      isPersonalized = isPersonalized === undefined ? 'false' : isPersonalized
+      self.note.config.personalizedMode = isPersonalized
+    })
+
+    // TODO
+    this.eventService.subscribe('$routeChangeStart', function (data) {
+      if (!self.note || !self.note.paragraphs) {
+        return
+      }
+      if (self.note && self.note.paragraphs) {
+        self.note.paragraphs.map(par => {
+          if (self.allowLeave === true) {
+            return
+          }
+          /*let thisScope = angular.element(
+            '#' + par.id + '_paragraphColumn_main').scope()
+
+          if (thisScope.dirtyText === undefined ||
+            thisScope.originalText === undefined ||
+            thisScope.dirtyText === thisScope.originalText) {
+            return true
           } else {
-            self.eventService.broadcast('focusParagraph', self.note.paragraphs[i].id, -1)
-            break
-          }
+            event.preventDefault()
+            self.showParagraphWarning(next)
+          }*/
+        })
+      }
+    })
+
+    this.eventService.subscribe('$destroy', function () {
+      //angular.element(window).off('beforeunload')
+      self.killSaveTimer()
+      self.saveNote()
+
+      document.removeEventListener('click', self.focusParagraphOnClick)
+      //document.removeEventListener('keydown', self.keyboardShortcut)
+      document.removeEventListener('keydown', function(keyEvent){
+        if (!self.viewOnly && !self.revisionView) {
+          self.eventService.broadcast('keyEvent', keyEvent)
         }
       })
+    })
 
-      this.eventService.subscribe('moveFocusToNextParagraph', function (event, currentParagraphId) {
-        let focus = false
-        for (let i = 0; i < self.note.paragraphs.length; i++) {
-          if (focus === false) {
-            if (self.note.paragraphs[i].id === currentParagraphId) {
-              focus = true
-              continue
-            }
-          } else {
-            self.eventService.broadcast('focusParagraph', self.note.paragraphs[i].id, 0)
-            break
-          }
+    this.eventService.subscribe('$unBindKeyEvent', function () {
+      document.removeEventListener('click', self.focusParagraphOnClick)
+      //document.removeEventListener('keydown', self.keyboardShortcut)
+      document.removeEventListener('keydown', function(keyEvent){
+        if (!self.viewOnly && !self.revisionView) {
+          self.eventService.broadcast('keyEvent', keyEvent)
         }
       })
+    })
 
-      this.eventService.subscribe('insertParagraph', function (event, paragraphId, position) {
-        if (self.revisionView === true) {
-          return
-        }
-        let newIndex = -1
-        for (let i = 0; i < self.note.paragraphs.length; i++) {
-          if (self.note.paragraphs[i].id === paragraphId) {
-            // determine position of where to add new paragraph; default is below
-            if (position === 'above') {
-              newIndex = i
-            } else {
-              newIndex = i + 1
-            }
-            break
-          }
-        }
 
-        if (newIndex < 0 || newIndex > self.note.paragraphs.length) {
-          return
-        }
-        self.websocketMsgSrv.insertParagraph(newIndex)
-      })
 
-      this.eventService.subscribe('$routeChangeStart', function (event, next, current) {
-        if (!self.note || !self.note.paragraphs) {
-          return
-        }
-        if (self.note && self.note.paragraphs) {
-          self.note.paragraphs.map(par => {
-            if (self.allowLeave === true) {
-              return
-            }
-            /*let thisScope = angular.element(
-              '#' + par.id + '_paragraphColumn_main').scope()
+    this.route.params.subscribe((params: Params) => {
 
-            if (thisScope.dirtyText === undefined ||
-              thisScope.originalText === undefined ||
-              thisScope.dirtyText === thisScope.originalText) {
-              return true
-            } else {
-              event.preventDefault()
-              self.showParagraphWarning(next)
-            }*/
-          })
-        }
-      })
+      // 获取URL中的NoteId
+      self.noteId = params['noteId']
 
-      this.eventService.subscribe('$destroy', function () {
-        //angular.element(window).off('beforeunload')
-        self.killSaveTimer()
-        self.saveNote()
+      // 获取URL中的revisionId
+      self.revisionId = params['revisionId']
 
-        document.removeEventListener('click', self.focusParagraphOnClick)
-        document.removeEventListener('keydown', self.keyboardShortcut)
-      })
-
-      this.eventService.subscribe('$unBindKeyEvent', function () {
-        document.removeEventListener('click', self.focusParagraphOnClick)
-        document.removeEventListener('keydown', self.keyboardShortcut)
-      })
+      self.paragraphUrl = params.paragraphId
+      self.asIframe = params.asIframe
 
       this.initNotebook()
     })
-  }
 
-  /** 初始化笔记 */
-  initNotebook():void {
-    this.noteVarShareService.clear()
-    /*if ($routeParams.revisionId) {
-      websocketMsgSrv.getNoteByRevision($routeParams.noteId, $routeParams.revisionId)
-    } else {
-      websocketMsgSrv.getNote($routeParams.noteId)
-    }*/
-    this.websocketMsgSrv.getNote(this.noteId)
-
-    /*this.websocketMsgSrv.listRevisionHistory($routeParams.noteId)
-    let currentRoute = $route.current
-    if (currentRoute) {
-      setTimeout(
-        function () {
-          let routeParams = currentRoute.params
-          let $id = angular.element('#' + routeParams.paragraph + '_container')
-
-          if ($id.length > 0) {
-            // adjust for navbar
-            let top = $id.offset().top - 103
-            angular.element('html, body').scrollTo({top: top, left: 0})
-          }
-        },
-        1000
-      )
-    }*/
-  }
-
-  /** 初始化Note */
-  initNoteContent(note):void {
-    if (note === undefined) {
-      this.router.navigate(['/login']);
-    }
-
-    this.note = note[0]
-    this.noteName = this.getNoteName(this.note)
-    /*$scope.paragraphUrl = $routeParams.paragraphId
-    $scope.asIframe = $routeParams.asIframe*/
-
-    if (this.paragraphUrl) {
-      /*$scope.note = cleanParagraphExcept($scope.paragraphUrl, $scope.note)
-      $scope.$broadcast('$unBindKeyEvent', $scope.$unBindKeyEvent)
-      $rootScope.$broadcast('setIframe', $scope.asIframe)
-      initializeLookAndFeel()*/
-      return
-    }
-
-    this.initializeLookAndFeel()
-
-    // open interpreter binding setting when there're none selected
-    this.getInterpreterBindings()
-    this.getPermissions(console.log())
-    let isPersonalized = this.note.config.personalizedMode
-    isPersonalized = isPersonalized === undefined ? 'false' : isPersonalized
-    this.note.config.personalizedMode = isPersonalized
-  }
-
-  //初始化外观
-  initializeLookAndFeel():void {
-    if (!this.note.config.looknfeel) {
-      this.note.config.looknfeel = 'default'
-    } else {
-      this.viewOnly = this.note.config.looknfeel === 'report' ? true : false
-    }
-
-    if (this.note.paragraphs && this.note.paragraphs[0]) {
-      this.note.paragraphs[0].focus = true
-    }
-    this.eventService.broadcast('setLookAndFeel', this.note.config.looknfeel)
-  }
-
-  //获取binding信息
-  getInterpreterBindings():void {
-    this.websocketMsgSrv.getInterpreterBindings(this.note.id)
-  }
-
-  //监听Bing信息的回调
-  callbackInterpreterBindings(data):void {
-    this.interpreterBindings = data[0].interpreterBindings
-    //this.interpreterBindingsOrig = angular.copy(this.interpreterBindings) // to check dirty
-
-    let selected = false
-    let key
-    let setting
-
-    for (key in this.interpreterBindings) {
-      setting = this.interpreterBindings[key]
-      if (setting.selected) {
-        selected = true
-        break
-      }
-    }
-
-    if (!selected) {
-      // make default selection
-      let selectedIntp = {}
-      for (key in this.interpreterBindings) {
-        setting = this.interpreterBindings[key]
-        if (!selectedIntp[setting.name]) {
-          setting.selected = true
-          selectedIntp[setting.name] = true
-        }
-      }
-      this.showSetting = true
-    }
-
-  }
-
-  // 获取Note的权限
-  getPermissions(callback):void {
-    let self = this;
-    this.httpClient.get(this.baseUrlSrv.getRestApiBase() + '/notebook/'+ this.note.id + '/permissions')
-      .subscribe(
-        response => {
-          self.permissions = response['body']
-          //self.permissionsOrig = angular.copy(self.permissions) // to check dirty
-
-          let selectJson = {
-            tokenSeparators: [',', ' '],
-            ajax: {
-              url: function (params) {
-                if (!params.term) {
-                  return false
-                }
-                return self.baseUrlSrv.getRestApiBase() + '/security/userlist/' + params.term
-              },
-              delay: 250,
-              processResults: function (data, params) {
-                let results = []
-
-                if (data.body.users.length !== 0) {
-                  let users = []
-                  for (let len = 0; len < data.body.users.length; len++) {
-                    users.push({
-                      'id': data.body.users[len],
-                      'text': data.body.users[len]
-                    })
-                  }
-                  results.push({
-                    'text': 'Users :',
-                    'children': users
-                  })
-                }
-                if (data.body.roles.length !== 0) {
-                  let roles = []
-                  for (let len = 0; len < data.body.roles.length; len++) {
-                    roles.push({
-                      'id': data.body.roles[len],
-                      'text': data.body.roles[len]
-                    })
-                  }
-                  results.push({
-                    'text': 'Roles :',
-                    'children': roles
-                  })
-                }
-                return {
-                  results: results,
-                  pagination: {
-                    more: false
-                  }
-                }
-              },
-              cache: false
-            },
-            width: ' ',
-            tags: true,
-            minimumInputLength: 3
-          }
-
-          self.setIamOwner()
-          /*angular.element('#selectOwners').select2(selectJson)
-          angular.element('#selectReaders').select2(selectJson)
-          angular.element('#selectRunners').select2(selectJson)
-          angular.element('#selectWriters').select2(selectJson)*/
-          if (callback) {
-            callback()
-          }
-        },
-        errorResponse => {
-          let redirect = errorResponse.headers('Location')
-          if (errorResponse.status === 401 && redirect !== undefined) {
-            // Handle page redirect
-            window.location.href = redirect
-          }
-        }
-      );
-  }
-
-  setIamOwner():boolean {
-    /*if (this.permissions.owners.length > 0 && _.indexOf(this.permissions.owners, this.globalService.ticket.principal) < 0) {
-      this.isOwner = false
-      return false
-    }*/
-    this.isOwner = true
-    return true
   }
 
   columnWidthClass(n) {
@@ -1474,13 +1549,11 @@ export class NotebookComponent implements OnInit {
    * @param {string} id
    */
   getParagraphById(id:string){
-
     for (let paragraph of this.note.paragraphs) {
       if(paragraph.id == id){
         return paragraph
       }
     }
-
     return null
   }
 

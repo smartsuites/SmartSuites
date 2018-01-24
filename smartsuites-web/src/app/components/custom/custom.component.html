@@ -1,0 +1,29 @@
+<div style="min-height: 800px">
+
+  <div class="ui-g">
+
+    <div class="ui-g-12">
+      <p-fieldset legend="平台名称" toggleable="true">
+        <input type="text" pInputText [(ngModel)]="property" style="width: 50%;"/>
+        <button pButton type="button" icon="fa-check" iconPos="right" label="更新"></button>
+      </p-fieldset>
+    </div>
+
+    <div class="ui-g-12">
+      <p-fieldset legend="登录界面欢迎图片（1920 x 1080）" toggleable="true">
+        <p-growl [value]="msgs"></p-growl>
+
+        <p-fileUpload name="demo[]" url="./upload.php" (onUpload)="onUpload($event)"
+                      multiple="multiple" accept="image/*" maxFileSize="1000000">
+          <ng-template pTemplate="content">
+            <ul *ngIf="uploadedFiles.length">
+              <li *ngFor="let file of uploadedFiles">{{file.name}} - {{file.size}} bytes</li>
+            </ul>
+          </ng-template>
+        </p-fileUpload>
+      </p-fieldset>
+    </div>
+
+  </div>
+
+</div>

@@ -4,8 +4,15 @@
 </div>
 
 <div class="login-body">
-  <!--<div class="login-image"></div>-->
-  <div class="card login-panel ui-fluid" style="height:450px">
+  <div class="title">
+    <h1>DATA SMART</h1>
+  </div>
+
+  <div class="about">
+    <a href="assets/pages/landing.html" target="_blank"><img src="assets/login/about.png"/></a>
+  </div>
+
+  <div class="card login-panel ui-fluid card-w-title shadow-box ui-shadow-5" style="height:400px">
 
     <!-- 登录 -->
     <div class="login-panel-content" *ngIf="formType==0">
@@ -14,26 +21,25 @@
           <img src="assets/layout/images/login/icon-login.svg"/>
         </div>
         <div class="ui-g-9" style="text-align:right;">
-          <h2 class="welcome-text">欢迎您</h2>
-          <span class="guest-sign-in">登陆 DATASMART 数据平台</span>
+          <h1 class="welcome-text">欢迎您</h1>
+          <span class="guest-sign-in"><h4>登陆 DATASMART 数据平台</h4></span>
         </div>
         <div class="ui-g-12" style="text-align:left;">
-          <label class="login-label">用户名称</label>
-          <div class="login-input">
-            <input type="text" class="ui-inputtext ui-widget ui-state-default ui-corner-all"/>
+          <div class="ui-inputgroup">
+            <span class="ui-inputgroup-addon" style="color: #000000"><i class="fa fa-user"></i></span>
+            <input type="text" pInputText placeholder="用户名">
           </div>
         </div>
         <div class="ui-g-12" style="text-align:left;">
-          <label class="login-label">用户密码</label>
-          <div class="login-input">
-            <input type="password" class="ui-inputtext ui-widget ui-state-default ui-corner-all"/>
+          <div class="ui-inputgroup">
+            <span class="ui-inputgroup-addon" style="color: #000000"><i class="fa fa-lock"></i></span>
+            <input type="text" pInputText placeholder="密码">
           </div>
         </div>
         <div class="ui-g-12" style="text-align:left;">
-          <label class="login-label">用户角色</label>
-          <div style="color: black">
-            <p-dropdown [options]="roles" [(ngModel)]="selectedRole" [autoWidth]="false"></p-dropdown>
-          </div>
+          <div class="ui-g-4"><p-radioButton name="group" value="analyst" label="分析人员" [(ngModel)]="selectedRole" inputId="opt1"></p-radioButton></div>
+          <div class="ui-g-4"><p-radioButton name="group" value="business" label="业务人员" [(ngModel)]="selectedRole" inputId="opt2"></p-radioButton></div>
+          <div class="ui-g-4"><p-radioButton name="group" value="manager" label="管理人员" [(ngModel)]="selectedRole" inputId="opt3"></p-radioButton></div>
         </div>
 
         <div class="ui-g-12 ui-md-6 button-pane">
@@ -55,13 +61,13 @@
           <img src="assets/layout/images/login/icon-login.svg"/>
         </div>
         <div class="ui-g-9" style="text-align:right;">
-          <h2 class="welcome-text">欢迎您</h2>
-          <span class="guest-sign-in">找回 DATASMART 数据平台密码</span>
+          <h1 class="welcome-text">欢迎您</h1>
+          <span class="guest-sign-in"><h4>找回 DATASMART 数据平台密码</h4></span>
         </div>
         <div class="ui-g-12" style="text-align:left;">
-          <label class="login-label">用户邮箱</label>
-          <div class="login-input">
-            <input type="text" class="ui-inputtext ui-widget ui-state-default ui-corner-all"/>
+          <div class="ui-inputgroup">
+            <span class="ui-inputgroup-addon" style="color: #000000"><i class="fa fa-envelope"></i></span>
+            <input type="text" pInputText placeholder="用户名">
           </div>
         </div>
         <div class="ui-g-12 ui-md-6 button-pane">

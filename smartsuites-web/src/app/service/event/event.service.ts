@@ -21,7 +21,8 @@ export class EventService1 {
     this._topic.subscribe({
       next: (v) => {
         if(v.eventType.trim() == eventType.trim()){
-          callback(v.eventMsg)
+          callback(v.eventMsg[0])
+          console.log(v.eventMsg[0])
         }
       }
     })
@@ -35,7 +36,7 @@ export class EventService1 {
 
 export class EventObject{
   eventType:String
-  eventMsg:any[]
+  eventMsg:any
 
   constructor(eventType, eventMsg) {
     this.eventType = eventType;

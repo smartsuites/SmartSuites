@@ -8,21 +8,17 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {RouterModule} from "@angular/router";
 import {HttpClientModule} from "@angular/common/http";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
-
-
 // UI PRIMENG
 import {LocationStrategy, HashLocationStrategy} from '@angular/common';
 import {HttpModule} from '@angular/http';
 import 'rxjs/add/operator/toPromise';
-
-import {AccordionModule, SidebarModule} from 'primeng/primeng';
+import {AccordionModule, ConfirmationService, ProgressSpinnerModule, SidebarModule} from 'primeng/primeng';
 import {AutoCompleteModule} from 'primeng/primeng';
 import {BreadcrumbModule} from 'primeng/primeng';
 import {ButtonModule} from 'primeng/primeng';
 import {CalendarModule} from 'primeng/primeng';
 import {CarouselModule} from 'primeng/primeng';
 import {ColorPickerModule} from 'primeng/primeng';
-import {ChartModule} from 'primeng/primeng';
 import {CheckboxModule} from 'primeng/primeng';
 import {ChipsModule} from 'primeng/primeng';
 import {CodeHighlighterModule} from 'primeng/primeng';
@@ -80,17 +76,8 @@ import {ToolbarModule} from 'primeng/primeng';
 import {TooltipModule} from 'primeng/primeng';
 import {TreeModule} from 'primeng/primeng';
 import {TreeTableModule} from 'primeng/primeng';
-
-
 import {AppComponent} from './app.component';
-import {NavbarComponent} from './components/navbar/navbar.component';
 import {LoginComponent} from './common/login/login.component';
-import {NoteCreateComponent} from './components/note-create/note-create.component';
-import {NoteListComponent} from './components/note-list/note-list.component';
-import {NoteRenameComponent} from './components/note-rename/note-rename.component';
-import {NoteImportComponent} from './components/note-import/note-import.component';
-import {NgEnterDirective} from './directive/ng-enter/ng-enter.directive';
-import {NgEscapeDirective} from './directive/ng-escape/ng-escape.directive';
 import {ArrayOrderingService} from "./service/array-ordering/array-ordering.service";
 import {BaseUrlService} from "./service/base-url/base-url.service";
 import {WebsocketMessageService} from "./service/websocket/websocket-message.service";
@@ -101,7 +88,6 @@ import {SearchService} from "./service/search/search.service";
 import {GlobalService} from "./service/global/global.service";
 import {EventService1} from "./service/event/event.service";
 import {AppRoutingModule} from "./route/app-routing.module";
-import {HomeComponent} from './components/home/home.component';
 import {NoteActionService} from "./service/note-action/note-action.service";
 import {NoteRenameService} from "./service/note-rename/note-rename.service";
 import {NoteListService} from "./service/note-list/note-list.service";
@@ -114,18 +100,11 @@ import {HeliumComponent} from './components/helium/helium.component';
 import {NotebookComponent} from './components/notebook/notebook.component';
 import {ParagraphComponent} from './components/notebook/paragraph/paragraph.component';
 import {SearchComponent} from './components/search/search.component';
-import {SpellComponent} from './components/spell/spell.component';
-import {TabledataComponent} from './components/tabledata/tabledata.component';
-import {VisualizationComponent} from './components/visualization/visualization.component';
-import {BuiltinsComponent} from './components/visualization/builtins/builtins.component';
 import {LoginService} from "./service/login/login.service";
-
-import {NgIncludeDirective } from './directive/ng-include/ng-include.directive';
 import {AppProfileComponent } from './common/profile/app.profile.component';
 import {AppFooterComponent } from './common/footer/app.footer.component';
 import {AppMenuComponent, AppSubMenuComponent} from './common/menu/app.menu.component';
 import {AppTopbarComponent } from './common/topbar/app.topbar.component';
-
 // DEMO ONLY
 import {DashboardDemoComponent} from './demo/view/dashboarddemo.component';
 import {SampleDemoComponent} from './demo/view/sampledemo.component';
@@ -141,14 +120,10 @@ import {ChartsDemoComponent} from './demo/view/chartsdemo.component';
 import {FileDemoComponent} from './demo/view/filedemo.component';
 import {UtilsDemoComponent} from './demo/view/utilsdemo.component';
 import {DocumentationComponent} from './demo/view/documentation.component';
-
 import {CarService} from './demo/service/carservice';
 import {CountryService} from './demo/service/countryservice';
 import {EventService} from './demo/service/eventservice';
 import {NodeService} from './demo/service/nodeservice';
-
-
-
 import { ScreenComponent } from './components/screen/screen.component';
 import { MessageService} from "primeng/components/common/messageservice";
 import {HubComponent} from "./components/hub/hub.component";
@@ -157,9 +132,14 @@ import {BussDashboardComponent} from "./components/buss-dashboard/buss-dashboard
 import {AnalysisDashboardComponent} from "./components/analysis-dashboard/analysis-dashboard.component";
 import {NoteVarShareService} from "./service/note-var-share/note-var-share.service";
 import {SaveAsService} from "./service/save-as/save-as.service";
-import {AceEditorDirective} from "ng2-ace-editor";
-import {MomentModule} from "angular2-moment";
-import {NgxEchartsModule} from "ngx-echarts";
+import { ResultComponent } from './components/notebook/paragraph/result/result.component';
+import { DocumentComponent } from './components/document/document.component';
+import {BlockUIModule} from "primeng/components/blockui/blockui";
+import { CatalogComponent } from './components/catalog/catalog.component';
+import { CustomComponent } from './components/custom/custom.component';
+import {CommonService} from "./service/common/common.service";
+import {HeliumService} from "./service/helium/helium.service";
+
 
 @NgModule({
   declarations: [
@@ -167,20 +147,10 @@ import {NgxEchartsModule} from "ngx-echarts";
     LoginComponent,
     ConfigurationComponent,
     NotebookComponent,
-    AceEditorDirective,
     ParagraphComponent,
-
-    /*NavbarComponent,
-
-    NoteCreateComponent,
-    NoteListComponent,
-    NoteRenameComponent,
-    NoteImportComponent,
-    NgEnterDirective,
-    NgEscapeDirective,
-
     CredentialComponent,
-    HomeComponent,
+    /*
+
     NotebookRepositoryComponent,
     InterpreterComponent,
     JobmanagerComponent,
@@ -188,12 +158,7 @@ import {NgxEchartsModule} from "ngx-echarts";
     WidgetComponent,
     HeliumComponent,
 
-    SearchComponent,
-    SpellComponent,
-    TabledataComponent,
-    VisualizationComponent,
-    BuiltinsComponent,
-    NgIncludeDirective,*/
+    SearchComponent,*/
     AppProfileComponent,
     AppFooterComponent,
     AppMenuComponent,
@@ -220,8 +185,11 @@ import {NgxEchartsModule} from "ngx-echarts";
     AdminDashboardComponent,
     BussDashboardComponent,
     AnalysisDashboardComponent,
-
-    DocumentationComponent
+    ResultComponent,
+    DocumentComponent,
+    CatalogComponent,
+    CustomComponent,
+    DocumentationComponent,
   ],
   imports: [
     BrowserModule,
@@ -231,9 +199,8 @@ import {NgxEchartsModule} from "ngx-echarts";
     HttpClientModule,
     BrowserAnimationsModule,
     ReactiveFormsModule,
-    MomentModule,
-    NgxEchartsModule,
-
+    BlockUIModule,
+    ProgressSpinnerModule,
     //UI
     HttpModule,
     AccordionModule,
@@ -243,7 +210,6 @@ import {NgxEchartsModule} from "ngx-echarts";
     CalendarModule,
     CarouselModule,
     ColorPickerModule,
-    ChartModule,
     CheckboxModule,
     ChipsModule,
     CodeHighlighterModule,
@@ -306,6 +272,7 @@ import {NgxEchartsModule} from "ngx-echarts";
   entryComponents: [
   ],
   providers: [
+    CommonService,
     ArrayOrderingService,
     BaseUrlService,
     WebsocketMessageService,
@@ -320,6 +287,8 @@ import {NgxEchartsModule} from "ngx-echarts";
     MessageService,
     NoteVarShareService,
     SaveAsService,
+    ConfirmationService,
+    HeliumService,
 
     //DEMO ONLY
     {provide: LocationStrategy, useClass: HashLocationStrategy},

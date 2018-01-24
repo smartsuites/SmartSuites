@@ -6,22 +6,20 @@ import {GlobalService} from "../global/global.service";
 import {$WebSocket, WebSocketSendMode} from "angular2-websocket/angular2-websocket";
 
 @Injectable()
-export class WebsocketEventService{
+export class WebsocketEventService {
 
   // WebSocket HB间隔
-  pingIntervalId
+  private pingIntervalId: number
 
   // WebSocket客户端
-  websocket
+  private websocket: any
 
   // 平台初始启动
   platformFirstLoad = true;
 
-  constructor(public baseUrlSrv:BaseUrlService, public router:Router, public eventService:EventService1, public globalService:GlobalService) {
-
-    this.websocket = new $WebSocket(this.baseUrlSrv.getWebsocketUrl())
-
+  constructor(public baseUrlSrv: BaseUrlService, public router: Router, public eventService: EventService1, public globalService: GlobalService) {
     let vm = this;
+    this.websocket = new $WebSocket(this.baseUrlSrv.getWebsocketUrl())
 
     this.websocket.onOpen(function () {
       console.log('Websocket created')
@@ -29,7 +27,7 @@ export class WebsocketEventService{
       vm.eventService.broadcast('setConnectedStatus', true)
 
       // 广播平台初始启动事件
-      if(vm.platformFirstLoad){
+      if (vm.platformFirstLoad) {
         vm.platformFirstLoad = false
         vm.eventService.broadcast('platformStartup')
       }
@@ -41,7 +39,7 @@ export class WebsocketEventService{
     })
 
     this.websocket.onMessage(
-      (event: MessageEvent)=> {
+      (event: MessageEvent) => {
 
         let payload
         if (event.data) {
@@ -184,11 +182,11 @@ export class WebsocketEventService{
       {autoApply: false}
     )
 
-    this.websocket.onError((event: MessageEvent)=> {
+    this.websocket.onError((event: MessageEvent) => {
       vm.eventService.broadcast('setConnectedStatus', false)
     })
 
-    this.websocket.onClose((event: MessageEvent)=> {
+    this.websocket.onClose((event: MessageEvent) => {
       console.log('close message: ', event)
       if (this.pingIntervalId !== null) {
         clearInterval(this.pingIntervalId)
@@ -216,7 +214,7 @@ export class WebsocketEventService{
       data.roles = ''
     }
     console.log('Send >> %o, %o, %o, %o, %o', data.op, data.principal, data.ticket, data.roles, data)
-    return this.websocket.send(data,WebSocketSendMode.Direct)
+    return this.websocket.send(data, WebSocketSendMode.Direct)
   }
 
   isConnected() {

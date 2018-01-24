@@ -5,6 +5,9 @@ import {GlobalService} from "../global/global.service";
 import {BaseUrlService} from "../base-url/base-url.service";
 import {Ticket} from "../../model/Ticket";
 import {EventService1} from "../event/event.service";
+import {AnalysisDashboardComponent} from "../../components/analysis-dashboard/analysis-dashboard.component";
+import {AdminDashboardComponent} from "../../components/admin-dashboard/admin-dashboard.component";
+import {BussDashboardComponent} from "../../components/buss-dashboard/buss-dashboard.component";
 
 @Injectable()
 export class LoginService {
@@ -72,7 +75,15 @@ export class LoginService {
   // 登录
   login():void {
     this.globalService.login = true
-    this.router.navigate(['/home']);
+
+    if(this.isAnalyst()){
+      this.router.navigate(['/analysisDashboard']);
+    }else if(this.isBusiness()){
+      this.router.navigate(['/bussDashboard']);
+    }else if(this.isManager()){
+      this.router.navigate(['/adminDashboard']);
+    }
+
     this.eventService.broadcast("loginSuccess")
     /*let config = {}
     this.httpClient.get(this.baseUrlSrv.getRestApiBase() + '/security/ticket', config)

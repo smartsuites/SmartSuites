@@ -48,10 +48,10 @@
 .notebook .new-paragraph:hover{
   text-align: center;
   background-color: #83b8d2;
-  font-size: 8px;
+  font-size: 6px;
 }
 
 .notebook .new-paragraph{
   text-align: center;
-  font-size: 8px;
+  font-size: 6px;
 }

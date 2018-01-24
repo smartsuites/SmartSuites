@@ -1,0 +1,52 @@
+<p-dialog header="创建主题目录" [(visible)]="createRootDialogDisplay" [modal]=true >
+  <div class="ui-g">
+
+    <span>目录名称：</span>
+    <div class="ui-g-12 ui-md-12" style="margin-bottom: 10px">
+      <input #rootname type="text" pInputText style="width: 100%"/>
+    </div>
+  </div>
+
+  <p-footer>
+    <button type="button" pButton icon="fa-plus-circle" (click)="createRootCatalog(rootname.value);createRootDialogDisplay=false" label="创建目录"></button>
+  </p-footer>
+</p-dialog>
+
+<p-dialog header="创建子目录" [(visible)]="createSubDialogDisplay" [modal]=true >
+  <div class="ui-g">
+
+    <span>目录名称：</span>
+    <div class="ui-g-12 ui-md-12" style="margin-bottom: 10px">
+      <input #subname type="text" pInputText style="width: 100%"/>
+    </div>
+  </div>
+
+  <p-footer>
+    <button type="button" pButton icon="fa-plus-circle" (click)="createSubCatalog(subname.value);createSubDialogDisplay=false" label="创建目录"></button>
+  </p-footer>
+</p-dialog>
+
+<div class="ui-g">
+
+  <div class="ui-g-12">
+    <p-toolbar>
+      <div class="ui-toolbar-group-left">
+        <button pButton type="button" label="新建主题目录" pTooltip="新建主题目录" tooltipPosition="bottom" icon="fa-home" (click)="createRootDialogDisplay=true"></button>
+        <button pButton type="button" label="新建子目录" pTooltip="新建子目录" tooltipPosition="bottom" icon="fa-folder-open" (click)="createSubDialogDisplay=true"></button>
+      </div>
+
+      <div class="ui-toolbar-group-right">
+        <button pButton type="button" label="删除目录" pTooltip="删除目录" tooltipPosition="bottom" class="danger-btn" icon="fa-bitbucket" (click)="removeCatalog()"></button>
+      </div>
+    </p-toolbar>
+  </div>
+
+
+
+  <div class="ui-g-12" style="min-height: 800px;">
+
+    <div style="margin-bottom: 8px">当前选择的节点为: {{selectedNode ? selectedNode.label : 'none'}}</div>
+    <p-tree [value]="catalogItems" layout="horizontal" selectionMode="single" [(selection)]="selectedNode" ></p-tree>
+
+  </div>
+</div>

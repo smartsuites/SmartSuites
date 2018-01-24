@@ -15,6 +15,7 @@ import {WebsocketEventService} from "./service/websocket/websocket-event.service
 import {NoteListService} from "./service/note-list/note-list.service";
 import {MessageService} from "primeng/components/common/messageservice";
 import {Ticket} from "./model/Ticket";
+import {CommonService} from "./service/common/common.service";
 
 enum MenuOrientation {
   STATIC,
@@ -79,16 +80,19 @@ export class AppComponent implements OnInit,AfterViewInit, OnDestroy {
               private router:Router,
               private websocketEventService:WebsocketEventService,
               private messageService: MessageService,
-              private noteListFactory:NoteListService) {
+              private noteListFactory:NoteListService,
+              private commonService:CommonService
+              ) {
     this.ticket = globalService.ticket
     this.notes = this.noteListFactory.notes
   }
 
   ngAfterViewInit() {
+
     this.layoutMenuScroller = <HTMLDivElement> this.layoutMenuScrollerViewChild.nativeElement;
 
     setTimeout(() => {
-      jQuery(this.layoutMenuScroller).nanoScroller({flash: true});
+      //jQuery(this.layoutMenuScroller).nanoScroller({flash: true});
     }, 10);
   }
 
@@ -143,7 +147,7 @@ export class AppComponent implements OnInit,AfterViewInit, OnDestroy {
 
     if (!this.isHorizontal()) {
       setTimeout(() => {
-        jQuery(this.layoutMenuScroller).nanoScroller();
+        //jQuery(this.layoutMenuScroller).nanoScroller();
       }, 500);
     }
   }
@@ -225,7 +229,7 @@ export class AppComponent implements OnInit,AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    jQuery(this.layoutMenuScroller).nanoScroller({flash: true});
+    //jQuery(this.layoutMenuScroller).nanoScroller({flash: true});
   }
 
   //************ BUSSINESS **************
@@ -276,9 +280,8 @@ export class AppComponent implements OnInit,AfterViewInit, OnDestroy {
 
     // 用于监听笔记加载消息，异步加载Notes
     this.eventService.subscribe('setNoteMenu', function (notes) {
-      console.log(notes)
       self.noteListFactory.setNotes(notes)
-      self.eventService.broadcast("noteComplete")
+      self.eventService.broadcast("noteComplete",notes)
     })
 
     // 监听登录状态
@@ -290,7 +293,6 @@ export class AppComponent implements OnInit,AfterViewInit, OnDestroy {
       //如果是分析人员
       if(self.loginService.isAnalyst()){
 
-        console.log(">>>>>>>>>>>>>>")
         self.listConfigurations()
         self.getHomeNote()
         self.loadNotes()

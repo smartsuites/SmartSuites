@@ -1,15 +1,13 @@
-/*.login-form {
-  max-width: 300px;
+.title{
+  position: absolute;
+  top: 0px;
+  left: 100px;
+  font-size: 30px;
+  color: #FFFFFF;
 }
 
-.login-form-forgot {
-  float: right;
-}
-
-.login-form-button {
-  width: 100%;
-}*/
-
-.login-body{
-  height:450px;
+.about{
+  position: absolute;
+  top: 0px;
+  right: 0px;
 }

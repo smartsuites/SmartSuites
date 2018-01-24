@@ -1,3 +1,100 @@
-<p>
-  app.menu works!
-</p>
+<ul app-submenu [item]="model" root="true" style="margin-top: 0px" class="layout-menu layout-main-menu clearfix"
+    [reset]="reset"
+    visible="true">
+</ul>
+
+<!--<p-blockUI [blocked]="createNoteDialogDisplay" [target]="body" [baseZIndex]="0" [autoZIndex]=false></p-blockUI>-->
+
+<p-dialog header="创建笔记" [(visible)]="createNoteDialogDisplay" [modal]=true [autoZIndex]=false>
+  <div class="ui-g">
+
+    <span>笔记名称：</span>
+    <div class="ui-g-12 ui-md-12" style="margin-bottom: 10px">
+      <input type="text" pInputText style="width: 100%" [(ngModel)]="noteName"/>
+    </div>
+
+    <span>默认解析器：</span>
+    <div class="ui-g-12 ui-md-12" style="margin-bottom: 10px">
+      <p-dropdown [options]="cities1" [(ngModel)]="defaultInter" [autoWidth]="false"></p-dropdown>
+    </div>
+
+    <span>使用 '/' 来创建文件夹. 比如: /NoteDirA/Note1</span>
+  </div>
+
+  <p-footer>
+    <button type="button" pButton icon="fa-plus-circle" (click)="display=false" label="创建笔记"></button>
+  </p-footer>
+</p-dialog>
+
+<p-dialog header="导入笔记" [(visible)]="importNoteDialogDisplay" [modal]=true [autoZIndex]=false>
+
+  <div style="width: 570px;
+    height: 390px">
+
+    <span>导入到笔记：</span>
+    <div style="margin-bottom: 10px; padding: 0px 10px 0px 10px;">
+      <input type="text" pInputText style="width: 100%" [(ngModel)]="noteName"/>
+    </div>
+
+    <div>使用 '/' 来创建文件夹. 比如: /NoteDirA/Note1</div>
+    <br/>
+    <div style="margin-bottom: 5px;
+    font-weight: 700;
+    margin-top: 10px;">JSON文件的大小不能超过1MB：
+    </div>
+
+    <div *ngIf="importUrlClick" style="margin-bottom: 5px;font-weight: 700;margin-top: 10px; padding: 0px 10px 0px 10px;">
+      <div>URL：</div>
+      <input type="text" pInputText style="width: 100%" [(ngModel)]="noteName"/>
+    </div>
+
+    <div *ngIf="!importUrlClick">
+      <div class="display-inline" style="background: #fff;
+          border: 1px solid #ddd;
+          border-radius: 5px;
+          color: #999;
+          cursor: pointer;
+          font-size: 98px;
+          float: left;
+          display: block;
+          height: 240px;
+          margin: 0 10px 16px;
+          padding-top: 60px;
+          text-align: center;
+          text-decoration: none;
+          width: 264px;">
+        <a class="fa fa-cloud-upload import-file-upload" ng-click="uploadFile()">
+          <p style="font-size: 15px">
+            <p-fileUpload mode="basic" chooseLabel="选择JSON文件" name="demo[]" url="./upload.php" accept="image/*" maxFileSize="1000000" (onUpload)="onBasicUpload($event)"></p-fileUpload>
+          </p>
+        </a>
+      </div>
+      <div class="display-inline" style="background: #fff;
+          border: 1px solid #ddd;
+          border-radius: 5px;
+          color: #999;
+          cursor: pointer;
+          float: left;
+          display: block;
+          font-size: 98px;
+          height: 240px;
+          margin: 0 10px 16px;
+          padding-top: 60px;
+          text-align: center;
+          text-decoration: none;
+          width: 264px;">
+        <a href="javascript:void(0);" ng-click="uploadURL()" class="fa fa-link">
+          <p style="font-size: 15px">
+            <button pButton type="button" label="从URL地址添加" icon="fa-edit"  (click)="importUrlClick=true"></button>
+          </p>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <p-footer *ngIf="importUrlClick">
+    <button type="button" pButton icon="fa-mail-reply" (click)="importUrlClick=false" label="返回"></button>
+    <button type="button" pButton icon="fa-plus-circle" (click)="display=false" label="创建笔记"></button>
+  </p-footer>
+</p-dialog>

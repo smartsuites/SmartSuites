@@ -1,6 +1,8 @@
 import {Component, OnInit, ViewContainerRef} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {BaseUrlService} from "../../service/base-url/base-url.service";
+import {Car} from "../../demo/domain/car";
+import {CarService} from "../../demo/service/carservice";
 //import {NzNotificationService} from "ng-zorro-antd";
 
 @Component({
@@ -26,8 +28,11 @@ export class CredentialComponent implements OnInit {
   password = ''
   username = ''
 
+  cars1: Car[];
+
   constructor(public httpClient:HttpClient,
               public baseUrlSrv:BaseUrlService,
+              private carService: CarService,
               /*public alertService: NzNotificationService*/) {
     // TODO
     //ngToast.dismiss()
@@ -35,8 +40,11 @@ export class CredentialComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.getAvailableInterpreters()
-    this.getCredentialInfo()
+    this.carService.getCarsMedium().then(cars => this.cars1 = cars);
+
+
+    /*this.getAvailableInterpreters()
+    this.getCredentialInfo()*/
   }
 
   hasCredential(){

@@ -1,6 +1,6 @@
 export class Ticket {
-  principal: String = "anonymous"
-  ticket: String = "anonymous"
-  roles: String = ""
-  screenUsername:String = "anonymous"
+  principal: string = "anonymous"
+  ticket: string = "anonymous"
+  roles: string = ""
+  screenUsername:string = "anonymous"
 }

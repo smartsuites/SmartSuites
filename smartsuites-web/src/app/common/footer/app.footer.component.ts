@@ -8,4 +8,6 @@ import {AppComponent} from '../../app.component';
 })
 export class AppFooterComponent {
 
+  constructor() {
+  }
 }

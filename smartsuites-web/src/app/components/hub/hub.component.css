@@ -1,0 +1,36 @@
+.zepl-card {
+  border-radius: 8px;
+  box-shadow: 0 1px 2px 0;
+  background-color: #fff;
+  font-family: Lato;
+  position: relative;
+}
+
+.zepl-card-span{
+  height: 8px;
+  display: inline-block;
+  vertical-align: top;
+  border-bottom: 1px solid #f3f2fa;
+  width: 100%;
+  background-color: rgb(230,92,98);
+  border-top-right-radius: 8px;
+  border-top-left-radius: 8px;
+}
+
+.zepl-card-footer{
+  height: 30px;
+  background-color: #fafafa;
+  position: absolute;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  bottom: 0;
+  font-size: 14px;
+  left: 0;
+  right: 0;
+  border-radius: 0 0 8px 8px;
+  padding: 0 20px;
+}

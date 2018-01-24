@@ -5,6 +5,7 @@
 /************** Login  **************/
 .show-pictures li,.show-pictures img{
   width: 100% !important;
+  height: 100% !important;
 }
 
 .show-pictures .ui-widget-content{
@@ -39,6 +40,16 @@
 /************** notebook ******************/
 .notebook .ui-g-1, .notebook .ui-g-2, .notebook .ui-g-3, .notebook .ui-g-4, .notebook .ui-g-5, .notebook .ui-g-6, .notebook .ui-g-7, .notebook .ui-g-8, .notebook .ui-g-9, .notebook .ui-g-10, .notebook .ui-g-11, .notebook .ui-g-12 {
   padding: 0px;
+}
+
+/************** hub  **************/
+.hub .ui-widget-content {
+  background-color: #EFF2F6 !important;
+  border: none !important;
+}
+
+.ui-dialog .ui-dialog-content {
+   overflow: unset;
 }
 
 /* You can add global styles to this file, and also import other style files */

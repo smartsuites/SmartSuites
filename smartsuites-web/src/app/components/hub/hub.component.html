@@ -1,47 +1,83 @@
-<div class="ui-g">
-  <div class="ui-g-12">
-    <div class="card card-w-title">
-      <h1>推荐算法</h1>
-      <p-carousel headerText="Cars" [value]="carouselCars">
-        <ng-template let-car pTemplate="item">
-          <div class="ui-g" style="text-align:center;margin: 1em">
-            <div class="ui-g-12" style="text-align:Center">
-              <img src="assets/demo/images/car/{{car.brand}}.png" />
+<div class="ui-g" style="margin-top: 80px;margin-bottom: 80px">
+
+  <div class="ui-g-6 ui-g-offset-3" style="text-align: center">
+
+    <div class="landing-explore__text--centered">
+      <div class="landing-explore__title" style="font-size: 60px;font-weight: bold;color: #47364d;margin-bottom: 10px">Explore Notebooks</div>
+      <div class="landing-explore__subtitle" style="font-size: 18px;color: #47364d;margin-bottom: 30px">The best way to share Notebooks</div>
+    </div>
+
+    <div class="ui-inputgroup" style="width: 100%">
+      <span class="ui-inputgroup-addon" style="font-size: 20px; background-color: white; border-right: none;">
+        <i class="fa fa-search"></i>
+      </span>
+      <input type="text" pInputText placeholder="Search" style="font-size: 20px;width: 100%">
+    </div>
+
+  </div>
+
+</div>
+
+<div class="ui-g" style="font-size: 20px;
+    font-weight: bold;
+    border-top: 1px solid #dddddd;
+    padding-top: 10px;
+    margin-bottom: 20px;">
+
+  <div class="ui-g-2 ui-g-offset-2" style="text-align: center">
+    <div style="max-width: 160px;height: 160px;margin: auto;padding-top: 40px; margin-bottom: 80px">
+      <img alt="Apache Spark" src="assets/hub/spark.png" style="max-width: 160px;">
+    </div>
+    <h2>Spark</h2>
+  </div>
+  <div class="ui-g-2 ui-g-offset-1" style="text-align: center">
+    <div style="max-width: 160px;height: 160px;margin: auto;padding-top: 40px; margin-bottom: 80px">
+      <img alt="Apache Spark" src="assets/hub/python.png" style="max-width: 160px;">
+    </div>
+    <h2>Python</h2>
+  </div>
+  <div class="ui-g-2 ui-g-offset-1" style="text-align: center">
+    <div style="max-width: 160px;height: 160px;margin: auto;padding-top: 40px; margin-bottom: 80px">
+      <img alt="Apache Spark" src="assets/hub/tensor.png" style="max-width: 160px;">
+    </div>
+    <h2>Machine learning</h2>
+  </div>
+
+</div>
+
+
+<div class="ui-g hub" style="font-size: 20px;
+    font-weight: bold;
+    border-top: 1px solid #dddddd;
+    padding-top: 10px;
+    margin-bottom: 20px;">
+
+  <div class="ui-g-offset-1 ui-g-10">
+
+    <p-dataGrid [value]="cars">
+      <ng-template let-car pTemplate="item">
+        <div style="padding:0.5em" class="ui-g-12 ui-md-3">
+          <div class="zepl-card">
+            <span class="zepl-card-span"></span>
+
+            <div style="padding: 10px">
+              <img src="assets/layout/images/{{car.img}}" style="width: 150px;height: 150px">
+              <div class="car-detail" style="padding:1em;float: right">{{car.title}}</div>
             </div>
-            <div class="ui-g-6">Vin: </div>
-            <div class="ui-g-6" style="font-weight:bold">{{car.vin}}</div>
 
-            <div class="ui-g-6">Year: </div>
-            <div class="ui-g-6" style="font-weight:bold">{{car.year}}</div>
-
-            <div class="ui-g-6">Brand: </div>
-            <div class="ui-g-6" style="font-weight:bold">{{car.brand}}</div>
-
-            <div class="ui-g-6">Color: </div>
-            <div class="ui-g-6" style="font-weight:bold">{{car.color}}</div>
+            <div class="zepl-card-footer">
+              <span>
+                <i class="fa fa-search"></i>
+                3
+              </span>
+            </div>
           </div>
-        </ng-template>
-      </p-carousel>
-    </div>
+
+
+        </div>
+      </ng-template>
+    </p-dataGrid>
+
   </div>
 
-  <div class="ui-g-12">
-    <!-- Left Side -->
-    <div class="card card-w-title">
-      <h1>DataGrid</h1>
-      <p-dataGrid [value]="cars2" [paginator]="true" [rows]="21">
-        <p-header>
-          Grid of Cars
-        </p-header>
-        <ng-template let-car pTemplate="item">
-          <div style="padding:1em" class="ui-g-12 ui-md-4">
-            <p-panel [header]="car.vin" [style]="{'text-align':'center'}">
-              <img src="assets/demo/images/car/{{car.brand}}.png">
-              <div class="car-detail" style="padding:1em">{{car.year}} - {{car.color}}</div>
-            </p-panel>
-          </div>
-        </ng-template>
-      </p-dataGrid>
-    </div>
-  </div>
 </div>

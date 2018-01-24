@@ -9,7 +9,7 @@
 
   <app-topbar *ngIf="isLogin()"></app-topbar>
 
-  <div [ngClass]="{'layout-menu-dark':darkMenu,'layout-menu-container':this.isLogin()}" (click)="onMenuClick($event)">
+  <div [ngClass]="{'layout-menu-dark':darkMenu,'layout-menu-container':this.isLogin()}" (click)="onMenuClick($event)" [hidden]="!this.isLogin()">
     <div #layoutMenuScroller class="nano">
       <div class="nano-content menu-scroll-content">
         <app-inline-profile *ngIf="profileMode=='inline'&&!isHorizontal()"></app-inline-profile>
@@ -24,6 +24,5 @@
 
   <div class="layout-mask"></div>
 
-  <app-footer *ngIf="isLogin()"></app-footer>
-
+  <app-footer class="footer" *ngIf="isLogin()"></app-footer>
 </div>

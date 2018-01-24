@@ -2,8 +2,7 @@
 
   <!-- 工具栏 -->
 
-  <!--<div class="ui-g-12" *ngIf="note.id && !paragraphUrl">-->
-  <div class="ui-g-12" style="margin-bottom: 8px">
+  <div class="ui-g-12" style="margin-bottom: 6px; padding-right: 3px; padding-left: 3px" *ngIf="noteId && !paragraphUrl">
     <div (dblclick)="this.editNoteTitle()">
       <input type="text" pInputText placeholder="Name" [(ngModel)]="this.noteName" [ngClass]="{'showmodel':!titleEditor, 'editmodel':titleEditor}" [disabled]="!titleEditor" (blur)="this.showNoteTitle();this.updateNoteName(this.noteName)">
     </div>
@@ -11,34 +10,161 @@
       <div class="ui-toolbar-group-left">
         <!--<input type="text" pInputText placeholder="Name">-->
 
-        <button pButton type="button" pTooltip="运行所有片段" tooltipPosition="bottom" icon="fa-play"></button>
-        <button pButton type="button" pTooltip="显示/隐藏代码" tooltipPosition="bottom" icon="fa-arrows-alt"></button>
-        <button pButton type="button" pTooltip="显示/隐藏输出" tooltipPosition="bottom" icon="fa-columns"></button>
-        <button pButton type="button" pTooltip="清除输出" tooltipPosition="bottom" icon="fa-eraser"></button>
+        <button pButton type="button" pTooltip="运行所有片段" tooltipPosition="bottom" icon="fa-play" (click)="runAllParagraphs(note.id)" [disabled]="isNoteRunning() || revisionView"></button>
+        <button pButton type="button" pTooltip="显示/隐藏代码" tooltipPosition="bottom" icon="fa-arrows-alt" (click)="toggleAllEditor()" [hidden]="viewOnly" [disabled]="revisionView"></button>
+        <button pButton type="button" pTooltip="显示/隐藏输出" tooltipPosition="bottom" icon="fa-columns" (click)="toggleAllTable()" [hidden]="viewOnly" [disabled]="revisionView"></button>
+        <button pButton type="button" pTooltip="清除输出" tooltipPosition="bottom" icon="fa-eraser" (click)="clearAllParagraphOutput(note.id)" [hidden]="viewOnly" [disabled]="isNoteRunning() || revisionView"></button>
         <button pButton type="button" pTooltip="复制笔记" tooltipPosition="bottom" icon="fa-copy"></button>
-        <button pButton type="button" pTooltip="导出笔记" tooltipPosition="bottom" icon="fa-arrow-down"></button>
+        <button pButton type="button" pTooltip="导出笔记" tooltipPosition="bottom" icon="fa-arrow-down" (click)="exportNote()" [hidden]="viewOnly" [disabled]="revisionView"></button>
         <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
-        <button pButton type="button" pTooltip="提交笔记" tooltipPosition="bottom" class="info-btn" icon="fa-code"></button>
-        <button pButton type="button" pTooltip="覆盖笔记" tooltipPosition="bottom" class="info-btn" icon="fa-arrow-circle-o-right"></button>
-        <p-splitButton label="head" pTooltip="版本选择" tooltipPosition="bottom"  icon="fa-check" styleClass="ui-button-info" (onClick)="save()" [model]="items"></p-splitButton>
+
+        <button pButton type="button" pTooltip="转换到协同模式 {{isOwner ? '' : '(owner can change)'}}" tooltipPosition="bottom" icon="fa-user" (click)="toggleNotePersonalizedMode()"
+                *ngIf="globalService.ticket.principal && globalService.ticket.principal !== 'anonymous'"
+                [hidden]="viewOnly || note.config.personalizedMode !== 'true'"
+                [disabled]="isNoteRunning() || revisionView"></button>
+
+        <button pButton type="button" pTooltip="转换到个人模式 {{isOwner ? '' : '(owner can change)'}}" tooltipPosition="bottom" icon="fa-users" (click)="toggleNotePersonalizedMode()"
+                *ngIf="globalService.ticket.principal && globalService.ticket.principal !== 'anonymous'"
+                [hidden]="viewOnly || note.config.personalizedMode === 'true'"
+                [disabled]="isNoteRunning() || revisionView"></button>
         <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
-        <button pButton type="button" pTooltip="删除笔记" tooltipPosition="bottom" class="danger-btn" icon="fa-bitbucket"></button>
+        <button pButton type="button" pTooltip="提交笔记" tooltipPosition="bottom" class="info-btn" icon="fa-code" [hidden]="viewOnly" [disabled]="revisionView" (click)="commit.toggle($event)"></button>
+        <p-overlayPanel #commit>
+          <textarea pInputTextarea #commitMessage></textarea>
+          <button pButton type="button" pTooltip="Commit" tooltipPosition="bottom" class="info-btn" icon="fa-code" label="Commit" [hidden]="viewOnly" (click)="checkpointNote(commitMessage.message)"></button>
+        </p-overlayPanel>
+        <button pButton type="button" pTooltip="恢复笔记" tooltipPosition="bottom" class="info-btn" icon="fa-arrow-circle-o-right" [hidden]="viewOnly" [disabled]="!revisionView" (click)="setNoteRevision()"></button>
+
+        <p-splitButton label="head"   icon="fa-check" styleClass="ui-button-info" (onClick)="save()" [model]="items"></p-splitButton>
+
+        <!--<p-dropdown [options]="getNoteRevisions(noteRevisions)" [(ngModel)]="currentRevision" pTooltip="版本选择" tooltipPosition="bottom" optionLabel="name">
+          <ng-template let-item pTemplate="selectedItem">
+              <div (click)="visitRevision(item.revision)">{{item.time}}</div>
+          </ng-template>
+          <ng-template let-list pTemplate="item">
+            <div class="ui-helper-clearfix" style="position: relative;height: 25px;">
+              {{list.time}}
+              {{list.message}}
+            </div>
+          </ng-template>
+        </p-dropdown>-->
+
+        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+
+        <!-- Search -->
+        <span class="labelBtn btn-group" id="searchGroup" style="vertical-align:middle; display:inline-block;">
+          <!--<button type="button" class="btn btn-default btn-xs dropdown-toggle"
+                  data-toggle="dropdown" tooltip-placement="bottom" uib-tooltip="Search code"
+                  ng-click="searchClicked()">
+            <i class="fa fa-search"></i>
+          </button>
+          <ul class="dropdown-menu search-dropdown" ng-click="$event.stopPropagation()"
+              ng-style="{left : search.left}" style="width: 350px">
+            <li>
+              <div class="input-group input-group-sm search-group">
+                <span class="input-group-addon">Find</span>
+                <input type="text" class="form-control" id="findInput"
+                       ng-class="{'no-match': !hasMatches() && search.searchText !== '',
+                        'has-match': search.searchText !== ''}"
+                       ng-change="markAllOccurrencesAndHighlightFirst()"
+                       ng-click="markAllOccurrencesAndHighlightFirst()" ng-keypress="onPressOnFindInput($event)"
+                       ng-model="search.searchText"  ng-trim="false"/>
+                <span class="input-group-addon after-input" ng-show="search.searchText !== ''"
+                      ng-class="{'no-match': !hasMatches() && search.searchText !== ''}">
+                  {{search.currentOccurrence}} of {{search.occurrencesCount}}
+                </span>
+                <div class="input-group-btn">
+                  <button class="btn btn-default" ng-click="prevOccurrence()">
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                  </button>
+                </div>
+                <div class="input-group-btn">
+                  <button class="btn btn-default" ng-click="nextOccurrence()">
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="input-group input-group-sm search-group">
+                <span class="input-group-addon" style="border-top-width: inherit">Replace</span>
+                <input type="text" class="form-control" ng-model="search.replaceText" ng-trim="false"
+                       style="border-top-width: inherit"/>
+                <div class="input-group-btn">
+                  <button class="btn btn-default" ng-click="replace()"
+                          style="border-top-width: inherit">Replace</button>
+                </div>
+                <div class="input-group-btn">
+                  <button class="btn btn-default" ng-click="replaceAll()"
+                          style="border-top-width: inherit">All</button>
+                </div>
+              </div>
+            </li>
+          </ul>-->
+        </span>
+
+        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+        <button pButton type="button" pTooltip="永久删除笔记" tooltipPosition="bottom" class="danger-btn" icon="fa-bitbucket" *ngIf="isTrash(note)" (click)="removeNote(note.id)" [hidden]="viewOnly" [disabled]="revisionView"></button>
+        <button pButton type="button" pTooltip="删除笔记" tooltipPosition="bottom" class="danger-btn" icon="fa-bitbucket" *ngIf="!isTrash(note)" (click)="moveNoteToTrash(note.id)" [hidden]="viewOnly" [disabled]="revisionView"></button>
         <span>&nbsp;&nbsp;</span>
-        <button pButton type="button" pTooltip="调度运行" tooltipPosition="bottom" class="warning-btn" icon="fa-clock-o"></button>
+
+        <button pButton type="button" pTooltip="调度运行" tooltipPosition="bottom" icon="fa-clock-o" (click)="schedule.toggle($event)"
+                label="{{getCronOptionNameFromValue(note.config.cron)}}" [disabled]="revisionView" ></button>
+                <!--[ngClass]="{'ui-button-info' : note.config.cron, 'ui-button-danger' : note.info.cron, 'ui-button-success' : !note.config.cron}"></button>-->
+        <p-overlayPanel #schedule>
+          <div>
+            <ul class="dropdown-menu" role="menu" style="width:300px">
+              <li>
+                <div class="cron-preset-container">
+                  Run note with cron scheduler.
+                  Either choose from preset or write your own <a href="http://www.quartz-scheduler.org/documentation/quartz-2.1.x/tutorials/crontrigger" target="_blank">cron expression</a>.
+                  <div>
+                    <span>- Preset</span>
+                    <a class="cron-preset" *ngFor="let cr of cronOption"
+                       type="button"
+                       (click)="setCronScheduler(cr.value)"
+                       [ngClass]="{ 'selected' : cr.value == note.config.cron}">{{cr.name}}</a>
+                  </div>
+                  <div>
+                    <span>- Cron expression</span>
+                    <input type="text"
+                           [ngModel]="note.config.cron"
+                           (change)="setCronScheduler(note.config.cron)"/>
+                    <p [hidden]="!note.info.cron" class="text-danger cron-info">
+                      {{note.info.cron}}
+                    </p>
+                  </div>
+                  <div>
+                    <span>- Cron executing user (click enter in field to submit)</span>
+                    <input type="text"
+                           [ngModel]="note.config.cronExecutingUser"
+                           (enter)="setCronExecutingUser(note.config.cronExecutingUser)"/>
+                  </div>
+                  <div>
+                    <span>- auto-restart interpreter on cron execution </span>
+                    <input type="checkbox"
+                           [ngModel]="note.config.releaseresource"
+                           (click)="setReleaseResource(note.config.releaseresource)"/>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </p-overlayPanel>
       </div>
 
       <div class="ui-toolbar-group-right">
-        <button pButton type="button" pTooltip="快捷键" tooltipPosition="bottom" class="success-btn" icon="fa-keyboard-o"></button>
-        <button pButton type="button" pTooltip="解析器绑定" tooltipPosition="bottom" class="success-btn" icon="fa-cog"></button>
-        <button pButton type="button" pTooltip="权限配置" tooltipPosition="bottom" class="success-btn" icon="fa-lock"></button>
-        <p-splitButton label="default" pTooltip="显示模式" tooltipPosition="bottom" icon="fa-bullseye" styleClass="ui-button-success" (onClick)="save()" [model]="items"></p-splitButton>
+        <button pButton type="button" pTooltip="快捷键" tooltipPosition="bottom" class="success-btn" icon="fa-keyboard-o" *ngIf="!revisionView"></button>
+        <button pButton type="button" pTooltip="解析器绑定" tooltipPosition="bottom" class="success-btn" icon="fa-cog" *ngIf="!revisionView" (click)="toggleSetting()"></button>
+        <button pButton type="button" pTooltip="权限配置" tooltipPosition="bottom" class="success-btn" icon="fa-lock" *ngIf="!revisionView" (click)="togglePermissions()"></button>
+        <p-splitButton label="default" icon="fa-bullseye" styleClass="ui-button-success" [model]="looknfeelOptionItems"></p-splitButton>
+
+        <!--<p-dropdown [options]="getNoteRevisions(noteRevisions)" [(ngModel)]="currentRevision" pTooltip="版本选择" tooltipPosition="bottom" optionLabel="name"></p-dropdown>-->
       </div>
     </p-toolbar>
   </div>
 
   <!-- 解析器绑定 -->
 
-  <div class="ui-g-12" *ngIf="showSetting"  style="margin-bottom: 8px">
+  <div class="ui-g-12" *ngIf="showSetting"  style="margin-bottom: 6px; padding-right: 3px; padding-left: 3px">
 
     <p-panel header="解析器绑定" [style]="{'min-height':'411px'}" class="interpreterBindings">
       <ul>
@@ -70,26 +196,72 @@
   <!-- 权限配置 -->
 
   <!-- TODO -->
-  <!--<div class="ui-g-12" *ngIf="showPermissions && ticket.principal && !isAnonymous">
-
-  </div>-->
+  <div class="ui-g-12" *ngIf="showPermissions && globalService.ticket.principal && !isAnonymous">
+    <p-panel header="Note Permissions (Only note owners can change)" [style]="{'min-height':'411px'}" class="permissions">
+      <div>
+        <p>
+          Enter comma separated users and groups in the fields. <br />
+          Empty field (*) implies anyone can do the operation.
+        </p>
+        <div class="permissionsForm"
+             data-ng-model="permissions">
+          <p><span class="owners">Owners </span>
+            <select id="selectOwners" multiple="multiple">
+              <option is-select2="false" *ngFor="let owner of permissions.owners" selected="selected">{{owner}}</option>
+            </select>
+            Owners can change permissions,read, run and write the note.
+          </p>
+          <p><span class="writers">Writers </span>
+            <select id="selectWriters" multiple="multiple">
+              <option is-select2="false" *ngFor="let writers of permissions.writers" selected="selected">{{writers}}</option>
+            </select>
+            Writers can read, run and write the note.
+          </p>
+          <p><span class="runners">Runners </span>
+            <select id="selectRunners" multiple="multiple">
+              <option is-select2="false" *ngFor="let runners of permissions.runners" selected="selected">{{runners}}</option>
+            </select>
+            Runners can read and run the note.
+          </p>
+          <p><span class="readers">Readers </span>
+            <select id="selectReaders" multiple="multiple">
+              <option is-select2="false" *ngFor="let readers of permissions.readers" selected="selected">{{readers}}</option>
+            </select>
+            Readers can only read the note.
+          </p>
+        </div>
+      </div>
+      <div style="margin: 10px 20px;">
+        <button pButton type="button" label="保存" pTooltip="保存配置" tooltipPosition="bottom" class="success-btn" icon="fa-check" (click)="savePermissions()"></button>
+        <button pButton type="button" label="取消" pTooltip="取消保存" tooltipPosition="bottom" class="success-btn" icon="fa-close" (click)="closePermissions()"></button>
+      </div>
+    </p-panel>
+  </div>
 
   <!-- 代码片段 -->
 
-  <div [ngClass]="this.columnWidthClass(currentParagraph.config.colWidth)" id="{{currentParagraph.id}}_paragraphColumn_main" *ngFor="let currentParagraph of this.note.paragraphs">
+  <div [ngClass]="this.columnWidthClass(currentParagraph.config.colWidth)" id="{{currentParagraph.id}}_paragraphColumn_main" *ngFor="let currentParagraph of this.note.paragraphs" style="padding-right: 3px; padding-left: 3px">
 
     <div class="new-paragraph"
-         (click)="this.insertNew('above')"
+         (click)="insertNew(currentParagraph.id,'above')"
          *ngIf="viewOnly || asIframe || revisionView"
          ng-class="{'first-paragraph': $first}">
       <span class="plus-sign">&#43;</span>
     </div>
 
-    <div class="card card-w-title shadow-box ui-shadow-1" id="{{currentParagraph.id}}_paragraphColumn">
+    <div class="card card-w-title shadow-box ui-shadow-1" id="{{currentParagraph.id}}_paragraphColumn" (dblclick)="paragraphOnDoubleClick(currentParagraph.id)">
       <app-paragraph paragraphid="{{currentParagraph.id}}"></app-paragraph>
     </div>
 
-    <div class="new-paragraph last-paragraph" (click)="this.insertNew('below');" *ngIf="!$last || viewOnly || asIframe || revisionView">
+    <!--<div id="{{currentParagraph.id}}_paragraphColumn"
+         ng-include src="'app/notebook/paragraph/paragraph.html'"
+         ng-class="{'paragraph-space box paragraph-margin': !asIframe, 'focused': paragraphFocused,
+                    'lastEmptyParagraph': !paragraph.text && !paragraph.result}"
+         ng-hide="currentParagraph.config.tableHide && viewOnly"
+         ng-dblclick="paragraphOnDoubleClick(currentParagraph.id);">
+    </div>-->
+
+    <div class="new-paragraph last-paragraph" (click)="insertNew(currentParagraph.id,'below');" *ngIf="!$last || viewOnly || asIframe || revisionView">
       <span class="plus-sign">&#43;</span>
     </div>
 

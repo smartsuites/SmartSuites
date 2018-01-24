@@ -9,3 +9,10 @@
 .connectStatus{
   font-size: larger;
 }
+
+.topbar-right{
+  background-position: right center,center center !important;
+  background-repeat: no-repeat !important;
+  background-image: 'assets/login/pattern.svg' !important;
+
+}

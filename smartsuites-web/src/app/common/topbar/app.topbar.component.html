@@ -1,10 +1,11 @@
+<p-growl [(value)]="msgs"></p-growl>
+<p-confirmDialog></p-confirmDialog>
 <div class="topbar clearfix">
   <div class="topbar-left">
-    <!--<img src="assets/layout/images/logo.png" class="topbar-logo" />-->
     <h1 style="margin: 0px; color: white">DATASMART</h1>
   </div>
 
-  <div class="topbar-right">
+  <div class="topbar-right" style="background-image: url('assets/login/pattern.svg')">
     <a id="menu-button" href="#" (click)="app.onMenuButtonClick($event)"
        [ngClass]="{'menu-button-rotate': app.rotateMenuButton}">
       <i class="fa fa-angle-left"></i>
@@ -26,7 +27,7 @@
 
         <ul class="layout-menu fadeInDown">
           <li role="menuitem">
-            <a href="#">
+            <a>
               <i class="fa fa-fw fa-user"></i>
               <span>用户配置</span>
             </a>
@@ -71,42 +72,25 @@
           </li>
         </ul>
       </li>
-      <li #messages [ngClass]="{'active-top-menu':app.activeTopbarItem === messages}">
+      <li #messages [ngClass]="{'active-top-menu':app.activeTopbarItem === messages}" *ngIf="this.loginService.isAnalyst()">
         <a href="#" (click)="app.onTopbarItemClick($event,messages)">
-          <i class="topbar-icon animated swing fa fa-fw fa-envelope-o"></i>
+          <i class="topbar-icon animated swing fa fa-fw fa-bitbucket" style="color: #f1f909"></i>
           <span class="topbar-badge animated rubberBand">5</span>
-          <span class="topbar-item-name">Messages</span>
+          <span class="topbar-item-name">回收站</span>
         </a>
         <ul class="layout-menu fadeInDown">
-          <li role="menuitem">
-            <a href="#" class="topbar-message">
-              <img src="assets/layout/images/avatar1.png" width="35"/>
-              <span>Give me a call</span>
+          <li role="menuitem" *ngFor="let note of recycleList">
+            <a class="topbar-message">
+              <i class="fa fa-fw fa-book"></i>
+              <span>{{note.name}}</span>
+              <i class="fa fa-fw fa-reply-all" style="float: right; cursor: pointer; color: red"></i>
             </a>
           </li>
           <li role="menuitem">
-            <a href="#" class="topbar-message">
-              <img src="assets/layout/images/avatar2.png" width="35"/>
-              <span>Sales reports attached</span>
-            </a>
+            &nbsp;
           </li>
           <li role="menuitem">
-            <a href="#" class="topbar-message">
-              <img src="assets/layout/images/avatar3.png" width="35"/>
-              <span>About your invoice</span>
-            </a>
-          </li>
-          <li role="menuitem">
-            <a href="#" class="topbar-message">
-              <img src="assets/layout/images/avatar2.png" width="35"/>
-              <span>Meeting today at 10pm</span>
-            </a>
-          </li>
-          <li role="menuitem">
-            <a href="#" class="topbar-message">
-              <img src="assets/layout/images/avatar4.png" width="35"/>
-              <span>Out of office</span>
-            </a>
+            <button pButton type="button" icon="fa-recycle" label="清空回收站" style="width: 100%;-webkit-border-radius: 0px;border-radius: 0px;"></button>
           </li>
         </ul>
       </li>

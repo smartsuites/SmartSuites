@@ -1,31 +1,32 @@
-<div class="ui-g" id="{{paragraph.id}}_container" ng-class="{'paragraph': !asIframe, 'paragraphAsIframe': asIframe}">
+<div class="ui-g" id="{{paragraph.id}}_container" [ngClass]="{'paragraph': !asIframe, 'paragraphAsIframe': asIframe}">
   <!-- control -->
   <div class="ui-g-12" style="margin-bottom: 8px">
-    <div style="float: left;" (dblclick)="this.editParagraphTitle()" class="paragraphTitle" *ngIf="paragraph.config.title" id="{{paragraph.id}}_title">
-      <input type="text" pInputText placeholder="Name" [(ngModel)]="paragraph.title" [ngClass]="{'showpmodel':!titleEditor, 'editpmodel':titleEditor}" [disabled]="!titleEditor" (blur)="this.showParagraphTitle();this.setTitle(paragraph)">
+    <!--<div style="float: left;" (dblclick)="this.editParagraphTitle()" class="paragraphTitle" *ngIf="paragraph.config.title" id="{{paragraph.id}}_title">-->
+    <div style="float: left;" (dblclick)="this.editParagraphTitle()" class="paragraphTitle" id="{{paragraph.id}}_title" *ngIf="paragraph.config.title">
+      <input type="text" pInputText [(ngModel)]="paragraph.title" [ngClass]="{'showpmodel':!titleEditor, 'editpmodel':titleEditor}" [disabled]="!titleEditor" (blur)="this.showParagraphTitle();this.setTitle(paragraph)">
     </div>
 
     <div style="float: right;" id="{{paragraph.id}}_control">
 
       <!--<span>
-        <span ng-show="paragraph.runtimeInfos.jobUrl.values.length == 1">
+        <span [hidden]="paragraph.runtimeInfos.jobUrl.values.length != 1">
           <a href="{{paragraph.runtimeInfos.jobUrl.values[0]}}" target="_blank" style="text-decoration: none;"
-             tooltip-placement="top" uib-tooltip="{{paragraph.runtimeInfos.jobUrl.tooltip}}">
+             tooltipPosition="top" pTooltip="{{paragraph.runtimeInfos.jobUrl.tooltip}}">
             <span class="fa fa-tasks"></span>
             {{paragraph.runtimeInfos.jobUrl.label}}
           </a>
         </span>
-        <span class="dropdown" ng-show="paragraph.runtimeInfos.jobUrl.values.length > 1">
-          <span style="cursor:pointer;color:#3071A9" tooltip-placement="top"
-                uib-tooltip="{{paragraph.runtimeInfos.jobUrl.tooltip}}"
+        <span class="dropdown" [hidden]="paragraph.runtimeInfos.jobUrl.values.length <= 1">
+          <span style="cursor:pointer;color:#3071A9" tooltipPosition="top"
+                pTooltip="{{paragraph.runtimeInfos.jobUrl.tooltip}}"
                 data-toggle="dropdown" type="button">
             <span class="fa fa-tasks"></span>
             {{paragraph.runtimeInfos.jobUrl.label}}S
           </span>
           <ul class="dropdown-menu" role="menu" style="width:200px;z-index:1002">
             <li ng-class="{'option-disabled': !noteOperationsAllowed()}"
-                ng-repeat="url in paragraph.runtimeInfos.jobUrl.values">
-              <a href="{{url}}" target="_blank"><span class="fa fa-external-link-square"></span> Jobs #{{$index}}</a>
+                *ngFor="let url of paragraph.runtimeInfos.jobUrl.values; let i = index">
+              <a href="{{url}}" target="_blank"><span class="fa fa-external-link-square"></span> Jobs #{{i}}</a>
             </li>
           </ul>
         </span>
@@ -37,12 +38,20 @@
         {{getProgress()}}%
       </span>
       <button pButton type="button" pTooltip="运行片段" tooltipPosition="bottom" icon="fa-play"
+              class="ui-button-secondary"
               (click)="this.runParagraphFromButton(this.getEditorValue())"
-              *ngIf="paragraph.status!='RUNNING' && paragraph.status!='PENDING' && paragraph.config.enabled"></button>
+              *ngIf="!revisionView && paragraph.status!='RUNNING' && paragraph.status!='PENDING' && paragraph.config.enabled"></button>
 
       <button pButton type="button" pTooltip="取消运行" tooltipPosition="bottom" icon="fa-play"
+              class="ui-button-secondary"
               (click)="this.cancelParagraph(paragraph)"
-              *ngIf="paragraph.status=='RUNNING' || paragraph.status=='PENDING'"></button>
+              *ngIf="!revisionView && (paragraph.status=='RUNNING' || paragraph.status=='PENDING')"></button>
+
+      <!--<button pButton type="button" pTooltip="Spark Job" tooltipPosition="bottom" icon="fa-tasks"
+              class="ui-button-secondary"
+              *ngIf="paragraph.runtimeInfos.jobUrl.length == 1">
+        <a href="{{paragraph.runtimeInfos.jobUrl[0]}}" target="_blank"><span class="fa fa-tasks"></span> Spark job </a>
+      </button>-->
 
       <!--<span *ngIf="paragraph.runtimeInfos.jobUrl.length == 1">
         <a href="{{paragraph.runtimeInfos.jobUrl[0]}}" target="_blank"><span class="fa fa-tasks"></span> Spark job </a>
@@ -60,14 +69,22 @@
         </ul>
       </span>-->
 
-      <button pButton type="button" pTooltip="{{(paragraph.config.editorHide ? '显示' : '隐藏')}}代码" tooltipPosition="bottom" icon="fa-arrows-alt"
+      <button pButton type="button" pTooltip="{{(paragraph.config.editorHide ? '显示' : '隐藏')}}代码"
+              class="ui-button-secondary"
+              tooltipPosition="bottom" icon="fa-arrows-alt"
               (click)="this.toggleEditor(paragraph)"></button>
 
-      <button pButton type="button" pTooltip="{{(paragraph.config.tableHide ? '显示' : '隐藏')}}输出" tooltipPosition="bottom" icon="fa-columns"
+      <button pButton type="button" pTooltip="{{(paragraph.config.tableHide ? '显示' : '隐藏')}}输出"
+              class="ui-button-secondary"
+              tooltipPosition="bottom" icon="fa-columns"
               (click)="this.toggleOutput(paragraph)"></button>
 
-      <button pButton type="button" pTooltip="全屏模式" tooltipPosition="bottom" icon="fa-desktop" (click)="display = true"></button>
-      <p-splitButton label="Setting" pTooltip="片段配置" tooltipPosition="bottom" icon="fa-cog" [model]="items"></p-splitButton>
+      <button pButton type="button" pTooltip="全屏模式" tooltipPosition="bottom"
+              class="ui-button-secondary"
+              icon="fa-desktop" (click)="display = true"></button>
+      <p-splitButton label="Setting" pTooltip="片段配置" tooltipPosition="bottom"
+                     styleClass="ui-button-secondary"
+                     icon="fa-cog" [model]="items"></p-splitButton>
 
 
 
@@ -195,31 +212,13 @@
     </div>
   </div>
   <!-- editor -->
-  <div class="ui-g-12" *ngIf="!paragraph.config.editorHide && !viewOnly">
+  <!--<div class="ui-g-12" *ngIf="!paragraph.config.editorHide && !viewOnly">-->
+  <div class="ui-g-12">
     <p-sidebar [(visible)]="display" [fullScreen]="true">
 
     </p-sidebar>
 
-    <!--<code-editor
-      paragraph-id="paragraph.id"
-      paragraph-context="paragraph"
-      dirty-text="dirtyText"
-      original-text="originalText"
-      on-load="aceLoaded"
-      revision-view="revisionView"
-      ng-click="onEditorClick()"
-    ></code-editor>-->
-
-    <div ace-editor #editor id="{{paragraph.id}}_editor"
-         [(text)]="text"
-         [mode]="'sql'"
-         [theme]="'eclipse'"
-         [options]="options"
-         [readOnly]="false"
-         [autoUpdateContent]="true"
-         [durationBeforeCallback]="1000"
-         (textChanged)="onChange($event)"
-         style="min-height: 200px; width:100%; overflow: auto;" (dblclick)="this.onEditorClick()"></div>
+    <div id="{{paragraph.id}}_editor"></div>
 
   </div>
   <!-- Processor Bar -->
@@ -305,6 +304,11 @@
          ng-init="init(result, paragraph.config.results[$index], paragraph, $index)"
          ng-include src="'app/notebook/paragraph/result/result.html'">
     </div>-->
+
+    <div *ngFor="let result of paragraph.results.msg; let i = index">
+      <app-result class="tableDisplay" paragraphid="{{paragraphid}}" index="{{i}}" noteid="{{notebook.noteId}}"></app-result>
+    </div>
+
 
     <div id="{{paragraph.id}}_error" class="error text">
       {{paragraph.errorMessage}}

@@ -29,7 +29,7 @@ export class NoteListService {
     // construct the folder-based tree
     this.notes.root = {children: []}
     this.notes.flatFolderMap = {}
-    notesList[0].reduce((previous, note, index, array) => {
+    notesList.reduce((previous, note, index, array) => {
       let noteName = note.name || note.id
       // 将名字用 / 分开
       let nodes = noteName.match(/([^\/][^\/]*)/g)

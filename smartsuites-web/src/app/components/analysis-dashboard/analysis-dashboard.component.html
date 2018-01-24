@@ -3,71 +3,86 @@
   <div class="ui-g">
 
     <div class="ui-g-12 ui-lg-4">
-      <div class="card timeline ui-fluid">
+      <div class="card timeline ui-fluid" style="border: 1px solid #DCE1E7;">
         <div class="ui-g">
-          <div class="ui-g-3">
-            <span class="event-time">just now</span>
-            <i class="fa fa-map-signs" style="color:#3984b8"></i>
+          <div class="ui-g-12">
+            <button type="button" pButton label="最近笔记列表（刷新）" icon="fa-refresh" class="rounded-btn raised-btn"></button>
           </div>
-          <div class="ui-g-9">
-            <span class="event-owner" style="color:#3984b8">Katherine May</span>
-            <span class="event-text">Lorem ipsun dolor amet</span>
-            <div class="event-content">
-              <img src="assets/layout/images/dashboard/bridge.png" width="100"/>
+        </div>
+        <div class="ui-g" style="height: 860px;overflow: auto;">
+
+          <div class="ui-g-12" *ngFor="let note of notesList; let i = index">
+            <div class="ui-g-3">
+              <span class="event-time">just now</span>
+              <i class="fa fa-history" style="color:#3984b8"></i>
+            </div>
+            <div class="ui-g-9" style="border: 1px solid #DCE1E7;">
+              <span class="event-owner" style="color:#3eb839"><a routerLink='/notebook/{{note.id}}'>{{note.name}}</a></span>
+              <span class="event-text">描述【略】</span>
+              <div class="event-content" *ngIf="i == 0 && note">
+                <img src="assets/layout/images/dashboard/bridge.png" width="100"/>
+              </div>
             </div>
           </div>
 
-          <div class="ui-g-3">
-            <span class="event-time">12h ago</span>
-            <i class="fa fa-star" style="color:#f6ac2b"></i>
-          </div>
-          <div class="ui-g-9">
-            <span class="event-owner" style="color:#f6ac2b">Brandon Santos</span>
-            <span class="event-text">Ab nobis, magnam sunt eum. Laudantium, repudiandae, similique!.</span>
-          </div>
-
-          <div class="ui-g-3">
-            <span class="event-time">15h ago</span>
-            <i class="fa fa-comment" style="color:#7e8dcd"></i>
-          </div>
-          <div class="ui-g-9">
-            <span class="event-owner" style="color:#7e8dcd">Stephan Ward</span>
-            <span class="event-text">Omnis veniam quibusdam ratione est repellat qui nam quisquam ab mollitia dolores ullam voluptates, similique, dignissimos.</span>
-          </div>
-
-          <div class="ui-g-3">
-            <span class="event-time">2d ago</span>
-            <i class="fa fa-map" style="color:#e175a0"></i>
-          </div>
-          <div class="ui-g-9">
-            <span class="event-owner" style="color:#e175a0">Jason Smith</span>
-            <span class="event-text">Laudantium, repudiandae, similique!</span>
-            <div class="event-content">
-              <img src="assets/layout/images/dashboard/map.png" />
+          <!--<div class="ui-g-12">
+            <div class="ui-g-3">
+              <span class="event-time">12h ago</span>
+              <i class="fa fa-star" style="color:#f6ac2b"></i>
             </div>
-          </div>
-
-          <div class="ui-g-3">
-            <span class="event-time">1w ago</span>
-            <i class="fa fa-heart" style="color:#39b8b6"></i>
-          </div>
-          <div class="ui-g-9">
-            <span class="event-owner">Kevin Cox</span>
-            <span class="event-text">Quibusdam ratione est repellat qui nam quisquam veniam quibusdam ratione.</span>
-          </div>
-
-          <div class="ui-g-3">
-            <span class="event-time">2w ago</span>
-            <i class="fa fa-history" style="color:#3eb839"></i>
-          </div>
-          <div class="ui-g-9">
-            <span class="event-owner" style="color:#3eb839">Walter White</span>
-            <span class="event-text">I am the one who knocks!</span>
+            <div class="ui-g-9">
+              <span class="event-owner" style="color:#f6ac2b">Brandon Santos</span>
+              <span class="event-text">Ab nobis, magnam sunt eum. Laudantium, repudiandae, similique!.</span>
+            </div>
           </div>
 
           <div class="ui-g-12">
-            <button type="button" pButton label="Refresh" icon="fa-refresh" class="rounded-btn raised-btn"></button>
+            <div class="ui-g-3">
+              <span class="event-time">15h ago</span>
+              <i class="fa fa-comment" style="color:#7e8dcd"></i>
+            </div>
+            <div class="ui-g-9">
+              <span class="event-owner" style="color:#7e8dcd">Stephan Ward</span>
+              <span class="event-text">Omnis veniam quibusdam ratione est repellat qui nam quisquam ab mollitia dolores ullam voluptates, similique, dignissimos.</span>
+            </div>
           </div>
+
+          <div class="ui-g-12">
+            <div class="ui-g-3">
+              <span class="event-time">2d ago</span>
+              <i class="fa fa-map" style="color:#e175a0"></i>
+            </div>
+            <div class="ui-g-9">
+              <span class="event-owner" style="color:#e175a0">Jason Smith</span>
+              <span class="event-text">Laudantium, repudiandae, similique!</span>
+              <div class="event-content">
+                <img src="assets/layout/images/dashboard/map.png" />
+              </div>
+            </div>
+          </div>
+
+          <div class="ui-g-12">
+            <div class="ui-g-3">
+              <span class="event-time">1w ago</span>
+              <i class="fa fa-heart" style="color:#39b8b6"></i>
+            </div>
+            <div class="ui-g-9">
+              <span class="event-owner">Kevin Cox</span>
+              <span class="event-text">Quibusdam ratione est repellat qui nam quisquam veniam quibusdam ratione.</span>
+            </div>
+          </div>
+
+          <div class="ui-g-12">
+            <div class="ui-g-3">
+              <span class="event-time">2w ago</span>
+              <i class="fa fa-history" style="color:#3eb839"></i>
+            </div>
+            <div class="ui-g-9">
+              <span class="event-owner" style="color:#3eb839">Walter White</span>
+              <span class="event-text">I am the one who knocks!</span>
+            </div>
+          </div>-->
+
         </div>
       </div>
     </div>
@@ -78,8 +93,10 @@
           <i class="fa fa-line-chart"></i>
           <span>任务状态统计</span>
         </p-header>
-
-        <div echarts [options]="taskStat" style="height:600px;width: 95%"></div>
+        <div class="ui-g">
+          <div style="height:400px;width: 30%" class="ui-g-3" id="piechart"></div>
+          <div style="height:400px;width: 70%" class="ui-g-9" id="multibar"></div>
+        </div>
 
       </p-panel>
 
@@ -91,7 +108,7 @@
           <span>笔记语言统计</span>
         </p-header>
 
-        <div echarts [options]="noteType" style="height:600px;width: 95%"></div>
+        <div style="height:400px;width: 100%" id="stackedArea"></div>
 
       </p-panel>
     </div>

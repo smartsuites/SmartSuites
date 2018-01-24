@@ -2,7 +2,7 @@
     <div class="ui-g-12">
         <div class="card card-w-title">
             <h1>DataTable</h1>
-            <p-dataTable [value]="cars1" selectionMode="single" [(selection)]="selectedCar" 
+            <p-dataTable [value]="cars1" selectionMode="single" [(selection)]="selectedCar"
                 [paginator]="true" [rows]="10" [responsive]="true">
                 <p-header>List of Cars</p-header>
                 <p-column field="vin" header="Vin" [sortable]="true"></p-column>
@@ -31,7 +31,7 @@
             </p-dataGrid>
         </div>
     </div>
-    
+
     <div class="ui-g-12 ui-md-8">
         <div class="card card-w-title">
             <h1>PickList</h1>
@@ -46,7 +46,7 @@
             </p-pickList>
         </div>
     </div>
-    
+
     <div class="ui-g-12 ui-md-4">
         <div class="card card-w-title">
             <h1>OrderList</h1>
@@ -60,7 +60,7 @@
             </p-orderList>
         </div>
     </div>
-    
+
     <div class="ui-g-12 ui-md-8">
         <div class="card card-w-title">
             <h1>Organization Chart</h1>
@@ -69,14 +69,14 @@
             </div>
         </div>
     </div>
-    
+
     <div class="ui-g-12 ui-md-4">
         <div class="card card-w-title">
             <h1>Tree</h1>
             <p-tree [value]="files2"></p-tree>
         </div>
     </div>
-                    
+
     <div class="ui-g-12">
         <div class="card card-w-title">
             <h1>TreeTable</h1>
@@ -88,7 +88,7 @@
             </p-treeTable>
         </div>
     </div>
-    
+
     <div class="ui-g-12">
         <div class="card card-w-title">
             <h1>DataList - Paginator</h1>
@@ -109,7 +109,7 @@
             </p-dataList>
         </div>
     </div>
-        
+
     <div class="ui-g-12">
         <div class="card card-w-title">
             <h1>Carousel</h1>
@@ -121,13 +121,13 @@
                         </div>
                         <div class="ui-g-6">Vin: </div>
                         <div class="ui-g-6" style="font-weight:bold">{{car.vin}}</div>
-                        
+
                         <div class="ui-g-6">Year: </div>
                         <div class="ui-g-6" style="font-weight:bold">{{car.year}}</div>
-                        
+
                         <div class="ui-g-6">Brand: </div>
                         <div class="ui-g-6" style="font-weight:bold">{{car.brand}}</div>
-                        
+
                         <div class="ui-g-6">Color: </div>
                         <div class="ui-g-6" style="font-weight:bold">{{car.color}}</div>
                     </div>
@@ -135,11 +135,11 @@
             </p-carousel>
         </div>
     </div>
-        
+
     <div class="ui-g-12">
         <div class="card card-w-title">
             <h1>Schedule</h1>
-            <p-schedule [events]="events" defaultDate="2016-01-12" [header]="scheduleHeader"></p-schedule>
+            <!--<p-schedule [events]="events" defaultDate="2016-01-12" [header]="scheduleHeader"></p-schedule>-->
         </div>
     </div>
 </div>

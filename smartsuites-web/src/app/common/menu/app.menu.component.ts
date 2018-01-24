@@ -2,16 +2,14 @@ import {Component, Input, OnInit, EventEmitter, ViewChild} from '@angular/core';
 import {trigger, state, style, transition, animate} from '@angular/animations';
 import {Location} from '@angular/common';
 import {Router} from '@angular/router';
-import {MenuItem} from 'primeng/primeng';
+import {MenuItem, SelectItem} from 'primeng/primeng';
 import {AppComponent} from '../../app.component';
 import {EventService1} from "../../service/event/event.service";
+import {Constants} from "../../model/Constants";
 
 @Component({
   selector: 'app-menu',
-  template: `
-    <ul app-submenu [item]="model" root="true" class="layout-menu layout-main-menu clearfix" [reset]="reset"
-        visible="true"></ul>
-  `
+  templateUrl:'./app.menu.component.html',
 })
 export class AppMenuComponent implements OnInit {
 
@@ -21,11 +19,43 @@ export class AppMenuComponent implements OnInit {
 
   items = [];
 
+  //********** Create Note ***********//
+  createNoteDialogDisplay: boolean = false;
+
+  showCreateNoteDialog() {
+    this.createNoteDialogDisplay = true;
+  }
+
+  cities1: SelectItem[];
+
+  noteName
+  defaultInter
+
+
+  //********** Import Note ***********//
+  importUrl
+
+  importUrlClick: boolean = false;
+
+  importNoteDialogDisplay: boolean = false;
+
+  showImportNoteDialog() {
+    this.importNoteDialogDisplay = true;
+  }
+
   constructor(public app: AppComponent,
               private eventService: EventService1) {
   }
 
   ngOnInit() {
+
+    this.cities1 = [];
+    this.cities1.push({label: 'Select City', value: null});
+    this.cities1.push({label: 'New York', value: {id: 1, name: 'New York', code: 'NY'}});
+    this.cities1.push({label: 'Rome', value: {id: 2, name: 'Rome', code: 'RM'}});
+    this.cities1.push({label: 'London', value: {id: 3, name: 'London', code: 'LDN'}});
+    this.cities1.push({label: 'Istanbul', value: {id: 4, name: 'Istanbul', code: 'IST'}});
+    this.cities1.push({label: 'Paris', value: {id: 5, name: 'Paris', code: 'PRS'}});
 
     let self = this;
     // 用于监听笔记加载消息，异步加载Notes
@@ -40,12 +70,16 @@ export class AppMenuComponent implements OnInit {
           label: '笔记管理', icon: 'fa fa-fw fa-book', /*routerLink: ['/notebook'],*/
           items: self.items
         },
-        {label: '新建笔记', icon: 'fa fa-fw fa-plus-circle', routerLink: ['/jobmanager']},
-        {label: '导入笔记', icon: 'fa fa-fw fa-upload', routerLink: ['/jobmanager']},
+        {label: '新建笔记', icon: 'fa fa-fw fa-plus-circle', command: (event) => {
+            self.showCreateNoteDialog()
+          }},
+        {label: '导入笔记', icon: 'fa fa-fw fa-upload', command: (event) => {
+            self.showImportNoteDialog()
+          }},
         {label: '任务监管', icon: 'fa fa-fw fa-tasks', routerLink: ['/jobmanager']},
         {label: '大屏发布', icon: 'fa fa-fw fa-dashboard', routerLink: ['/screen']},
         {label: '远程HUB', icon: 'fa fa-fw fa-soundcloud', routerLink: ['/hub']},
-        {label: '在线文档', icon: 'fa fa-fw fa-book', routerLink: ['/documentation']}
+        {label: '在线文档', icon: 'fa fa-fw fa-book', routerLink: ['/document']}
       ];
 
 
@@ -58,7 +92,7 @@ export class AppMenuComponent implements OnInit {
         /*{label: '系统首页', icon: 'fa fa-fw fa-home', routerLink: ['/home']},*/
         {label: '系统首页', icon: 'fa fa-fw fa-home', routerLink: ['/bussDashboard']},
         {
-          label: '财务部报表', icon: 'fa fa-fw fa-laptop', routerLink: ['/interpreter'],
+          label: '财务部报表', icon: 'fa fa-fw fa-laptop',
           items: [
             {
               label: 'Submenu 1', icon: 'fa fa-fw fa-sign-in',
@@ -66,7 +100,6 @@ export class AppMenuComponent implements OnInit {
                 {
                   label: 'Submenu 1.1', icon: 'fa fa-fw fa-sign-in',
                   items: [
-                    {label: '财务报表', icon: 'fa fa-fw fa-sign-in', routerLink: ['/charts']},
                     {label: 'Submenu 1.1.2', icon: 'fa fa-fw fa-sign-in'},
                     {label: 'Submenu 1.1.3', icon: 'fa fa-fw fa-sign-in'},
                   ]
@@ -84,33 +117,7 @@ export class AppMenuComponent implements OnInit {
           ]
         },
         {
-          label: '销售部报表', icon: 'fa fa-fw fa-laptop', routerLink: ['/interpreter'],
-          items: [
-            {
-              label: 'Submenu 1', icon: 'fa fa-fw fa-sign-in',
-              items: [
-                {
-                  label: 'Submenu 1.1', icon: 'fa fa-fw fa-sign-in',
-                  items: [
-                    {label: 'Submenu 1.1.1', icon: 'fa fa-fw fa-sign-in'},
-                    {label: 'Submenu 1.1.2', icon: 'fa fa-fw fa-sign-in'},
-                    {label: 'Submenu 1.1.3', icon: 'fa fa-fw fa-sign-in'},
-                  ]
-                },
-                {
-                  label: 'Submenu 1.2', icon: 'fa fa-fw fa-sign-in',
-                  items: [
-                    {label: 'Submenu 1.2.1', icon: 'fa fa-fw fa-sign-in'},
-                    {label: 'Submenu 1.2.2', icon: 'fa fa-fw fa-sign-in'}
-                  ]
-                },
-              ]
-            },
-            {label: 'Utils', icon: 'fa fa-fw fa-wrench', routerLink: ['/utils']},
-          ]
-        },
-        {
-          label: '人事部报表', icon: 'fa fa-fw fa-laptop', routerLink: ['/interpreter'],
+          label: '销售部报表', icon: 'fa fa-fw fa-laptop',
           items: [
             {
               label: 'Submenu 1', icon: 'fa fa-fw fa-sign-in',
@@ -136,7 +143,33 @@ export class AppMenuComponent implements OnInit {
           ]
         },
         {
-          label: '生产部报表', icon: 'fa fa-fw fa-laptop', routerLink: ['/interpreter'],
+          label: '人事部报表', icon: 'fa fa-fw fa-laptop',
+          items: [
+            {
+              label: 'Submenu 1', icon: 'fa fa-fw fa-sign-in',
+              items: [
+                {
+                  label: 'Submenu 1.1', icon: 'fa fa-fw fa-sign-in',
+                  items: [
+                    {label: 'Submenu 1.1.1', icon: 'fa fa-fw fa-sign-in'},
+                    {label: 'Submenu 1.1.2', icon: 'fa fa-fw fa-sign-in'},
+                    {label: 'Submenu 1.1.3', icon: 'fa fa-fw fa-sign-in'},
+                  ]
+                },
+                {
+                  label: 'Submenu 1.2', icon: 'fa fa-fw fa-sign-in',
+                  items: [
+                    {label: 'Submenu 1.2.1', icon: 'fa fa-fw fa-sign-in'},
+                    {label: 'Submenu 1.2.2', icon: 'fa fa-fw fa-sign-in'}
+                  ]
+                },
+              ]
+            },
+            {label: 'Utils', icon: 'fa fa-fw fa-wrench', routerLink: ['/utils']},
+          ]
+        },
+        {
+          label: '生产部报表', icon: 'fa fa-fw fa-laptop',
           items: [
             {
               label: 'Submenu 1', icon: 'fa fa-fw fa-sign-in',
@@ -179,7 +212,8 @@ export class AppMenuComponent implements OnInit {
             {label: '笔记仓库', icon: 'fa fa-fw fa-code', routerLink: ['/notebookRepos']},
             {label: '用户管理', icon: 'fa fa-fw fa-table', routerLink: ['/credential']},
             {label: 'Helium', icon: 'fa fa-fw fa-list-alt', routerLink: ['/helium']},
-            {label: '参数配置', icon: 'fa fa-fw fa-square', routerLink: ['/configuration']}
+            {label: '参数配置', icon: 'fa fa-fw fa-cog', routerLink: ['/configuration']},
+            {label: '目录管理', icon: 'fa fa-fw fa-list', routerLink: ['/catalog']}
           ]
         },
         {
@@ -406,10 +440,10 @@ export class AppMenuComponent implements OnInit {
                 }
               ]
             },
-            {label: '个性化', icon: 'fa fa-fw fa-pencil-square-o', routerLink: ['/helium']},
+            {label: '个性化', icon: 'fa fa-fw fa-pencil-square-o', routerLink: ['/custom']},
           ]
-        },
-        /*{
+        }/*,
+        {
           label: 'Components', icon: 'fa fa-fw fa-sitemap',
           items: [
             {label: 'Sample Page', icon: 'fa fa-fw fa-columns', routerLink: ['/sample']},
@@ -499,236 +533,6 @@ export class AppMenuComponent implements OnInit {
 
     })
 
-    /*self.model = [
-      {label: '系统首页', icon: 'fa fa-fw fa-home', routerLink: ['/home']},
-      {
-        label: '算法笔记', icon: 'fa fa-fw fa-book', /!*routerLink: ['/notebook'],*!/
-        items: self.items
-      },
-
-      {label: '集团业务', icon: 'fa fa-fw fa-laptop', routerLink: ['/interpreter'],
-        items: [
-          {
-            label: 'Submenu 1', icon: 'fa fa-fw fa-sign-in',
-            items: [
-              {
-                label: 'Submenu 1.1', icon: 'fa fa-fw fa-sign-in',
-                items: [
-                  {label: 'Submenu 1.1.1', icon: 'fa fa-fw fa-sign-in'},
-                  {label: 'Submenu 1.1.2', icon: 'fa fa-fw fa-sign-in'},
-                  {label: 'Submenu 1.1.3', icon: 'fa fa-fw fa-sign-in'},
-                ]
-              },
-              {
-                label: 'Submenu 1.2', icon: 'fa fa-fw fa-sign-in',
-                items: [
-                  {label: 'Submenu 1.2.1', icon: 'fa fa-fw fa-sign-in'},
-                  {label: 'Submenu 1.2.2', icon: 'fa fa-fw fa-sign-in'}
-                ]
-              },
-            ]
-          },
-          {
-            label: 'Submenu 2', icon: 'fa fa-fw fa-sign-in',
-            items: [
-              {
-                label: 'Submenu 2.1', icon: 'fa fa-fw fa-sign-in',
-                items: [
-                  {label: 'Submenu 2.1.1', icon: 'fa fa-fw fa-sign-in'},
-                  {label: 'Submenu 2.1.2', icon: 'fa fa-fw fa-sign-in'},
-                  {label: 'Submenu 2.1.3', icon: 'fa fa-fw fa-sign-in'},
-                ]
-              },
-              {
-                label: 'Submenu 2.2', icon: 'fa fa-fw fa-sign-in',
-                items: [
-                  {label: 'Submenu 2.2.1', icon: 'fa fa-fw fa-sign-in'},
-                  {label: 'Submenu 2.2.2', icon: 'fa fa-fw fa-sign-in'}
-                ]
-              },
-            ]
-          }
-        ]
-      },
-      {label: '运行任务', icon: 'fa fa-fw fa-tasks', routerLink: ['/jobmanager']},
-      {label: '大屏发布', icon: 'fa fa-fw fa-dashboard', routerLink: ['/screen']},
-      {label: '远程HUB', icon: 'fa fa-fw fa-cloud', routerLink: ['/hub']},
-      {
-        label: '系统配置', icon: 'fa fa-fw fa-gears',
-        items: [
-          {label: '解析器配置', icon: 'fa fa-fw fa-columns', routerLink: ['/interpreter']},
-          {label: '笔记仓库', icon: 'fa fa-fw fa-code', routerLink: ['/notebookRepos']},
-          {label: '用户管理', icon: 'fa fa-fw fa-table', routerLink: ['/credential']},
-          {label: 'Helium', icon: 'fa fa-fw fa-list-alt', routerLink: ['/helium']},
-          {label: '参数配置', icon: 'fa fa-fw fa-square', routerLink: ['/configuration']}
-        ]
-      },
-      {
-        label: '平台定制化', icon: 'fa fa-fw fa-gear' , badge: '8',
-        items: [
-          {
-            label: '菜单模式',
-            icon: 'fa fa-fw fa-bars',
-            items: [
-              {label: '竖向菜单模式', icon: 'fa fa-fw fa-bars',  command: () => this.app.changeToStaticMenu()},
-              {label: '浮动菜单模式', icon: 'fa fa-fw fa-bars',  command: () => this.app.changeToOverlayMenu()},
-              {label: '简洁菜单模式', icon: 'fa fa-fw fa-bars',  command: () => this.app.changeToSlimMenu()},
-              {label: '横向菜单模式', icon: 'fa fa-fw fa-bars',  command: () => this.app.changeToHorizontalMenu()},
-            ]
-          },
-          {
-            label: '菜单颜色',
-            icon: 'fa fa-fw  fa-tachometer',
-            items: [
-              {label: '白色菜单', icon: 'fa fa-sun-o fa-fw',  command: () => this.app.darkMenu = false},
-              {label: '黑色菜单', icon: 'fa fa-moon-o fa-fw',  command: () => this.app.darkMenu = true}
-            ]
-          },
-          {
-            label: '用户位置',
-            icon: 'fa fa-fw fa-user',
-            items: [
-              {label: '菜单跟随', icon: 'fa fa-sun-o fa-fw',  command: () => this.app.profileMode = 'inline'},
-              {label: '顶部跟随', icon: 'fa fa-moon-o fa-fw',  command: () => this.app.profileMode = 'top'},
-            ]
-          },
-          {
-            label: '主题配置', icon: 'fa fa-fw fa-paint-brush', badge: '5',
-            items: [
-              {label: '蓝色主题', icon: 'fa fa-fw fa-paint-brush', command: (event) => {this.changeTheme('blue'); }},
-              {label: '青色主题', icon: 'fa fa-fw fa-paint-brush', command: (event) => {this.changeTheme('cyan'); }},
-              {label: '靛蓝主题', icon: 'fa fa-fw fa-paint-brush', command: (event) => {this.changeTheme('indigo'); }},
-              {label: '紫色主题', icon: 'fa fa-fw fa-paint-brush', command: (event) => {this.changeTheme('purple'); }},
-              {label: '蓝绿主题', icon: 'fa fa-fw fa-paint-brush', command: (event) => {this.changeTheme('teal'); }},
-              {label: '橙色主题', icon: 'fa fa-fw fa-paint-brush', command: (event) => {this.changeTheme('orange'); }},
-              {label: '深紫主题', icon: 'fa fa-fw fa-paint-brush', command: (event) => {this.changeTheme('deeppurple'); }},
-              {label: '淡蓝主题', icon: 'fa fa-fw fa-paint-brush', command: (event) => {this.changeTheme('lightblue'); }},
-              {label: '绿色主题', icon: 'fa fa-fw fa-paint-brush', command: (event) => {this.changeTheme('green'); }},
-              {label: '浅绿主题', icon: 'fa fa-fw fa-paint-brush', command: (event) => {this.changeTheme('lightgreen'); }},
-              {label: '青橙主题', icon: 'fa fa-fw fa-paint-brush', command: (event) => {this.changeTheme('lime'); }},
-              {label: '琥珀主题', icon: 'fa fa-fw fa-paint-brush', command: (event) => {this.changeTheme('amber'); }},
-              {label: '棕色主题', icon: 'fa fa-fw fa-paint-brush', command: (event) => {this.changeTheme('brown'); }},
-              {label: '深灰主题', icon: 'fa fa-fw fa-paint-brush', command: (event) => {this.changeTheme('darkgrey'); }},
-            ]
-          },
-          {
-            label: '布局颜色', icon: 'fa fa-fw fa-magic',
-            items: [
-              {
-                label: '单色模式',
-                icon: 'fa fa-fw fa-circle',
-                items: [
-                  {label: '蓝色模式', icon: 'fa fa-fw fa-paint-brush', command: (event) => {this.changeLayout('blue'); }},
-                  {label: '紫色模式', icon: 'fa fa-fw fa-paint-brush', command: (event) => {this.changeLayout('purple'); }},
-                  {label: '青色模式', icon: 'fa fa-fw fa-paint-brush', command: (event) => {this.changeLayout('cyan'); }},
-                  {label: '靛蓝模式', icon: 'fa fa-fw fa-paint-brush', command: (event) => {this.changeLayout('indigo'); }},
-                  {label: '蓝绿模式', icon: 'fa fa-fw fa-paint-brush', command: (event) => {this.changeLayout('teal'); }},
-                  {label: '粉红模式', icon: 'fa fa-fw fa-paint-brush', command: (event) => {this.changeLayout('pink'); }},
-                  {label: '青橙模式', icon: 'fa fa-fw fa-paint-brush', command: (event) => {this.changeLayout('lime'); }},
-                  {label: '绿色模式', icon: 'fa fa-fw fa-paint-brush', command: (event) => {this.changeLayout('green'); }},
-                  {label: '琥珀模式', icon: 'fa fa-fw fa-paint-brush', command: (event) => {this.changeLayout('amber'); }},
-                  {label: '深灰模式', icon: 'fa fa-fw fa-paint-brush', command: (event) => {this.changeLayout('darkgrey'); }},
-                ]
-              },
-              {
-                label: '特殊模式',
-                icon: 'fa fa-fw fa-fire',
-                items: [
-                  {label: '流行模式', icon: 'fa fa-fw fa-paint-brush',
-                    command: (event) => {this.changeLayout('influenza', true); }},
-                  {label: 'Suzy', icon: 'fa fa-fw fa-paint-brush', command: (event) => {this.changeLayout('suzy', true); }},
-                  {label: 'Calm', icon: 'fa fa-fw fa-paint-brush', command: (event) => {this.changeLayout('calm', true); }},
-                  {label: 'Crimson', icon: 'fa fa-fw fa-paint-brush', command: (event) => {this.changeLayout('crimson', true); }},
-                  {label: 'Night', icon: 'fa fa-fw fa-paint-brush', command: (event) => {this.changeLayout('night', true); }},
-                  {label: 'Skyling', icon: 'fa fa-fw fa-paint-brush', command: (event) => {this.changeLayout('skyline', true); }},
-                  {label: 'Sunkist', icon: 'fa fa-fw fa-paint-brush', command: (event) => {this.changeLayout('sunkist', true); }},
-                  {label: 'Little Leaf', icon: 'fa fa-fw fa-paint-brush',
-                    command: (event) => {this.changeLayout('littleleaf', true); }},
-                  {label: 'Joomla', icon: 'fa fa-fw fa-paint-brush', command: (event) => {this.changeLayout('joomla', true); }},
-                  {label: 'Firewatch', icon: 'fa fa-fw fa-paint-brush',
-                    command: (event) => {this.changeLayout('firewatch', true); }}
-                ]
-              }
-            ]
-          },
-        ]
-      },
-      {
-        label: 'Components', icon: 'fa fa-fw fa-sitemap',
-        items: [
-          {label: 'Sample Page', icon: 'fa fa-fw fa-columns', routerLink: ['/sample']},
-          {label: 'Forms', icon: 'fa fa-fw fa-code', routerLink: ['/forms']},
-          {label: 'Data', icon: 'fa fa-fw fa-table', routerLink: ['/data']},
-          {label: 'Panels', icon: 'fa fa-fw fa-list-alt', routerLink: ['/panels']},
-          {label: 'Overlays', icon: 'fa fa-fw fa-square', routerLink: ['/overlays']},
-          {label: 'Menus', icon: 'fa fa-fw fa-minus-square-o', routerLink: ['/menus']},
-          {label: 'Messages', icon: 'fa fa-fw fa-circle-o-notch', routerLink: ['/messages']},
-          {label: 'Charts', icon: 'fa fa-fw fa-area-chart', routerLink: ['/charts']},
-          {label: 'File', icon: 'fa fa-fw fa-arrow-circle-o-up', routerLink: ['/file']},
-          {label: 'Misc', icon: 'fa fa-fw fa-user-secret', routerLink: ['/misc']}
-        ]
-      },
-      {
-        label: 'Template Pages', icon: 'fa fa-fw fa-life-saver',
-        items: [
-          {label: 'Empty Page', icon: 'fa fa-fw fa-square-o', routerLink: ['/empty']},
-          {label: 'Landing Page', icon: 'fa fa-fw fa-certificate', url: 'assets/pages/landing.html', target: '_blank'},
-          {label: 'Login Page', icon: 'fa fa-fw fa-sign-in', url: 'assets/pages/login.html', target: '_blank'},
-          {label: 'Error Page', icon: 'fa fa-fw fa-exclamation-circle', url: 'assets/pages/error.html', target: '_blank'},
-          {label: 'Not Found Page', icon: 'fa fa-fw fa-times', url: 'assets/pages/notfound.html', target: '_blank'},
-          {label: 'Access Denied Page', icon: 'fa fa-fw fa-exclamation-triangle',
-            url: 'assets/pages/access.html', target: '_blank'}
-        ]
-      },
-      {
-        label: 'Menu Hierarchy', icon: 'fa fa-fw fa-gg',
-        items: [
-          {
-            label: 'Submenu 1', icon: 'fa fa-fw fa-sign-in',
-            items: [
-              {
-                label: 'Submenu 1.1', icon: 'fa fa-fw fa-sign-in',
-                items: [
-                  {label: 'Submenu 1.1.1', icon: 'fa fa-fw fa-sign-in'},
-                  {label: 'Submenu 1.1.2', icon: 'fa fa-fw fa-sign-in'},
-                  {label: 'Submenu 1.1.3', icon: 'fa fa-fw fa-sign-in'},
-                ]
-              },
-              {
-                label: 'Submenu 1.2', icon: 'fa fa-fw fa-sign-in',
-                items: [
-                  {label: 'Submenu 1.2.1', icon: 'fa fa-fw fa-sign-in'},
-                  {label: 'Submenu 1.2.2', icon: 'fa fa-fw fa-sign-in'}
-                ]
-              },
-            ]
-          },
-          {
-            label: 'Submenu 2', icon: 'fa fa-fw fa-sign-in',
-            items: [
-              {
-                label: 'Submenu 2.1', icon: 'fa fa-fw fa-sign-in',
-                items: [
-                  {label: 'Submenu 2.1.1', icon: 'fa fa-fw fa-sign-in'},
-                  {label: 'Submenu 2.1.2', icon: 'fa fa-fw fa-sign-in'},
-                  {label: 'Submenu 2.1.3', icon: 'fa fa-fw fa-sign-in'},
-                ]
-              },
-              {
-                label: 'Submenu 2.2', icon: 'fa fa-fw fa-sign-in',
-                items: [
-                  {label: 'Submenu 2.2.1', icon: 'fa fa-fw fa-sign-in'},
-                  {label: 'Submenu 2.2.2', icon: 'fa fa-fw fa-sign-in'}
-                ]
-              },
-            ]
-          }
-        ]
-      },
-      {label: 'Utils', icon: 'fa fa-fw fa-wrench', routerLink: ['/utils']},
-      {label: 'Documentation', icon: 'fa fa-fw fa-book', routerLink: ['/documentation']}
-    ];*/
-
   }
 
   generateNoteBookMenu(nodes) {
@@ -737,14 +541,18 @@ export class AppMenuComponent implements OnInit {
 
     for (let node of nodes) {
 
+      // 去掉回收站
+      if(node.name.indexOf(Constants.TRASH_FOLDER_ID) > -1){
+        continue;
+      }
+
       if (node.children) {
 
         var subitem = this.generateNoteBookMenu(node.children)
 
         var treeNode = {
           label: node.name,
-          icon: 'fa fa-fw fa-archive',
-          //id: '[/' + node.id + ']',
+          icon: 'fa fa-fw fa-folder',
           items: subitem
         }
 
