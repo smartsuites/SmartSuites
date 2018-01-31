@@ -1,4 +1,4 @@
-<div class="ui-g" id="{{paragraph.id}}_container" [ngClass]="{'paragraph': !asIframe, 'paragraphAsIframe': asIframe}">
+<div class="ui-g" id="{{paragraph.id}}_container" [ngClass]="{'paragraph': !asIframe, 'paragraphAsIframe': asIframe}" (click)="handleFocus(true)">
   <!-- control -->
   <div class="ui-g-12" style="margin-bottom: 8px">
     <!--<div style="float: left;" (dblclick)="this.editParagraphTitle()" class="paragraphTitle" *ngIf="paragraph.config.title" id="{{paragraph.id}}_title">-->
@@ -71,21 +71,179 @@
 
       <button pButton type="button" pTooltip="{{(paragraph.config.editorHide ? '显示' : '隐藏')}}代码"
               class="ui-button-secondary"
-              tooltipPosition="bottom" icon="fa-arrows-alt"
+              tooltipPosition="bottom" icon="fa-{{(paragraph.config.editorHide ? 'compress' : 'expand')}}"
               (click)="this.toggleEditor(paragraph)"></button>
 
       <button pButton type="button" pTooltip="{{(paragraph.config.tableHide ? '显示' : '隐藏')}}输出"
               class="ui-button-secondary"
-              tooltipPosition="bottom" icon="fa-columns"
+              tooltipPosition="bottom" icon="fa-{{(paragraph.config.tableHide ? 'eye-slash' : 'eye')}}"
               (click)="this.toggleOutput(paragraph)"></button>
 
       <button pButton type="button" pTooltip="全屏模式" tooltipPosition="bottom"
               class="ui-button-secondary"
-              icon="fa-desktop" (click)="display = true"></button>
-      <p-splitButton label="Setting" pTooltip="片段配置" tooltipPosition="bottom"
-                     styleClass="ui-button-secondary"
-                     icon="fa-cog" [model]="items"></p-splitButton>
+              icon="fa-arrows-alt" (click)="display = true"></button>
 
+      <button pButton type="button" pTooltip="配置" tooltipPosition="bottom"
+              class="ui-button-secondary"
+              icon="fa-cog" (click)="setting.toggle($event)"></button>
+      <p-overlayPanel #setting>
+
+        <ul class="setting" role="menu" style="width:270px;z-index:1002">
+          <li style="text-align:center;margin-top:4px;">
+            <a  tooltipPosition="bottom"
+                pTooltip="{{tooltip}}">
+              <span>{{paragraph.id}}</span>
+            </a>
+          </li>
+          <li role="separator" class="divider"></li>
+          <!-- Auto Run -->
+          <li style="padding-top:8px"
+              *ngIf="paragraph.config.runOnSelectionChange == true || paragraph.config.runOnSelectionChange == false">
+            <span *ngIf="paragraph.config.runOnSelectionChange == true" class="fa fa-toggle-on shortcut-icon" style="padding:3px 8px 8px 20px"></span>
+            <span *ngIf="paragraph.config.runOnSelectionChange == false" class="fa fa-toggle-off shortcut-icon" style="padding:3px 8px 8px 20px"></span>Run on selection change
+            <form style="display:inline; float:right">
+              <input type="checkbox"
+                     style="width:16px;"
+                     tooltipPosition="top" pTooltip="Even if you uncheck this, still can run the paragraph by pressing Enter"
+                     [checked]="paragraph.config.runOnSelectionChange"
+                     (click)="turnOnAutoRun(paragraph)"/>
+            </form>
+          </li>
+
+          <!-- Width -->
+          <li>
+            <a (click)="$event.stopPropagation()" class="dropdown">
+              <span style="margin-top: 2px;" class="fa fa-arrows-h shortcut-icon"></span>
+              <select style="float: right" [(ngModel)]="paragraph.config.colWidth"
+                      class="selectpicker"
+                      (change)="changeColWidth(paragraph, paragraph.config.colWidth)">
+                <option *ngFor="let col of colWidthOption" value="{{col}}">{{col}}</option>
+              </select>
+              Width
+            </a>
+          </li>
+
+          <!-- Font Size -->
+          <li>
+            <a (click)="$event.stopPropagation()" class="dropdown">
+              <span class="fa fa-text-height shortcut-icon"></span>
+              <select style="float: right" ng-model="paragraph.config.fontSize"
+                      class="selectpicker"
+                      (change)="changeFontSize(paragraph, paragraph.config.fontSize)">
+                <option *ngFor="let s of fontSizeOption" value="{{s}}">{{s}}</option>
+              </select>
+              Font size
+            </a>
+          </li>
+
+          <!-- Move Up Down -->
+          <li>
+            <a (click)="moveUp(paragraph)" [hidden]="$first">
+              <span class="fa fa-arrow-circle-o-up shortcut-icon"></span>
+              Move up
+              <span class="shortcut-keys" style="float:right">Ctrl+{{ isMac ? 'Option' : 'Alt'}}+K</span>
+            </a>
+          </li>
+          <li>
+            <a (click)="moveDown(paragraph)" [hidden]="$last">
+              <span class="fa fa-arrow-circle-o-down shortcut-icon"></span>
+              Move down
+              <span class="shortcut-keys" style="float:right">Ctrl+{{ isMac ? 'Option' : 'Alt'}}+J</span>
+            </a>
+          </li>
+
+          <!-- Insert -->
+          <li>
+            <a (click)="insertNew('below')">
+              <span class="fa fa-plus-circle shortcut-icon"></span>
+              Insert new
+              <span class="shortcut-keys" style="float:right">Ctrl+{{ isMac ? 'Option' : 'Alt'}}+B</span>
+            </a>
+          </li>
+
+          <!-- Clone -->
+          <li>
+            <a (click)="copyParagraph(getEditorValue())">
+              <span class="fa fa-copy shortcut-icon"></span>
+              Clone paragraph
+              <span class="shortcut-keys" style="float:right">Ctrl+Shift+C</span>
+            </a>
+          </li>
+
+          <!-- Title -->
+          <li>
+            <div [hidden]="!paragraph.config.title">
+              <a (click)="hideTitle(paragraph)">
+                <span class="fa fa-font shortcut-icon"></span>
+                Hide title
+                <span class="shortcut-keys" style="float:right">Ctrl+{{ isMac ? 'Option' : 'Alt'}}+T</span>
+              </a>
+            </div>
+            <div [hidden]="paragraph.config.title">
+              <a (click)="showTitle(paragraph)">
+                <span class="fa fa-font shortcut-icon"></span>
+                Show title
+                <span class="shortcut-keys" style="float:right">Ctrl+{{ isMac ? 'Option' : 'Alt'}}+T</span>
+              </a>
+            </div>
+          </li>
+
+          <!-- Line Number -->
+          <li>
+            <div [hidden]="!paragraph.config.lineNumbers">
+              <a (click)="hideLineNumbers(paragraph)">
+                <span class="fa fa-list-ol shortcut-icon"></span>
+                Hide line numbers
+                <span class="shortcut-keys" style="float:right">Ctrl+{{ isMac ? 'Option' : 'Alt'}}+M</span>
+              </a>
+            </div>
+            <div [hidden]="paragraph.config.lineNumbers">
+              <a (click)="showLineNumbers(paragraph)">
+                <span class="fa fa-list-ol shortcut-icon"></span>
+                Show line numbers
+                <span class="shortcut-keys" style="float:right">Ctrl+{{ isMac ? 'Option' : 'Alt'}}+M</span>
+              </a>
+            </div>
+          </li>
+
+          <!-- Run -->
+          <li>
+            <a (click)="toggleEnableDisable(paragraph)">
+              <span class="fa fa-play shortcut-icon"></span>
+              {{paragraph.config.enabled ? "Disable" : "Enable"}} run
+              <span class="shortcut-keys" style="float:right">Ctrl+ {{ isMac ? 'Option' : 'Alt'}}+R</span>
+            </a>
+          </li>
+
+          <!-- Link -->
+          <li>
+            <a (click)="goToSingleParagraph()">
+              <span class="fa fa-external-link shortcut-icon"></span>
+              Link this paragraph
+              <span class="shortcut-keys" style="float:right">Ctrl+{{ isMac ? 'Option' : 'Alt'}}+W</span>
+            </a>
+          </li>
+
+          <!-- Clear -->
+          <li>
+            <a (click)="clearParagraphOutput(paragraph)">
+              <span class="fa fa-eraser shortcut-icon"></span>
+              Clear output
+              <span class="shortcut-keys" style="float:right">Ctrl+{{ isMac ? 'Option' : 'Alt'}}+L</span>
+            </a>
+          </li>
+
+          <!-- Remove -->
+          <li>
+            <a (click)="removeParagraph(paragraph)" >
+              <span class="fa fa-times shortcut-icon"></span>
+              Remove
+              <span class="shortcut-keys" style="float:right">Ctrl+{{ isMac ? 'Option' : 'Alt'}}+D</span>
+            </a>
+          </li>
+        </ul>
+
+      </p-overlayPanel>
 
 
       <!--<ul class="dropdown-menu dropdown-menu-right" role="menu" style="width:270px;z-index:1002">
@@ -218,7 +376,7 @@
 
     </p-sidebar>
 
-    <div id="{{paragraph.id}}_editor"></div>
+    <div id="{{paragraph.id}}_editor" class="editor" [hidden]="paragraph.config.editorHide || viewOnly"></div>
 
   </div>
   <!-- Processor Bar -->
@@ -305,7 +463,7 @@
          ng-include src="'app/notebook/paragraph/result/result.html'">
     </div>-->
 
-    <div *ngFor="let result of paragraph.results.msg; let i = index">
+    <div *ngFor="let result of paragraph.results.msg; let i = index" [hidden]="paragraph.config.tableHide" >
       <app-result class="tableDisplay" paragraphid="{{paragraphid}}" index="{{i}}" noteid="{{notebook.noteId}}"></app-result>
     </div>
 

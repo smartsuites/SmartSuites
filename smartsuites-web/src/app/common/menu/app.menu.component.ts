@@ -6,6 +6,7 @@ import {MenuItem, SelectItem} from 'primeng/primeng';
 import {AppComponent} from '../../app.component';
 import {EventService1} from "../../service/event/event.service";
 import {Constants} from "../../model/Constants";
+import {NoteCreateComponent} from "../../components/note-create/note-create.component";
 
 @Component({
   selector: 'app-menu',
@@ -20,13 +21,15 @@ export class AppMenuComponent implements OnInit {
   items = [];
 
   //********** Create Note ***********//
-  createNoteDialogDisplay: boolean = false;
+
+  @ViewChild("noteCreate")
+  noteCreateComponent:NoteCreateComponent
+
 
   showCreateNoteDialog() {
-    this.createNoteDialogDisplay = true;
+    this.noteCreateComponent.getInterpreterSettings()
+    this.noteCreateComponent.openCreateNoteDialog()
   }
-
-  cities1: SelectItem[];
 
   noteName
   defaultInter
@@ -48,14 +51,6 @@ export class AppMenuComponent implements OnInit {
   }
 
   ngOnInit() {
-
-    this.cities1 = [];
-    this.cities1.push({label: 'Select City', value: null});
-    this.cities1.push({label: 'New York', value: {id: 1, name: 'New York', code: 'NY'}});
-    this.cities1.push({label: 'Rome', value: {id: 2, name: 'Rome', code: 'RM'}});
-    this.cities1.push({label: 'London', value: {id: 3, name: 'London', code: 'LDN'}});
-    this.cities1.push({label: 'Istanbul', value: {id: 4, name: 'Istanbul', code: 'IST'}});
-    this.cities1.push({label: 'Paris', value: {id: 5, name: 'Paris', code: 'PRS'}});
 
     let self = this;
     // 用于监听笔记加载消息，异步加载Notes

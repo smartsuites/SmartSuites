@@ -29,3 +29,71 @@
   font-size: 12px;
   font-family: Roboto,sans-serif;
 }
+
+
+.paragraph .editor {
+  width: 100%;
+  border-left: 4px solid #DDD;
+  background: rgba(255,255,255,0);
+  margin: 7px 0 2px;
+}
+
+.setting li {
+  margin-bottom: 6px;
+  list-style-type: none;
+  color: #000;
+  font-size: 13px;
+}
+
+/*.setting li:hover{
+  margin-bottom: 6px;
+  list-style-type: none;
+  color: #000;
+  font-size: 13px;
+  cursor: pointer;
+}*/
+
+.setting li a{
+  padding: 0.429em 1.429em;
+  width: 100%;
+  color: #292B2C;
+  -moz-border-radius: 0;
+  -webkit-border-radius: 0;
+  border-radius: 0;
+  display: block;
+  text-decoration: none;
+  font-weight: normal;
+  border: 1px solid transparent;
+  line-height: 1em;
+  cursor: pointer;
+}
+
+.setting li a:hover{
+  background-color: #f5f5f5;
+  color: #292B2C;
+}
+
+.setting {
+  padding: 5px;
+  margin: 0px;
+  /*position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  display: none;
+  float: left;
+  min-width: 160px;
+  padding: 5px 0;
+  margin: 2px 0 0;
+  font-size: 14px;
+  text-align: left;
+  list-style: none;
+  background-color: #fff;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0,0,0,.15);
+  border-radius: 4px;
+  -webkit-box-shadow: 0 6px 12px rgba(0,0,0,.175);
+  box-shadow: 0 6px 12px rgba(0,0,0,.175);*/
+}

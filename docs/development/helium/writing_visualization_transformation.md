@@ -42,13 +42,13 @@ See [passthrough.js](https://github.com/apache/zeppelin/blob/master/zeppelin-web
 
 `ColumnselectorTransformation` is uses when you need `N` axes but do not need aggregation. 
 
-See [columnselector.js](https://github.com/apache/zeppelin/blob/master/zeppelin-web/src/app/tabledata/columnselector.js)
+See [columnselector.ts](https://github.com/apache/zeppelin/blob/master/zeppelin-web/src/app/tabledata/columnselector.ts)
 
 ## 3. PivotTransformation
 
 `PivotTransformation` provides group by and aggregation. Every chart using `PivotTransformation` has 3 axes. `Keys`, `Groups` and `Values`.
 
-See [pivot.js](https://github.com/apache/zeppelin/blob/master/zeppelin-web/src/app/tabledata/pivot.js)
+See [pivot.ts](https://github.com/apache/zeppelin/blob/master/zeppelin-web/src/app/tabledata/pivot.ts)
 
 ## 4. AdvancedTransformation
 

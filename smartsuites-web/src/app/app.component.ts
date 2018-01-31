@@ -244,6 +244,7 @@ export class AppComponent implements OnInit,AfterViewInit, OnDestroy {
   notes
 
   looknfeel = 'default'
+  asIframe
 
   isLogin():boolean{
     return this.loginService.isLogin()
@@ -309,23 +310,23 @@ export class AppComponent implements OnInit,AfterViewInit, OnDestroy {
 
     })
 
-    this.eventService.subscribe('setIframe', function (event, data) {
+    this.eventService.subscribe('setIframe', function (data) {
       if (!event.defaultPrevented) {
-        this.asIframe = data
+        self.asIframe = data
         event.preventDefault()
       }
     })
 
-    this.eventService.subscribe('setLookAndFeel', function (event, data) {
-      if (!event.defaultPrevented && data && data !== '' && data !== this.looknfeel) {
-        this.looknfeel = data
+    this.eventService.subscribe('setLookAndFeel', function (data) {
+      if (!event.defaultPrevented && data && data !== '' && data !== self.looknfeel) {
+        self.looknfeel = data
         event.preventDefault()
       }
     })
 
     // Set The lookAndFeel to default on every page
     this.eventService.subscribe('$routeChangeStart', function (event, next, current) {
-      this.eventService.broadcast('setLookAndFeel', 'default')
+      self.eventService.broadcast('setLookAndFeel', 'default')
     })
 
     //this.loginService.login()

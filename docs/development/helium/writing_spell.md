@@ -99,10 +99,10 @@ Here's an example
 
 Here are some examples you can refer
 
-- [Echo Spell](https://github.com/apache/zeppelin/blob/master/zeppelin-examples/zeppelin-example-spell-echo/index.js)
-- [Markdown Spell: Using library](https://github.com/apache/zeppelin/blob/master/zeppelin-examples/zeppelin-example-spell-markdown/index.js)
-- [Flowchart Spell: Using DOM](https://github.com/apache/zeppelin/blob/master/zeppelin-examples/zeppelin-example-spell-flowchart/index.js)
-- [Google Translation API Spell: Using API (returning promise)](https://github.com/apache/zeppelin/blob/master/zeppelin-examples/zeppelin-example-spell-translator/index.js)
+- [Echo Spell](https://github.com/apache/zeppelin/blob/master/zeppelin-examples/zeppelin-example-spell-echo/index.ts)
+- [Markdown Spell: Using library](https://github.com/apache/zeppelin/blob/master/zeppelin-examples/zeppelin-example-spell-markdown/index.ts)
+- [Flowchart Spell: Using DOM](https://github.com/apache/zeppelin/blob/master/zeppelin-examples/zeppelin-example-spell-flowchart/index.ts)
+- [Google Translation API Spell: Using API (returning promise)](https://github.com/apache/zeppelin/blob/master/zeppelin-examples/zeppelin-example-spell-translator/index.ts)
 
 Now, you need to write code to create spell which processing text.
 
@@ -171,8 +171,8 @@ export default class MarkdownSpell extends SpellBase {
 }
 ```
 
-- You might want to manipulate DOM directly (e.g google d3.js), then refer [Flowchart Spell](https://github.com/apache/zeppelin/blob/master/zeppelin-examples/zeppelin-example-spell-flowchart/index.js)
-- You might want to return promise not string (e.g API call), then refer [Google Translation API Spell](https://github.com/apache/zeppelin/blob/master/zeppelin-examples/zeppelin-example-spell-translator/index.js)
+- You might want to manipulate DOM directly (e.g google d3.js), then refer [Flowchart Spell](https://github.com/apache/zeppelin/blob/master/zeppelin-examples/zeppelin-example-spell-flowchart/index.ts)
+- You might want to return promise not string (e.g API call), then refer [Google Translation API Spell](https://github.com/apache/zeppelin/blob/master/zeppelin-examples/zeppelin-example-spell-translator/index.ts)
 
 ### 3. Create __Helium package file__ for local deployment
 

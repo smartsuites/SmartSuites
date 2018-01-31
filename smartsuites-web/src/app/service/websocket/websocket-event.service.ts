@@ -163,13 +163,16 @@ export class WebsocketEventService {
         } else if (op === 'INTERPRETER_SETTINGS') {
           vm.eventService.broadcast('interpreterSettings', data)
         } else if (op === 'PARAGRAPH_ADDED') {
-          vm.eventService.broadcast('addParagraph', data.paragraph, data.index)
+          //vm.eventService.broadcast('addParagraph', data.paragraph, data.index)
+          vm.eventService.broadcast('addParagraph', data)
         } else if (op === 'PARAGRAPH_REMOVED') {
-          vm.eventService.broadcast('removeParagraph', data.id)
+          vm.eventService.broadcast('removeParagraph', data)
         } else if (op === 'PARAGRAPH_MOVED') {
-          vm.eventService.broadcast('moveParagraph', data.id, data.index)
+          //vm.eventService.broadcast('moveParagraph', data.id, data.index)
+          vm.eventService.broadcast('moveParagraph', data)
         } else if (op === 'NOTE_UPDATED') {
-          vm.eventService.broadcast('updateNote', data.name, data.config, data.info)
+          //vm.eventService.broadcast('updateNote', data.name, data.config, data.info)
+          vm.eventService.broadcast('updateNote', data)
         } else if (op === 'SET_NOTE_REVISION') {
           vm.eventService.broadcast('setNoteRevisionResult', data)
         } else if (op === 'PARAS_INFO') {

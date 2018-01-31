@@ -17,9 +17,8 @@ import {CommonService} from "../../../../service/common/common.service";
 import PiechartVisualization from "../../../../service/visualization/builtins/visualization-piechart";
 import LinechartVisualization from "../../../../service/visualization/builtins/visualization-linechart";
 import ScatterchartVisualization from "../../../../service/visualization/builtins/visualization-scatterchart";
+import {HighlightJsService} from "angular2-highlight-js";
 /*import {AnsiUp} from "ansi_up/ansi_up"*/
-/*import * as hljs from "highlight.js"
-import * as MathJax from "mathjax"*/
 
 @Component({
   selector: 'app-result',
@@ -456,11 +455,13 @@ export class ResultComponent implements OnInit,AfterViewInit {
     this.handleData(data, DefaultDisplayType.HTML,
       (generated) => {
         elem.html(generated)
-        /*elem.find('pre code').each(function (i, e) {
-          hljs.highlightBlock(e)
+        elem.find('pre code').each(function (i, e) {
+          self.highlightJsService.highlight(e,false)
         })
+        /*
         /!* eslint new-cap: [2, {"capIsNewExceptions": ["MathJax.Hub.Queue"]}] *!/
-        MathJax.Hub.Queue(['Typeset', MathJax.Hub, elem[0]])*/
+        */
+        MathJax.Hub.Queue(['Typeset', MathJax.Hub, elem[0]])
       },
       (error) => { elem.html(`${error.stack}`) }
     )
@@ -492,6 +493,8 @@ export class ResultComponent implements OnInit,AfterViewInit {
         self.removeChildrenDOM(targetElemId)
 
         if (generated) {
+          /*let ansi = new AnsiUp()
+          const escaped = ansi.ansi_to_html(generated)*/
           /*let ansi = new AnsiUp()
           const escaped = ansi.ansi_to_html(generated)*/
           //const divDom = self.renderer2.createElement('<div>');
@@ -986,7 +989,8 @@ export class ResultComponent implements OnInit,AfterViewInit {
               private jitCompile:JitCompileService,
               private renderer2:Renderer2,
               private commonService:CommonService,
-              private eventService:EventService1) {
+              private eventService:EventService1,
+              private highlightJsService : HighlightJsService) {
 
     this.items = [
       {label: 'CSV', command: () => {

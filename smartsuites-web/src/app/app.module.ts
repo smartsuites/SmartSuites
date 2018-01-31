@@ -139,6 +139,8 @@ import { CatalogComponent } from './components/catalog/catalog.component';
 import { CustomComponent } from './components/custom/custom.component';
 import {CommonService} from "./service/common/common.service";
 import {HeliumService} from "./service/helium/helium.service";
+import {HighlightJsModule, HighlightJsService} from "angular2-highlight-js";
+import { NoteCreateComponent } from './components/note-create/note-create.component';
 
 
 @NgModule({
@@ -189,6 +191,7 @@ import {HeliumService} from "./service/helium/helium.service";
     DocumentComponent,
     CatalogComponent,
     CustomComponent,
+    NoteCreateComponent,
     DocumentationComponent,
   ],
   imports: [
@@ -201,6 +204,7 @@ import {HeliumService} from "./service/helium/helium.service";
     ReactiveFormsModule,
     BlockUIModule,
     ProgressSpinnerModule,
+    HighlightJsModule,
     //UI
     HttpModule,
     AccordionModule,
@@ -289,6 +293,7 @@ import {HeliumService} from "./service/helium/helium.service";
     SaveAsService,
     ConfirmationService,
     HeliumService,
+    HighlightJsService,
 
     //DEMO ONLY
     {provide: LocationStrategy, useClass: HashLocationStrategy},

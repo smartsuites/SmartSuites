@@ -22,6 +22,7 @@ export class EventService1 {
       next: (v) => {
         if(v.eventType.trim() == eventType.trim()){
           callback(v.eventMsg[0])
+          console.log("event:"+eventType + " data:")
           console.log(v.eventMsg[0])
         }
       }

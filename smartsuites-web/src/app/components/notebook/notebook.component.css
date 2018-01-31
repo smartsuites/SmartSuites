@@ -47,11 +47,46 @@
 
 .notebook .new-paragraph:hover{
   text-align: center;
-  background-color: #83b8d2;
+  background-color: #D4E3E7;
+  -moz-border-radius: 8px;
+  border-radius: 8px;
   font-size: 6px;
+  cursor: pointer;
 }
 
 .notebook .new-paragraph{
   text-align: center;
   font-size: 6px;
+}
+
+
+.kbd-dark {
+  color: #eee;
+  background: #222 none;
+  border: 0;
+}
+
+kbd {
+  background: #e7e7e7;
+  background-repeat: repeat-x;
+  display: inline-block;
+  padding: 4px 5px;
+  font: 11px Consolas,"Liberation Mono",Menlo,Courier,monospace;
+  line-height: 10px;
+  color: #000;
+  border-radius: 2px;
+}
+kbd {
+  font-size: 90%;
+  color: #fff;
+  background-color: #333;
+  border-radius: 3px;
+  -webkit-box-shadow: inset 0 -1px 0 rgba(0,0,0,.25);
+  box-shadow: inset 0 -1px 0 rgba(0,0,0,.25);
+}
+
+.cron-preset.selected {
+  color: #000;
+  text-decoration: none;
+  cursor: default;
 }

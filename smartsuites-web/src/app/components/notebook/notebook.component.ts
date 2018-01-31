@@ -16,7 +16,8 @@ import * as moment from "moment";
 import {Constants} from "../../model/Constants";
 import {MessageService} from "primeng/components/common/messageservice";
 import {CommonService} from "../../service/common/common.service";
-import {ConfirmationService} from "primeng/primeng";
+import {ConfirmationService, MenuItem} from "primeng/primeng";
+import {NoteCreateComponent} from "../note-create/note-create.component";
 
 @Component({
   selector: 'app-notebook',
@@ -26,7 +27,7 @@ import {ConfirmationService} from "primeng/primeng";
 export class NotebookComponent implements OnInit {
 
 
-  /**************** 更新Note名称 START ***************/
+  /**************** 更新Note名称 ***************/
   titleEditor = false
 
   noteName
@@ -39,7 +40,7 @@ export class NotebookComponent implements OnInit {
     this.titleEditor = false
   }
 
-  /** Update the note name */
+  /** 跟新Notebook名称 */
   updateNoteName(newName) {
     const trimmedNewName = newName.trim()
     if (trimmedNewName.length > 0 && this.note.name !== trimmedNewName) {
@@ -48,41 +49,103 @@ export class NotebookComponent implements OnInit {
     }
   }
 
-  /**************** 更新Note名称 END ***************/
+  /**************** 复制笔记本 **************/
+  @ViewChild("noteCopy")
+  noteCreateComponent:NoteCreateComponent
 
-  //当前Note的ID
-  noteId
+  showCreateNoteDialog() {
+    this.noteCreateComponent.getInterpreterSettings()
+    this.noteCreateComponent.openCloneNoteDialog(this.note.name)
+  }
 
-  //当前的Note实例
-  note:any
+  /**************** 切换代码和输出显示状态 **************/
 
-  //是否切换编辑状态
+  //是否切换代码显示
   editorToggled = false
 
-  //是否显示输出
+  //是否显示输出显示
   tableToggled = false
 
-  //是否只读
-  viewOnly = false
+  toggleAllEditor() {
+    if (this.editorToggled) {
+      this.eventService.broadcast('openEditor')
+    } else {
+      this.eventService.broadcast('closeEditor')
+    }
+    this.editorToggled = !this.editorToggled
+  }
 
-  //是否显示配置
-  showSetting = false
+  showAllEditor() {
+    this.eventService.broadcast('openEditor')
+  }
+
+  hideAllEditor() {
+    this.eventService.broadcast('closeEditor')
+  }
+
+  toggleAllTable() {
+    if (this.tableToggled) {
+      this.eventService.broadcast('openTable')
+    } else {
+      this.eventService.broadcast('closeTable')
+    }
+    this.tableToggled = !this.tableToggled
+  }
+
+  showAllTable() {
+    this.eventService.broadcast('openTable')
+  }
+
+  hideAllTable() {
+    this.eventService.broadcast('closeTable')
+  }
+
+  /**************** 显示快捷方式的Model **************/
+  // 快捷方式显示
+  shortcutsDialog = false
+
+  /**************** NoteBook的三种显示方式 **************/
 
   //当前Note三种显示模式
   looknfeelOption = ['default', 'simple', 'report']
 
   looknfeelOptionItems = [
     {label: 'default', icon: 'fa-bullseye', command: () => {
-        //this.update();
+        this.setLookAndFeel('default');
       }},
     {label: 'simple', icon: 'fa-bullseye', command: () => {
-        //this.delete();
+        this.setLookAndFeel('simple');
       }},
     {label: 'report', icon: 'fa-bullseye', command: () => {
-        //this.delete();
+        this.setLookAndFeel('report');
       }
     }
   ];
+
+  //初始化外观
+  initializeLookAndFeel():void {
+    if (!this.note.config.looknfeel) {
+      this.note.config.looknfeel = 'default'
+    } else {
+      this.viewOnly = this.note.config.looknfeel === 'report' ? true : false
+    }
+
+    if (this.note.paragraphs && this.note.paragraphs[0]) {
+      this.note.paragraphs[0].focus = true
+    }
+    this.eventService.broadcast('setLookAndFeel', this.note.config.looknfeel)
+  }
+
+  setLookAndFeel(looknfeel) {
+    this.note.config.looknfeel = looknfeel
+    if (this.revisionView === true) {
+      this.eventService.broadcast('setLookAndFeel', this.note.config.looknfeel)
+    } else {
+      this.setConfig()
+    }
+  }
+
+  /**************** NoteBook的调度方式 **************/
 
   //Cron的表达式
   cronOption = [
@@ -96,25 +159,43 @@ export class NotebookComponent implements OnInit {
     {name: '1d', value: '0 0 0 * * ?'}
   ]
 
+  getCronOptionNameFromValue(value) {
+    if (!value || value == undefined || value == "") {
+      return "None"
+    }
+
+    for (let o in this.cronOption) {
+      if (this.cronOption[o].value === value) {
+        return this.cronOption[o].name
+      }
+    }
+    return value
+  }
+
+  /** Set cron expression for this note **/
+  setCronScheduler(cronExpr) {
+    if (cronExpr) {
+      if (!this.note.config.cronExecutingUser) {
+        this.note.config.cronExecutingUser = this.globalService.ticket.principal
+      }
+    } else {
+      this.note.config.cronExecutingUser = ''
+    }
+    this.note.config.cron = cronExpr
+    this.setConfig()
+  }
+
+  /** Set the username of the user to be used to execute all notes in notebook **/
+  setCronExecutingUser(cronExecutingUser) {
+    this.note.config.cronExecutingUser = cronExecutingUser
+    this.setConfig()
+  }
+
+  /**************** NoteBook的版本管理 **************/
+
   formatRevisionDate(date) {
     return moment.unix(date).format('MMMM Do YYYY, h:mm a')
   }
-
-  // 当前Note的解析器绑定
-  interpreterSettings = []
-  interpreterBindings = []
-
-  // Note是否更新
-  isNoteDirty = null
-
-  // 自动保存
-  saveTimer = null
-
-  // TODO
-  paragraphWarningDialog = {}
-
-  // 是否连接到后台
-  connectedOnce = false
 
   // 检测Path是否为修订版本
   isRevisionPath(path) {
@@ -128,189 +209,27 @@ export class NotebookComponent implements OnInit {
   // 当前的版本
   currentRevision = 'Head'
 
+  noteRev: MenuItem[] = [];
+
   // 是否为修订版本视图
   revisionView = this.isRevisionPath(this.location.path())
 
   // 当前修订版本号
   revisionId
 
-  // 查询对象
-  search = {
-    searchText: '',
-    occurrencesExists: false,
-    needHighlightFirst: false,
-    occurrencesHidden: false,
-    replaceText: '',
-    needToSendNextOccurrenceAfterReplace: false,
-    occurrencesCount: 0,
-    currentOccurrence: 0,
-    searchBoxOpened: false,
-    searchBoxWidth: 350,
-    left: '0px'
-  }
-
-  // 当前查询的片段索引
-  currentSearchParagraph = 0
-
-
-  permissionsOrig
-
-  permissions
-
-  paragraphUrl
-
-  asIframe
-
-  interpreterBindingsOrig = []
-
-  isOwner
-
-  allowLeave
-
-  showPermissions
-
-  isAnonymous
-
-  getNoteRevisions(noteRevisions){
-
-    let noteRev = [];
-
-    for(let rev of noteRevisions){
-      noteRev.push({
-        revision: rev,
-        time: this.formatRevisionDate(rev.time),
-        message:rev.message
+  // 获取Note版本列表
+  getNoteRevisions(){
+    let self = this;
+    for(let rev of this.noteRevisions){
+      self.noteRev.push({
+        label: rev.message+"["+self.formatRevisionDate(rev.time)+"]",
+        icon: 'fa-clock-o',
+        style:'font-size:10px',
+        command: () => {
+          self.visitRevision(rev);
+        }
       })
     }
-    return noteRev
-  }
-
-  // 名称
-  /*$scope.$watch('note', function (value) {
-    $rootScope.pageTitle = value ? value.name : 'Zeppelin'
-  }, true)*/
-
-  getCronOptionNameFromValue(value) {
-    if (!value || value == undefined) {
-      return ''
-    }
-
-    for (let o in this.cronOption) {
-      if (this.cronOption[o].value === value) {
-        return this.cronOption[o].name
-      }
-    }
-    return value
-  }
-
-  // 显示非权限用户
-  blockAnonUsers() {
-    let zeppelinVersion = this.globalService.dataSmartVersion
-    let url = 'https://zeppelin.apache.org/docs/' + zeppelinVersion + '/security/notebook_authorization.html'
-    let content = 'Only authenticated user can set the permission.' +
-      '<a data-toggle="tooltip" data-placement="top" title="Learn more" target="_blank" href=' + url + '>' +
-      '<i class="icon-question" />' +
-      '</a>'
-    this.messageService.add({severity:'warn', summary:'权限拒绝', detail:content});
-  }
-
-  /** 初始化笔记 */
-  initNotebook():void {
-    this.noteVarShareService.clear()
-    if (this.revisionId) {
-      this.websocketMsgSrv.getNoteByRevision(this.noteId, this.revisionId)
-    } else {
-      this.websocketMsgSrv.getNote(this.noteId)
-    }
-
-    this.websocketMsgSrv.listRevisionHistory(this.noteId)
-
-    // TODO 滑动到具体的地方
-    /*let currentRoute = $route.current
-    if (currentRoute) {
-      setTimeout(
-        function () {
-          let routeParams = currentRoute.params
-          let $id = angular.element('#' + routeParams.paragraph + '_container')
-
-          if ($id.length > 0) {
-            // adjust for navbar
-            let top = $id.offset().top - 103
-            angular.element('html, body').scrollTo({top: top, left: 0})
-          }
-        },
-        1000
-      )
-    }*/
-  }
-
-
-  focusParagraphOnClick(clickEvent) {
-    if (!this.note) {
-      return
-    }
-    for (let i = 0; i < this.note.paragraphs.length; i++) {
-      let paragraphId = this.note.paragraphs[i].id
-      if (this.commonService._jQuery.contains(this.elementRef.nativeElement.querySelector('#' + paragraphId + '_container'), clickEvent.target)) {
-
-        // 发送片段聚焦事件，
-        let paraInfo = {
-          paragraphId:paragraphId,
-          cursorPos:0,
-          mouseEvent:true
-        }
-        this.eventService.broadcast("noteComplete",paraInfo)
-        break
-      }
-    }
-  }
-
-  keyboardShortcut(keyEvent) {
-    // handle keyevent
-    if (!this.viewOnly && !this.revisionView) {
-      this.eventService.broadcast('keyEvent', keyEvent)
-    }
-  }
-
-  //片段双击事件
-  paragraphOnDoubleClick(paragraphId) {
-    this.eventService.broadcast('doubleClickParagraph', paragraphId)
-  }
-
-  // Move the note to trash and go back to the main page
-  moveNoteToTrash(noteId) {
-    this.noteActionService.moveNoteToTrash(noteId, true)
-  }
-
-  // Remove the note permanently if it's in the trash
-  removeNote(noteId) {
-    this.noteActionService.removeNote(noteId, true)
-  }
-
-  isTrash(note) {
-    return note ? note.name.split('/')[0] === Constants.TRASH_FOLDER_ID : false
-  }
-
-  // Export notebook
-  exportNote() {
-    let jsonContent = JSON.stringify(this.note)
-    this.saveAsService.saveAs(jsonContent, this.note.name, 'json')
-  }
-
-  // Clone note
-  cloneNote(noteId) {
-    let self = this;
-
-    this.confirmationService.confirm({
-      message: 'Do you want to clone this note?',
-      header: 'Confirmation',
-      icon: 'fa fa-question-circle',
-      accept: () => {
-        self.websocketMsgSrv.cloneNote(noteId,'cloned-'+self.noteName)
-        this.messageService.add({severity:'info', summary:'Success', detail:'Cloned SuccessFully!'});
-      },
-      reject: () => {}
-    });
   }
 
   // checkpoint/commit notebook
@@ -356,227 +275,22 @@ export class NotebookComponent implements OnInit {
     }
   }
 
-  runAllParagraphs(noteId) {
-    let self = this;
-    this.confirmationService.confirm({
-      message: 'Run all paragraphs?',
-      header: 'Confirmation',
-      icon: 'fa fa-question-circle',
-      accept: () => {
-        const paragraphs = self.note.paragraphs.map(p => {
-          return {
-            id: p.id,
-            title: p.title,
-            paragraph: p.text,
-            config: p.config,
-            params: p.settings.params
-          }
-        })
-        self.websocketMsgSrv.runAllParagraphs(noteId, paragraphs)
-      },
-      reject: () => {}
-    });
-  }
-
-  saveNote() {
-
-    if (this.note && this.note.paragraphs) {
-      for(let par of this.note.paragraphs){
-        /*this.elementRef.nativeElement
-          .querySelector('#' + par.id + '_paragraphColumn_main')
-          .scope()
-          .saveParagraph(par)*/
-      }
-      this.isNoteDirty = null
-    }
-  }
-
-  clearAllParagraphOutput(noteId) {
-    this.noteActionService.clearAllParagraphOutput(noteId)
-  }
-
-  toggleAllEditor() {
-    if (this.editorToggled) {
-      this.eventService.broadcast('openEditor')
-    } else {
-      this.eventService.broadcast('closeEditor')
-    }
-    this.editorToggled = !this.editorToggled
-  }
-
-  showAllEditor() {
-    this.eventService.broadcast('openEditor')
-  }
-
-  hideAllEditor() {
-    this.eventService.broadcast('closeEditor')
-  }
-
-  toggleAllTable() {
-    if (this.tableToggled) {
-      this.eventService.broadcast('openTable')
-    } else {
-      this.eventService.broadcast('closeTable')
-    }
-    this.tableToggled = !this.tableToggled
-  }
-
-  showAllTable() {
-    this.eventService.broadcast('openTable')
-  }
-
-  hideAllTable() {
-    this.eventService.broadcast('closeTable')
-  }
-
-  /**
-   * @returns {boolean} true if one more paragraphs are running. otherwise return false.
-   */
-  isNoteRunning() {
-    if (!this.note) { return false }
-
-    for (let i = 0; i < this.note.paragraphs.length; i++) {
-      if (isParagraphRunning(this.note.paragraphs[i])) {
-        return true
-      }
-    }
-
-    return false
-  }
-
-  killSaveTimer() {
-    if (this.saveTimer) {
-      // TODO 停止Timer
-      //$timeout.cancel(this.saveTimer)
-      this.saveTimer = null
-    }
-  }
-
-  startSaveTimer() {
-    this.killSaveTimer()
-    this.isNoteDirty = true
-    // console.log('startSaveTimer called ' + $scope.note.id);
-    /*this.saveTimer = $timeout(function () {
-      this.saveNote()
-    }, 10000)*/
-  }
-
-  setLookAndFeel(looknfeel) {
-    this.note.config.looknfeel = looknfeel
-    if (this.revisionView === true) {
-      this.eventService.broadcast('setLookAndFeel', this.note.config.looknfeel)
-    } else {
-      this.setConfig()
-    }
-  }
-
-  /** Set cron expression for this note **/
-  setCronScheduler(cronExpr) {
-    if (cronExpr) {
-      if (!this.note.config.cronExecutingUser) {
-        this.note.config.cronExecutingUser = this.globalService.ticket.principal
-      }
-    } else {
-      this.note.config.cronExecutingUser = ''
-    }
-    this.note.config.cron = cronExpr
-    this.setConfig()
-  }
-
-  /** Set the username of the user to be used to execute all notes in notebook **/
-  setCronExecutingUser(cronExecutingUser) {
-    this.note.config.cronExecutingUser = cronExecutingUser
-    this.setConfig()
-  }
-
   /** Set release resource for this note **/
   setReleaseResource(value) {
     this.note.config.releaseresource = value
     this.setConfig()
   }
 
-  /** Update note config **/
-  setConfig(config?) {
-    if (config) {
-      this.note.config = config
-    }
-    this.websocketMsgSrv.updateNote(this.note.id, this.note.name, this.note.config)
-  }
+  /**************** NoteBook的解析器配置 **************/
 
-  //初始化外观
-  initializeLookAndFeel():void {
-    if (!this.note.config.looknfeel) {
-      this.note.config.looknfeel = 'default'
-    } else {
-      this.viewOnly = this.note.config.looknfeel === 'report' ? true : false
-    }
+  //是否显示解析器配置
+  showSetting = false
 
-    if (this.note.paragraphs && this.note.paragraphs[0]) {
-      this.note.paragraphs[0].focus = true
-    }
-    this.eventService.broadcast('setLookAndFeel', this.note.config.looknfeel)
-  }
+  // 当前Note的解析器绑定
+  interpreterSettings = []
+  interpreterBindings = []
 
-  cleanParagraphExcept(paragraphId, note) {
-    let noteCopy = {
-      id: note.id,
-      name:note.name,
-      config:note.config,
-      info:note.info,
-      paragraphs: []
-    }
-    for (let i = 0; i < note.paragraphs.length; i++) {
-      if (note.paragraphs[i].id === paragraphId) {
-        noteCopy.paragraphs[0] = note.paragraphs[i]
-        if (!noteCopy.paragraphs[0].config) {
-          noteCopy.paragraphs[0].config = {}
-        }
-        noteCopy.paragraphs[0].config.editorHide = true
-        noteCopy.paragraphs[0].config.tableHide = false
-        break
-      }
-    }
-    return noteCopy
-  }
-
-  addPara(paragraph, index) {
-    this.note.paragraphs.splice(index, 0, paragraph)
-    this.note.paragraphs.map(para => {
-      if (para.id === paragraph.id) {
-        para.focus = true
-
-        let paraInfo = {
-          paragraphId:para.id,
-          cursorPos:0,
-          mouseEvent:false
-        }
-        this.eventService.broadcast('focusParagraph', paraInfo)
-        // we need `$timeout` since angular DOM might not be initialized
-        //$timeout(() => { this.eventService.broadcast('focusParagraph', para.id, 0, false) })
-      }
-    })
-  }
-
-  removePara(paragraphId) {
-    let removeIdx
-    this.note.paragraphs.each(function (para, idx) {
-      if (para.id === paragraphId) {
-        removeIdx = idx
-      }
-    })
-    return this.note.paragraphs.splice(removeIdx, 1)
-  }
-
-  //获取binding信息
-  getInterpreterBindings():void {
-    this.websocketMsgSrv.getInterpreterBindings(this.note.id)
-  }
-
-  interpreterSelectionListeners = {
-    accept: function (sourceItemHandleScope, destSortableScope) { return true },
-    itemMoved: function (event) {},
-    orderChanged: function (event) {}
-  }
+  interpreterBindingsOrig = []
 
   openSetting() {
     this.showSetting = true
@@ -633,6 +347,48 @@ export class NotebookComponent implements OnInit {
       this.closePermissions()
       //angular.element('html, body').animate({ scrollTop: 0 }, 'slow')
     }
+  }
+
+  //获取binding信息
+  getInterpreterBindings():void {
+    this.websocketMsgSrv.getInterpreterBindings(this.note.id)
+  }
+
+  interpreterSelectionListeners = {
+    accept: function (sourceItemHandleScope, destSortableScope) { return true },
+    itemMoved: function (event) {},
+    orderChanged: function (event) {}
+  }
+
+  isSettingDirty() {
+    if (this.interpreterBindings == this.interpreterBindingsOrig) {
+      return false
+    } else {
+      return true
+    }
+  }
+
+  /**************** NoteBook的权限配置 **************/
+
+  permissionsOrig
+
+  permissions
+
+  isOwner
+
+  showPermissions
+
+  isAnonymous
+
+  // 显示非权限用户
+  blockAnonUsers() {
+    let zeppelinVersion = this.globalService.dataSmartVersion
+    let url = 'https://zeppelin.apache.org/docs/' + zeppelinVersion + '/security/notebook_authorization.html'
+    let content = 'Only authenticated user can set the permission.' +
+      '<a data-toggle="tooltip" data-placement="top" title="Learn more" target="_blank" href=' + url + '>' +
+      '<i class="icon-question" />' +
+      '</a>'
+    this.messageService.add({severity:'warn', summary:'权限拒绝', detail:content});
   }
 
   openPermissions() {
@@ -722,6 +478,14 @@ export class NotebookComponent implements OnInit {
       );
   }
 
+  isPermissionsDirty() {
+    if (this.permissions == this.permissionsOrig) {
+      return false
+    } else {
+      return true
+    }
+  }
+
   closePermissions() {
     let self = this;
     if (this.isPermissionsDirty()) {
@@ -746,6 +510,135 @@ export class NotebookComponent implements OnInit {
     this.permissions.writers = angular.element('#selectWriters').val()
     angular.element('.permissionsForm select').find('option:not([is-select2="false"])').remove()*/
   }
+
+  isOwnerEmpty() {
+    if (this.permissions.owners.length > 0) {
+      for (let i = 0; i < this.permissions.owners.length; i++) {
+        if (this.permissions.owners[i].trim().length > 0) {
+          return false
+        } else if (i === this.permissions.owners.length - 1) {
+          return true
+        }
+      }
+    } else {
+      return true
+    }
+  }
+
+  savePermissions() {
+    let self = this;
+    if (this.isAnonymous || this.globalService.ticket.principal.trim().length === 0) {
+      this.blockAnonUsers()
+    }
+    this.convertPermissionsToArray()
+    if (this.isOwnerEmpty()) {
+
+      this.confirmationService.confirm({
+        message: 'Please fill the [Owners] field. If not, it will set as current user.\n\n' +
+        'Current user : [ ' + self.globalService.ticket.principal + ']',
+        header: 'Setting Owners Permissions',
+        icon: 'fa fa-question-circle',
+        accept: () => {
+          self.permissions.owners = [self.globalService.ticket.principal]
+          self.setPermissions()
+        },
+        reject: () => {
+          self.openPermissions()
+        }
+      });
+
+    } else {
+      this.setPermissions()
+    }
+  }
+
+  setPermissions() {
+    let self = this;
+    self.httpClient.put(this.baseUrlSrv.getRestApiBase() + '/notebook/' + self.note.id + '/permissions', self.permissions)
+      .subscribe(
+        response => {
+          self.getPermissions(function () {
+            console.log('Note permissions %o saved', self.permissions)
+
+            this.confirmationService.confirm({
+              message: 'Owners : ' + self.permissions.owners + '\n\n' + 'Readers : ' +
+              self.permissions.readers + '\n\n' + 'Runners : ' + self.permissions.runners +
+              '\n\n' + 'Writers  : ' + self.permissions.writers,
+              header: 'Permissions Saved Successfully',
+              icon: 'fa fa-question-circle',
+              accept: () => {
+              },
+              reject: () => {
+              }
+            });
+            self.showPermissions = false
+          })
+        },
+        errorResponse => {
+          console.log('Error %o %o', status, errorResponse)
+          this.confirmationService.confirm({
+            message: errorResponse,
+            header: 'Permissions Saved Successfully',
+            icon: 'fa fa-question-circle',
+            accept: () => {
+            },
+            reject: () => {
+            }
+          });
+
+
+          this.messageService.add({severity:'error', summary:'Error restart interpreter.', detail:errorResponse['message']});
+        }
+      );
+  }
+
+  togglePermissions() {
+    let principal = this.globalService.ticket.principal
+    this.isAnonymous = principal === 'anonymous' ? true : false
+    if (!!principal && this.isAnonymous) {
+      this.blockAnonUsers()
+    } else {
+      if (this.showPermissions) {
+        this.closePermissions()
+        /*angular.element('#selectOwners').select2({})
+        angular.element('#selectReaders').select2({})
+        angular.element('#selectRunners').select2({})
+        angular.element('#selectWriters').select2({})*/
+      } else {
+        this.openPermissions()
+        this.closeSetting()
+      }
+    }
+  }
+
+  setIamOwner():boolean {
+    if (this.permissions.owners.length > 0 && this.permissions.owners.indexOf(this.globalService.ticket.principal) < 0) {
+      this.isOwner = false
+      return false
+    }
+    this.isOwner = true
+    return true
+  }
+
+  /**************** NoteBook的查询 **************/
+
+  // 查询对象
+  search = {
+    searchText: '',
+    occurrencesExists: false,
+    needHighlightFirst: false,
+    occurrencesHidden: false,
+    replaceText: '',
+    needToSendNextOccurrenceAfterReplace: false,
+    occurrencesCount: 0,
+    currentOccurrence: 0,
+    searchBoxOpened: false,
+    searchBoxWidth: 350,
+    left: '0px'
+  }
+
+  // 当前查询的片段索引
+  currentSearchParagraph = 0
 
   hasMatches = function() {
     return this.search.occurrencesCount > 0
@@ -893,6 +786,165 @@ export class NotebookComponent implements OnInit {
     this.makeSearchBoxVisible()
   }
 
+
+  /**************** 删除Notebook **************/
+
+  // Move the note to trash and go back to the main page
+  moveNoteToTrash(noteId) {
+    this.noteActionService.moveNoteToTrash(noteId, true)
+  }
+
+  // Remove the note permanently if it's in the trash
+  removeNote(noteId) {
+    this.noteActionService.removeNote(noteId, true)
+  }
+  i= 0
+  isTrash(note) {
+    console.log(this.i++)
+    return note ? note.name.split('/')[0] === Constants.TRASH_FOLDER_ID : false
+  }
+
+  /**************** 导出Notebook **************/
+
+  // Export notebook
+  exportNote() {
+    let jsonContent = JSON.stringify(this.note)
+    this.saveAsService.saveAs(jsonContent, this.note.name, 'json')
+  }
+
+  /**************** 克隆Notebook **************/
+
+  // Clone note
+  cloneNote(noteId) {
+    let self = this;
+
+    this.confirmationService.confirm({
+      message: 'Do you want to clone this note?',
+      header: 'Confirmation',
+      icon: 'fa fa-question-circle',
+      accept: () => {
+        self.websocketMsgSrv.cloneNote(noteId,'cloned-'+self.noteName)
+        this.messageService.add({severity:'info', summary:'Success', detail:'Cloned SuccessFully!'});
+      },
+      reject: () => {}
+    });
+  }
+
+  /**************** 运行整个Notebook **************/
+
+  runAllParagraphs(noteId) {
+    let self = this;
+    this.confirmationService.confirm({
+      message: 'Run all paragraphs?',
+      header: 'Confirmation',
+      icon: 'fa fa-question-circle',
+      accept: () => {
+        const paragraphs = self.note.paragraphs.map(p => {
+          return {
+            id: p.id,
+            title: p.title,
+            paragraph: p.text,
+            config: p.config,
+            params: p.settings.params
+          }
+        })
+        self.websocketMsgSrv.runAllParagraphs(noteId, paragraphs)
+      },
+      reject: () => {}
+    });
+  }
+
+  /**************** 保存整个Notebook **************/
+
+  // 自动保存
+  saveTimer = null
+
+  // Note是否更新
+  isNoteDirty = null
+
+  saveNote() {
+    let self = this;
+    if (this.note && this.note.paragraphs) {
+      self.eventService.broadcast("saveParagraph")
+      /*for(let par of this.note.paragraphs){
+
+        /!*this.elementRef.nativeElement
+          .querySelector('#' + par.id + '_paragraphColumn_main')
+          .scope()
+          .saveParagraph(par)*!/
+      }*/
+      this.isNoteDirty = null
+    }
+  }
+
+  killSaveTimer() {
+    let self = this;
+    if (self.saveTimer) {
+      // TODO 停止Timer
+      //$timeout.cancel(this.saveTimer)
+      clearTimeout(self.saveTimer)
+      self.saveTimer = null
+    }
+  }
+
+  startSaveTimer() {
+    let self = this;
+    self.killSaveTimer()
+    self.isNoteDirty = true
+    console.log('startSaveTimer called ' + this.note.id);
+    self.saveTimer = setTimeout(function () {
+      self.saveNote()
+    }, 1000)
+  }
+
+  /**************** 添加Notebook中的片段 **************/
+
+  addPara(paragraph, index) {
+    this.note.paragraphs.splice(index, 0, paragraph)
+    this.note.paragraphs.map(para => {
+      if (para.id === paragraph.id) {
+        para.focus = true
+
+        let paraInfo = {
+          paragraphId:para.id,
+          cursorPos:0,
+          mouseEvent:false
+        }
+        this.eventService.broadcast('focusParagraph', paraInfo)
+        // we need `$timeout` since angular DOM might not be initialized
+        //$timeout(() => { this.eventService.broadcast('focusParagraph', para.id, 0, false) })
+      }
+    })
+  }
+
+  insertNew(paragraphId,position) {
+    let para ={
+      paragraphId:paragraphId,
+      position:position
+    }
+    this.eventService.broadcast('insertParagraph', para)
+  }
+
+  /**************** 删除Notebook中的片段 **************/
+
+  removePara(paragraphId) {
+    let removeIdx
+    this.note.paragraphs.forEach(function (para, idx) {
+      if (para.id === paragraphId) {
+        removeIdx = idx
+      }
+    })
+    return this.note.paragraphs.splice(removeIdx, 1)
+  }
+
+  /**************** 清除Notebook中的片段输出 **************/
+
+  clearAllParagraphOutput(noteId) {
+    this.noteActionService.clearAllParagraphOutput(noteId)
+  }
+
+  /**************** 重启解析器 **************/
+
   restartInterpreter(interpreter) {
     let self = this;
     const thisConfirm = this.confirmationService.confirm({
@@ -930,100 +982,7 @@ export class NotebookComponent implements OnInit {
 
   }
 
-  savePermissions() {
-    let self = this;
-    if (this.isAnonymous || this.globalService.ticket.principal.trim().length === 0) {
-      this.blockAnonUsers()
-    }
-    this.convertPermissionsToArray()
-    if (this.isOwnerEmpty()) {
-
-      this.confirmationService.confirm({
-        message: 'Please fill the [Owners] field. If not, it will set as current user.\n\n' +
-        'Current user : [ ' + self.globalService.ticket.principal + ']',
-        header: 'Setting Owners Permissions',
-        icon: 'fa fa-question-circle',
-        accept: () => {
-          self.permissions.owners = [self.globalService.ticket.principal]
-          self.setPermissions()
-        },
-        reject: () => {
-          self.openPermissions()
-        }
-      });
-
-    } else {
-      this.setPermissions()
-    }
-  }
-
-  setPermissions() {
-    let self = this;
-    self.httpClient.put(this.baseUrlSrv.getRestApiBase() + '/notebook/' + self.note.id + '/permissions', self.permissions)
-      .subscribe(
-        response => {
-          self.getPermissions(function () {
-            console.log('Note permissions %o saved', self.permissions)
-
-            this.confirmationService.confirm({
-              message: 'Owners : ' + self.permissions.owners + '\n\n' + 'Readers : ' +
-              self.permissions.readers + '\n\n' + 'Runners : ' + self.permissions.runners +
-              '\n\n' + 'Writers  : ' + self.permissions.writers,
-              header: 'Permissions Saved Successfully',
-              icon: 'fa fa-question-circle',
-              accept: () => {
-              },
-              reject: () => {
-              }
-            });
-            self.showPermissions = false
-          })
-        },
-        errorResponse => {
-          console.log('Error %o %o', status, errorResponse)
-          this.confirmationService.confirm({
-            message: errorResponse,
-            header: 'Permissions Saved Successfully',
-            icon: 'fa fa-question-circle',
-            accept: () => {
-            },
-            reject: () => {
-            }
-          });
-
-
-          this.messageService.add({severity:'error', summary:'Error restart interpreter.', detail:errorResponse['message']});
-        }
-      );
-  }
-
-  togglePermissions() {
-    let principal = this.globalService.ticket.principal
-    this.isAnonymous = principal === 'anonymous' ? true : false
-    if (!!principal && this.isAnonymous) {
-      this.blockAnonUsers()
-    } else {
-      if (this.showPermissions) {
-        this.closePermissions()
-        /*angular.element('#selectOwners').select2({})
-        angular.element('#selectReaders').select2({})
-        angular.element('#selectRunners').select2({})
-        angular.element('#selectWriters').select2({})*/
-      } else {
-        this.openPermissions()
-        this.closeSetting()
-      }
-    }
-  }
-
-  setIamOwner():boolean {
-    if (this.permissions.owners.length > 0 && this.permissions.owners.indexOf(this.globalService.ticket.principal) < 0) {
-      this.isOwner = false
-      return false
-    }
-    this.isOwner = true
-    return true
-  }
+  /**************** 切换个人模式和协作模式 **************/
 
   toggleNotePersonalizedMode() {
     let self = this;
@@ -1049,47 +1008,181 @@ export class NotebookComponent implements OnInit {
     }
   }
 
-  isSettingDirty() {
-    if (this.interpreterBindings == this.interpreterBindingsOrig) {
-      return false
-    } else {
-      return true
+  /**************** 页面事件和布局 **************/
+
+  focusParagraphOnClick(clickEvent) {
+    if (!this.note) {
+      return
     }
-  }
+    for (let i = 0; i < this.note.paragraphs.length; i++) {
+      let paragraphId = this.note.paragraphs[i].id
+      if (this.commonService._jQuery.contains(this.elementRef.nativeElement.querySelector('#' + paragraphId + '_container'), clickEvent.target)) {
 
-  isPermissionsDirty() {
-    if (this.permissions == this.permissionsOrig) {
-      return false
-    } else {
-      return true
-    }
-  }
-
-  /*angular.element(document).click(function () {
-    angular.element('.ace_autocomplete').hide()
-  })*/
-
-  isOwnerEmpty() {
-    if (this.permissions.owners.length > 0) {
-      for (let i = 0; i < this.permissions.owners.length; i++) {
-        if (this.permissions.owners[i].trim().length > 0) {
-          return false
-        } else if (i === this.permissions.owners.length - 1) {
-          return true
+        // 发送片段聚焦事件，
+        let paraInfo = {
+          paragraphId:paragraphId,
+          cursorPos:0,
+          mouseEvent:true
         }
+        this.eventService.broadcast('focusParagraph', paraInfo)
+        break
       }
-    } else {
-      return true
     }
   }
 
-  insertNew(paragraphId,position) {
-    let para ={
-      paragraphId:paragraphId,
-      position:position
+  // 单击片段聚焦
+  paragraphOnClick(paragraphId){
+    // ui-shadow-2 = selected  ui-shadow-1 = unselected
+    if(this.commonService._jQuery('#'+paragraphId+"_paragraphColumn").hasClass("ui-shadow-2")){
+      return
     }
-    this.eventService.broadcast('insertParagraph', para)
+    // Update CSS Class
+    this.commonService._jQuery(".notebook .paragraphColumn").removeClass("ui-shadow-1 ui-shadow-2")
+    this.commonService._jQuery(".notebook .paragraphColumn").addClass("ui-shadow-1")
+    this.commonService._jQuery('#'+paragraphId+"_paragraphColumn").removeClass("ui-shadow-1")
+    this.commonService._jQuery('#'+paragraphId+"_paragraphColumn").addClass("ui-shadow-2")
+    let paraInfo = {
+      paragraphId:paragraphId,
+      cursorPos:0,
+      mouseEvent:true
+    }
+    this.eventService.broadcast('focusParagraph', paraInfo)
   }
+
+  keyboardShortcut(keyEvent) {
+    // handle keyevent
+    if (!this.viewOnly && !this.revisionView) {
+      this.eventService.broadcast('keyEvent', keyEvent)
+    }
+  }
+
+  //片段双击事件
+  paragraphOnDoubleClick(paragraphId) {
+    this.eventService.broadcast('doubleClickParagraph', paragraphId)
+  }
+
+  columnWidthClass(n) {
+    if (this.asIframe || n == undefined) {
+      return 'ui-g-12'
+    } else {
+      return 'paragraph-col ui-g-' + n
+    }
+  }
+
+  /**************** 共享变量 **************/
+
+  //当前Note的ID
+  noteId
+
+  //当前的Note实例
+  note:any
+
+  //是否只读
+  viewOnly = false
+
+  // 是否连接到后台
+  connectedOnce = false
+
+  paragraphUrl
+
+  asIframe
+
+
+  // 初始化笔记
+  initNotebook():void {
+    this.noteVarShareService.clear()
+    if (this.revisionId) {
+      this.websocketMsgSrv.getNoteByRevision(this.noteId, this.revisionId)
+    } else {
+      this.websocketMsgSrv.getNote(this.noteId)
+    }
+
+    this.websocketMsgSrv.listRevisionHistory(this.noteId)
+
+    // TODO 滑动到具体的地方
+    /*let currentRoute = $route.current
+    if (currentRoute) {
+      setTimeout(
+        function () {
+          let routeParams = currentRoute.params
+          let $id = angular.element('#' + routeParams.paragraph + '_container')
+
+          if ($id.length > 0) {
+            // adjust for navbar
+            let top = $id.offset().top - 103
+            angular.element('html, body').scrollTo({top: top, left: 0})
+          }
+        },
+        1000
+      )
+    }*/
+  }
+
+  // 检测Note是否在运行
+  isNoteRunning() {
+    if (!this.note) { return false }
+
+    for (let i = 0; i < this.note.paragraphs.length; i++) {
+      if (isParagraphRunning(this.note.paragraphs[i])) {
+        return true
+      }
+    }
+
+    return false
+  }
+
+  cleanParagraphExcept(paragraphId, note) {
+    let noteCopy = {
+      id: note.id,
+      name:note.name,
+      config:note.config,
+      info:note.info,
+      paragraphs: []
+    }
+    for (let i = 0; i < note.paragraphs.length; i++) {
+      if (note.paragraphs[i].id === paragraphId) {
+        noteCopy.paragraphs[0] = note.paragraphs[i]
+        if (!noteCopy.paragraphs[0].config) {
+          noteCopy.paragraphs[0].config = {}
+        }
+        noteCopy.paragraphs[0].config.editorHide = true
+        noteCopy.paragraphs[0].config.tableHide = false
+        break
+      }
+    }
+    return noteCopy
+  }
+
+  // 更新Note的配置
+  setConfig(config?) {
+    if (config) {
+      this.note.config = config
+    }
+    this.websocketMsgSrv.updateNote(this.note.id, this.note.name, this.note.config)
+  }
+
+  // 获取Note的名称
+  getNoteName(note) {
+    if (note) {
+      return this.arrayOrderingSrv.getNoteName(note)
+    }
+  }
+
+  // 从note中根据id获取相应的片段
+  getParagraphById(id:string){
+    for (let paragraph of this.note.paragraphs) {
+      if(paragraph.id == id){
+        return paragraph
+      }
+    }
+    return null
+  }
+
+
+
+
+  // TODO
+  paragraphWarningDialog = {}
 
   showParagraphWarning(next) {
     let self = this;
@@ -1115,11 +1208,23 @@ export class NotebookComponent implements OnInit {
 
   }
 
+  allowLeave
+
+  // 名称
+  /*$scope.$watch('note', function (value) {
+    $rootScope.pageTitle = value ? value.name : 'Zeppelin'
+  }, true)*/
+
+  /*angular.element(document).click(function () {
+    angular.element('.ace_autocomplete').hide()
+  })*/
+
   /*angular.element(window).bind('resize', function () {
     const actionbarHeight = document.getElementById('actionbar').lastElementChild.clientHeight
     angular.element(document.getElementById('content')).css('padding-top', actionbarHeight - 20)
   })*/
 
+  // 构造函数
   constructor(private eventService:EventService1,
               private websocketMsgSrv:WebsocketMessageService,
               private route:ActivatedRoute,
@@ -1141,22 +1246,31 @@ export class NotebookComponent implements OnInit {
     this.note = {
       name:'',
       paragraphs:[],
-      config:{},
+      config:{
+        cron:''
+      },
       info:{}
-    }
-  }
-
-  orderListCars: Car[];
-
-  getNoteName(note) {
-    if (note) {
-      return this.arrayOrderingSrv.getNoteName(note)
     }
   }
 
   ngOnInit(): void {
 
     let self = this;
+
+    // 获取URL参数
+    this.route.params.subscribe((params: Params) => {
+
+      // 获取URL中的NoteId
+      self.noteId = params['noteId']
+
+      // 获取URL中的revisionId
+      self.revisionId = params['revisionId']
+
+      self.paragraphUrl = params.paragraphId
+      self.asIframe = params.asIframe
+
+      this.initNotebook()
+    })
 
     // register mouseevent handler for focus paragraph
     document.addEventListener('click', self.focusParagraphOnClick)
@@ -1169,21 +1283,22 @@ export class NotebookComponent implements OnInit {
       }
     })
 
+    // Windows Resize的回调
     window.addEventListener('resize', function () {
       const actionbarHeight = document.getElementById('actionbar').lastElementChild.clientHeight
       /*angular.element(document.getElementById('content')).css('padding-top', actionbarHeight - 20)*/
     })
 
     // 监听Websocket的连接状态
-    this.eventService.subscribe('setConnectedStatus', function (msg) {
-      if (self.connectedOnce && msg) {
-
+    this.eventService.subscribe('setConnectedStatus', function (data) {
+      if (self.connectedOnce && data) {
         // 初始化NoteBook
         self.initNotebook()
       }
       self.connectedOnce = true
     })
 
+    // 监听列出版本历史
     this.eventService.subscribe('listRevisionHistory', function (data) {
       console.debug('received list of revisions %o', data)
       self.noteRevisions = data.revisionList
@@ -1197,8 +1312,11 @@ export class NotebookComponent implements OnInit {
           this.currentRevision = self.noteRevisions[index].message
         }*/
       }
+      // 更新NoteList集合
+      self.getNoteRevisions()
     })
 
+    // 监听设置Note版本事件
     this.eventService.subscribe('noteRevision', function (data) {
       console.log('received note revision %o', data)
       if (data.note) {
@@ -1209,6 +1327,7 @@ export class NotebookComponent implements OnInit {
       }
     })
 
+    // 监听设置Note版本事件
     this.eventService.subscribe('setNoteRevisionResult', function (data) {
       console.log('received set note revision result %o', data)
       if (data.status) {
@@ -1216,6 +1335,7 @@ export class NotebookComponent implements OnInit {
       }
     })
 
+    // 监听添加片段事件
     this.eventService.subscribe('addParagraph', function (data) {
       if (self.paragraphUrl || self.revisionView === true) {
         return
@@ -1223,23 +1343,27 @@ export class NotebookComponent implements OnInit {
       self.addPara(data.paragraph, data.index)
     })
 
+    // 监听删除片段事件
     this.eventService.subscribe('removeParagraph', function (data) {
       if (self.paragraphUrl || self.revisionView === true) {
         return
       }
-      self.removePara(data.paragraphId)
+      //self.removePara(data.paragraphId)
+      self.removePara(data.id)
     })
 
+    // 监听向上移动片段事件
     this.eventService.subscribe('moveParagraph', function (data) {
       if (self.revisionView === true) {
         return
       }
-      let removedPara = self.removePara(data.paragraphId)
+      let removedPara = self.removePara(data.id)
       if (removedPara && removedPara.length === 1) {
-        self.addPara(removedPara[0], data.newIdx)
+        self.addPara(removedPara[0], data.index)
       }
     })
 
+    // 监听更新笔记事件
     this.eventService.subscribe('updateNote', function (data) {
       /** update Note name */
       if (data.name !== self.note.name) {
@@ -1251,7 +1375,7 @@ export class NotebookComponent implements OnInit {
       self.initializeLookAndFeel()
     })
 
-    //设置Bingding信息获取到的回调
+    // 设置Bingding信息获取到的回调
     this.eventService.subscribe('interpreterBindings', function (data) {
       self.interpreterBindings = data.interpreterBindings
       Object.assign(self.interpreterBindingsOrig,self.interpreterBindings) // to check dirty
@@ -1282,6 +1406,7 @@ export class NotebookComponent implements OnInit {
       }
     })
 
+    // 监听查询是否存在事件【搜索】
     this.eventService.subscribe('occurrencesExists', function(data) {
       self.search.occurrencesCount += data.count
       if (self.search.needHighlightFirst) {
@@ -1290,21 +1415,25 @@ export class NotebookComponent implements OnInit {
       }
     })
 
+    // 监听下一个显示事件【搜索】
     this.eventService.subscribe('noNextOccurrence', function(event) {
       self.increaseCurrentSearchParagraph()
       self.sendNextOccurrenceMessage()
     })
 
+    // 监听上一个显示事件【搜索】
     this.eventService.subscribe('noPrevOccurrence', function(event) {
       self.decreaseCurrentSearchParagraph()
       self.sendPrevOccurrenceMessage()
     })
 
+    // 监听编辑器点击事件
     this.eventService.subscribe('editorClicked', function() {
       self.search.occurrencesHidden = true
       self.eventService.broadcast('unmarkAll')
     })
 
+    // 监听显示数量变更事件
     this.eventService.subscribe('occurrencesCountChanged', function(data) {
       self.search.occurrencesCount += data.cnt
       if (self.search.occurrencesCount === 0) {
@@ -1317,6 +1446,7 @@ export class NotebookComponent implements OnInit {
       }
     })
 
+    // 监听替换后事件
     this.eventService.subscribe('noNextOccurrenceAfterReplace', function() {
       self.search.occurrencesCount = 0
       self.search.needHighlightFirst = false
@@ -1328,6 +1458,7 @@ export class NotebookComponent implements OnInit {
       }
     })
 
+    // 监听显示、隐藏搜索窗口
     this.eventService.subscribe('toggleSearchBox', function() {
       /*let elem = angular.element('#searchGroup')
       if (self.search.searchBoxOpened) {
@@ -1338,6 +1469,7 @@ export class NotebookComponent implements OnInit {
       $timeout(self.makeSearchBoxVisible())*/
     })
 
+    // 监听片段向上移动事件
     this.eventService.subscribe('moveParagraphUp', function (paragraph) {
       let newIndex = -1
       for (let i = 0; i < self.note.paragraphs.length; i++) {
@@ -1362,6 +1494,7 @@ export class NotebookComponent implements OnInit {
       self.websocketMsgSrv.moveParagraph(paragraph.id, newIndex)
     })
 
+    // 监听片段向下移动事件
     this.eventService.subscribe('moveParagraphDown', function (data) {
       let newIndex = -1
       for (let i = 0; i < self.note.paragraphs.length; i++) {
@@ -1387,6 +1520,7 @@ export class NotebookComponent implements OnInit {
       self.websocketMsgSrv.moveParagraph(data.paragraph.id, newIndex)
     })
 
+    // 监听聚焦到上一个片段事件
     this.eventService.subscribe('moveFocusToPreviousParagraph', function (data) {
       let focus = false
       for (let i = self.note.paragraphs.length - 1; i >= 0; i--) {
@@ -1402,6 +1536,7 @@ export class NotebookComponent implements OnInit {
       }
     })
 
+    // 监听聚焦到下一个片段事件
     this.eventService.subscribe('moveFocusToNextParagraph', function (data) {
       let focus = false
       for (let i = 0; i < self.note.paragraphs.length; i++) {
@@ -1417,6 +1552,7 @@ export class NotebookComponent implements OnInit {
       }
     })
 
+    // 监听插入片段事件
     this.eventService.subscribe('insertParagraph', function (data) {
       if (self.revisionView === true) {
         return
@@ -1440,7 +1576,7 @@ export class NotebookComponent implements OnInit {
       self.websocketMsgSrv.insertParagraph(newIndex)
     })
 
-    //设置Note内容获取到的回调
+    // 监听设置Note内容获取到的回调
     this.eventService.subscribe('setNoteContent', function (note) {
       if (note === undefined) {
         this.router.navigate(['/login']);
@@ -1469,7 +1605,7 @@ export class NotebookComponent implements OnInit {
       self.note.config.personalizedMode = isPersonalized
     })
 
-    // TODO
+    // TODO 监听路由更改事件
     this.eventService.subscribe('$routeChangeStart', function (data) {
       if (!self.note || !self.note.paragraphs) {
         return
@@ -1494,6 +1630,7 @@ export class NotebookComponent implements OnInit {
       }
     })
 
+    // TODO 监听笔记销毁事件
     this.eventService.subscribe('$destroy', function () {
       //angular.element(window).off('beforeunload')
       self.killSaveTimer()
@@ -1508,6 +1645,7 @@ export class NotebookComponent implements OnInit {
       })
     })
 
+    // TODO 监听解绑键盘事件
     this.eventService.subscribe('$unBindKeyEvent', function () {
       document.removeEventListener('click', self.focusParagraphOnClick)
       //document.removeEventListener('keydown', self.keyboardShortcut)
@@ -1518,43 +1656,6 @@ export class NotebookComponent implements OnInit {
       })
     })
 
-
-
-    this.route.params.subscribe((params: Params) => {
-
-      // 获取URL中的NoteId
-      self.noteId = params['noteId']
-
-      // 获取URL中的revisionId
-      self.revisionId = params['revisionId']
-
-      self.paragraphUrl = params.paragraphId
-      self.asIframe = params.asIframe
-
-      this.initNotebook()
-    })
-
-  }
-
-  columnWidthClass(n) {
-    if (this.asIframe || n == undefined) {
-      return 'ui-g-12'
-    } else {
-      return 'paragraph-col ui-g-' + n
-    }
-  }
-
-  /**
-   * 从note中根据id获取相应的片段
-   * @param {string} id
-   */
-  getParagraphById(id:string){
-    for (let paragraph of this.note.paragraphs) {
-      if(paragraph.id == id){
-        return paragraph
-      }
-    }
-    return null
   }
 
 }

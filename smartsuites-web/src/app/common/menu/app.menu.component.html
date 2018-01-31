@@ -3,28 +3,7 @@
     visible="true">
 </ul>
 
-<!--<p-blockUI [blocked]="createNoteDialogDisplay" [target]="body" [baseZIndex]="0" [autoZIndex]=false></p-blockUI>-->
-
-<p-dialog header="创建笔记" [(visible)]="createNoteDialogDisplay" [modal]=true [autoZIndex]=false>
-  <div class="ui-g">
-
-    <span>笔记名称：</span>
-    <div class="ui-g-12 ui-md-12" style="margin-bottom: 10px">
-      <input type="text" pInputText style="width: 100%" [(ngModel)]="noteName"/>
-    </div>
-
-    <span>默认解析器：</span>
-    <div class="ui-g-12 ui-md-12" style="margin-bottom: 10px">
-      <p-dropdown [options]="cities1" [(ngModel)]="defaultInter" [autoWidth]="false"></p-dropdown>
-    </div>
-
-    <span>使用 '/' 来创建文件夹. 比如: /NoteDirA/Note1</span>
-  </div>
-
-  <p-footer>
-    <button type="button" pButton icon="fa-plus-circle" (click)="display=false" label="创建笔记"></button>
-  </p-footer>
-</p-dialog>
+<app-note-create #noteCreate></app-note-create>
 
 <p-dialog header="导入笔记" [(visible)]="importNoteDialogDisplay" [modal]=true [autoZIndex]=false>
 

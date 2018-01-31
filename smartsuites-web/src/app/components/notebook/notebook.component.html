@@ -3,21 +3,48 @@
   <!-- 工具栏 -->
 
   <div class="ui-g-12" style="margin-bottom: 6px; padding-right: 3px; padding-left: 3px" *ngIf="noteId && !paragraphUrl">
+
+    <!--NoteBook名称-->
     <div (dblclick)="this.editNoteTitle()">
       <input type="text" pInputText placeholder="Name" [(ngModel)]="this.noteName" [ngClass]="{'showmodel':!titleEditor, 'editmodel':titleEditor}" [disabled]="!titleEditor" (blur)="this.showNoteTitle();this.updateNoteName(this.noteName)">
     </div>
+
+    <!--工具栏-->
     <p-toolbar>
       <div class="ui-toolbar-group-left">
-        <!--<input type="text" pInputText placeholder="Name">-->
 
-        <button pButton type="button" pTooltip="运行所有片段" tooltipPosition="bottom" icon="fa-play" (click)="runAllParagraphs(note.id)" [disabled]="isNoteRunning() || revisionView"></button>
-        <button pButton type="button" pTooltip="显示/隐藏代码" tooltipPosition="bottom" icon="fa-arrows-alt" (click)="toggleAllEditor()" [hidden]="viewOnly" [disabled]="revisionView"></button>
-        <button pButton type="button" pTooltip="显示/隐藏输出" tooltipPosition="bottom" icon="fa-columns" (click)="toggleAllTable()" [hidden]="viewOnly" [disabled]="revisionView"></button>
-        <button pButton type="button" pTooltip="清除输出" tooltipPosition="bottom" icon="fa-eraser" (click)="clearAllParagraphOutput(note.id)" [hidden]="viewOnly" [disabled]="isNoteRunning() || revisionView"></button>
-        <button pButton type="button" pTooltip="复制笔记" tooltipPosition="bottom" icon="fa-copy"></button>
-        <button pButton type="button" pTooltip="导出笔记" tooltipPosition="bottom" icon="fa-arrow-down" (click)="exportNote()" [hidden]="viewOnly" [disabled]="revisionView"></button>
+        <button pButton type="button" pTooltip="运行所有片段" tooltipPosition="bottom" icon="fa-play"
+                (click)="runAllParagraphs(note.id)"
+                [disabled]="isNoteRunning() || revisionView"></button>
+
+        <button pButton type="button" pTooltip="{{(editorToggled ? '显示' : '隐藏')}}代码" tooltipPosition="bottom"
+                icon="fa-{{(editorToggled ? 'compress' : 'expand')}}"
+                (click)="toggleAllEditor()"
+                [hidden]="viewOnly"
+                [disabled]="revisionView"></button>
+
+        <button pButton type="button" pTooltip="{{(tableToggled ? '显示' : '隐藏')}}输出" tooltipPosition="bottom"
+                icon="fa-{{(tableToggled ? 'eye-slash' : 'eye')}}"
+                (click)="toggleAllTable()"
+                [hidden]="viewOnly"
+                [disabled]="revisionView"></button>
+
+        <button pButton type="button" pTooltip="清除输出" tooltipPosition="bottom" icon="fa-eraser"
+                (click)="clearAllParagraphOutput(note.id)"
+                [hidden]="viewOnly"
+                [disabled]="isNoteRunning() || revisionView"></button>
+
+        <button pButton type="button" pTooltip="复制笔记" tooltipPosition="bottom" icon="fa-copy" (click)="showCreateNoteDialog()"></button>
+        <app-note-create #noteCopy></app-note-create>
+
+        <button pButton type="button" pTooltip="导出笔记" tooltipPosition="bottom" icon="fa-arrow-down"
+                (click)="exportNote()"
+                [hidden]="viewOnly"
+                [disabled]="revisionView"></button>
         <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
 
+
+        <!-- 协同 -->
         <button pButton type="button" pTooltip="转换到协同模式 {{isOwner ? '' : '(owner can change)'}}" tooltipPosition="bottom" icon="fa-user" (click)="toggleNotePersonalizedMode()"
                 *ngIf="globalService.ticket.principal && globalService.ticket.principal !== 'anonymous'"
                 [hidden]="viewOnly || note.config.personalizedMode !== 'true'"
@@ -28,26 +55,32 @@
                 [hidden]="viewOnly || note.config.personalizedMode === 'true'"
                 [disabled]="isNoteRunning() || revisionView"></button>
         <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
-        <button pButton type="button" pTooltip="提交笔记" tooltipPosition="bottom" class="info-btn" icon="fa-code" [hidden]="viewOnly" [disabled]="revisionView" (click)="commit.toggle($event)"></button>
+
+
+        <!-- 版本管理 -->
+        <button pButton type="button" pTooltip="提交笔记" tooltipPosition="bottom" class="info-btn" icon="fa-code"
+                [hidden]="viewOnly"
+                [disabled]="revisionView"
+                (click)="commit.toggle($event)"></button>
+
         <p-overlayPanel #commit>
-          <textarea pInputTextarea #commitMessage></textarea>
-          <button pButton type="button" pTooltip="Commit" tooltipPosition="bottom" class="info-btn" icon="fa-code" label="Commit" [hidden]="viewOnly" (click)="checkpointNote(commitMessage.message)"></button>
+          <div>
+            <textarea pInputTextarea #commitMessage style="width: 350px;height: 100px;"></textarea>
+          </div>
+          <div>
+            <button pButton type="button" pTooltip="Commit" tooltipPosition="bottom" class="info-btn" icon="fa-arrow-circle-up" label="提交代码"
+                    [hidden]="viewOnly"
+                    (click)="checkpointNote(commitMessage.message)"></button>
+          </div>
+
         </p-overlayPanel>
-        <button pButton type="button" pTooltip="恢复笔记" tooltipPosition="bottom" class="info-btn" icon="fa-arrow-circle-o-right" [hidden]="viewOnly" [disabled]="!revisionView" (click)="setNoteRevision()"></button>
 
-        <p-splitButton label="head"   icon="fa-check" styleClass="ui-button-info" (onClick)="save()" [model]="items"></p-splitButton>
+        <button pButton type="button" pTooltip="恢复笔记" tooltipPosition="bottom" class="info-btn" icon="fa-arrow-circle-down"
+                [hidden]="viewOnly"
+                [disabled]="!revisionView"
+                (click)="setNoteRevision()"></button>
 
-        <!--<p-dropdown [options]="getNoteRevisions(noteRevisions)" [(ngModel)]="currentRevision" pTooltip="版本选择" tooltipPosition="bottom" optionLabel="name">
-          <ng-template let-item pTemplate="selectedItem">
-              <div (click)="visitRevision(item.revision)">{{item.time}}</div>
-          </ng-template>
-          <ng-template let-list pTemplate="item">
-            <div class="ui-helper-clearfix" style="position: relative;height: 25px;">
-              {{list.time}}
-              {{list.message}}
-            </div>
-          </ng-template>
-        </p-dropdown>-->
+        <p-splitButton label="{{currentRevision}}" icon="fa-check" styleClass="ui-button-info" [model]="noteRev"></p-splitButton>
 
         <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
 
@@ -102,60 +135,366 @@
         </span>
 
         <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
-        <button pButton type="button" pTooltip="永久删除笔记" tooltipPosition="bottom" class="danger-btn" icon="fa-bitbucket" *ngIf="isTrash(note)" (click)="removeNote(note.id)" [hidden]="viewOnly" [disabled]="revisionView"></button>
-        <button pButton type="button" pTooltip="删除笔记" tooltipPosition="bottom" class="danger-btn" icon="fa-bitbucket" *ngIf="!isTrash(note)" (click)="moveNoteToTrash(note.id)" [hidden]="viewOnly" [disabled]="revisionView"></button>
+        <!--<button pButton type="button" pTooltip="永久删除笔记" tooltipPosition="bottom" class="danger-btn" icon="fa-bitbucket"
+                *ngIf="isTrash(note)"
+                (click)="removeNote(note.id)"
+                [hidden]="viewOnly"
+                [disabled]="revisionView"></button>-->
+
+        <button pButton type="button" pTooltip="删除笔记" tooltipPosition="bottom" class="danger-btn" icon="fa-bitbucket"
+                (click)="moveNoteToTrash(note.id)"
+                [hidden]="viewOnly"
+                [disabled]="revisionView"></button>
         <span>&nbsp;&nbsp;</span>
 
-        <button pButton type="button" pTooltip="调度运行" tooltipPosition="bottom" icon="fa-clock-o" (click)="schedule.toggle($event)"
-                label="{{getCronOptionNameFromValue(note.config.cron)}}" [disabled]="revisionView" ></button>
+        <button pButton type="button" pTooltip="调度运行" tooltipPosition="bottom" icon="fa-clock-o"
+                (click)="schedule.toggle($event)"
+                [label]="getCronOptionNameFromValue(note.config.cron)"
+                [disabled]="revisionView" ></button>
                 <!--[ngClass]="{'ui-button-info' : note.config.cron, 'ui-button-danger' : note.info.cron, 'ui-button-success' : !note.config.cron}"></button>-->
         <p-overlayPanel #schedule>
+
           <div>
-            <ul class="dropdown-menu" role="menu" style="width:300px">
-              <li>
-                <div class="cron-preset-container">
-                  Run note with cron scheduler.
-                  Either choose from preset or write your own <a href="http://www.quartz-scheduler.org/documentation/quartz-2.1.x/tutorials/crontrigger" target="_blank">cron expression</a>.
-                  <div>
-                    <span>- Preset</span>
-                    <a class="cron-preset" *ngFor="let cr of cronOption"
-                       type="button"
-                       (click)="setCronScheduler(cr.value)"
-                       [ngClass]="{ 'selected' : cr.value == note.config.cron}">{{cr.name}}</a>
-                  </div>
-                  <div>
-                    <span>- Cron expression</span>
-                    <input type="text"
-                           [ngModel]="note.config.cron"
-                           (change)="setCronScheduler(note.config.cron)"/>
-                    <p [hidden]="!note.info.cron" class="text-danger cron-info">
-                      {{note.info.cron}}
-                    </p>
-                  </div>
-                  <div>
-                    <span>- Cron executing user (click enter in field to submit)</span>
-                    <input type="text"
-                           [ngModel]="note.config.cronExecutingUser"
-                           (enter)="setCronExecutingUser(note.config.cronExecutingUser)"/>
-                  </div>
-                  <div>
-                    <span>- auto-restart interpreter on cron execution </span>
-                    <input type="checkbox"
-                           [ngModel]="note.config.releaseresource"
-                           (click)="setReleaseResource(note.config.releaseresource)"/>
-                  </div>
-                </div>
-              </li>
-            </ul>
+            <h3>选择或设置一个<a href="http://www.quartz-scheduler.org/documentation/quartz-2.1.x/tutorials/crontrigger" target="_blank">Cron表达式</a>来运行笔记</h3>
           </div>
+          <div style="font-size: 14px;margin-bottom: 5px;">
+            <span>- 预设表达式</span>
+            <a class="cron-preset" *ngFor="let cr of cronOption"
+               type="button"
+               (click)="setCronScheduler(cr.value)"
+               [ngClass]="{ 'selected' : cr.value == note.config.cron}" style="margin-left: 5px">{{cr.name}}</a>
+          </div>
+          <div style="font-size: 14px;margin-bottom: 5px;">
+            <span>- Cron表达式</span>
+            <input type="text"
+                   [ngModel]="note.config.cron"
+                   (change)="setCronScheduler(note.config.cron)" style="float: right;"/>
+            <p [hidden]="!note.info.cron" class="text-danger cron-info">
+              {{note.info.cron}}
+            </p>
+          </div>
+          <div style="font-size: 14px;margin-bottom: 5px;">
+            <span>- Cron执行用户</span>
+            <input type="text"
+                   [ngModel]="note.config.cronExecutingUser"
+                   (enter)="setCronExecutingUser(note.config.cronExecutingUser)" style="float: right;"/>
+          </div>
+          <div style="font-size: 14px;margin-bottom: 5px;">
+            <span>- Cron执行时自动启动解析器</span>
+            <input type="checkbox"
+                   [ngModel]="note.config.releaseresource"
+                   (click)="setReleaseResource(note.config.releaseresource)" style="float: right;"/>
+          </div>
+
         </p-overlayPanel>
       </div>
 
       <div class="ui-toolbar-group-right">
-        <button pButton type="button" pTooltip="快捷键" tooltipPosition="bottom" class="success-btn" icon="fa-keyboard-o" *ngIf="!revisionView"></button>
+        <button pButton type="button" pTooltip="快捷键" tooltipPosition="bottom" class="success-btn" icon="fa-keyboard-o" *ngIf="!revisionView" (click)="shortcutsDialog = true"></button>
+        <p-dialog header="Keyboard shortcuts" [(visible)]="shortcutsDialog" height="750" [modal]="true">
+          <table class="table table-shortcut">
+            <tr>
+              <th style="width:70%">Note Keyboard Shortcuts</th>
+              <th></th>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="col-md-8">Run paragraph</div>
+              </td>
+              <td>
+                <div class="keys">
+                  <kbd class="kbd-default">Shift</kbd> + <kbd class="kbd-default">Enter</kbd>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="col-md-8">Cancel</div>
+              </td>
+              <td>
+                <div class="keys">
+                  <kbd class="kbd-default">Ctrl</kbd> + <kbd class="kbd-default">{{ isMac ? 'Option' : 'Alt'}}</kbd> + <kbd class="kbd-default">C</kbd>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="col-md-8">Move cursor Up</div>
+              </td>
+              <td>
+                <div class="keys">
+                  <kbd class="kbd-default">Ctrl</kbd> + <kbd class="kbd-default">P</kbd>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="col-md-8">Move cursor Down</div>
+              </td>
+              <td>
+                <div class="keys">
+                  <kbd class="kbd-default">Ctrl</kbd> + <kbd class="kbd-default">N</kbd>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="col-md-8">Remove paragraph</div>
+              </td>
+              <td>
+                <div class="keys">
+                  <kbd class="kbd-default">Ctrl</kbd> + <kbd class="kbd-default">{{ isMac ? 'Option' : 'Alt'}}</kbd> + <kbd class="kbd-default">D</kbd>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="col-md-8">Insert new paragraph above</div>
+              </td>
+              <td>
+                <div class="keys">
+                  <kbd class="kbd-default">Ctrl</kbd> + <kbd class="kbd-default">{{ isMac ? 'Option' : 'Alt'}}</kbd> + <kbd class="kbd-default">A</kbd>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="col-md-8">Insert new paragraph below</div>
+              </td>
+              <td>
+                <div class="keys">
+                  <kbd class="kbd-default">Ctrl</kbd> + <kbd class="kbd-default">{{ isMac ? 'Option' : 'Alt'}}</kbd> + <kbd class="kbd-default">B</kbd>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="col-md-8">Insert copy of paragraph below</div>
+              </td>
+              <td>
+                <div class="keys">
+                  <kbd class="kbd-default">Ctrl</kbd> + <kbd class="kbd-default">Shift</kbd> + <kbd class="kbd-default">C</kbd>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="col-md-8">Move paragraph Up</div>
+              </td>
+              <td>
+                <div class="keys">
+                  <kbd class="kbd-default">Ctrl</kbd> + <kbd class="kbd-default">{{ isMac ? 'Option' : 'Alt'}}</kbd> + <kbd class="kbd-default">K</kbd>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="col-md-8">Move paragraph Down</div>
+              </td>
+              <td>
+                <div class="keys">
+                  <kbd class="kbd-default">Ctrl</kbd> + <kbd class="kbd-default">{{ isMac ? 'Option' : 'Alt'}}</kbd> + <kbd class="kbd-default">J</kbd>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="col-md-8">Enable/Disable run paragraph</div>
+              </td>
+              <td>
+                <div class="keys">
+                  <kbd class="kbd-default">Ctrl</kbd> + <kbd class="kbd-default">{{ isMac ? 'Option' : 'Alt' }}</kbd> + <kbd class="kbd-default">R</kbd>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="col-md-8">Toggle output</div>
+              </td>
+              <td>
+                <div class="keys">
+                  <kbd class="kbd-default">Ctrl</kbd> + <kbd class="kbd-default">{{ isMac ? 'Option' : 'Alt'}}</kbd> + <kbd class="kbd-default">O</kbd>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="col-md-8">Toggle editor</div>
+              </td>
+              <td>
+                <div class="keys">
+                  <kbd class="kbd-default">Ctrl</kbd> + <kbd class="kbd-default">{{ isMac ? 'Option' : 'Alt'}}</kbd> + <kbd class="kbd-default">E</kbd>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="col-md-8">Toggle line number</div>
+              </td>
+              <td>
+                <div class="keys">
+                  <kbd class="kbd-default">Ctrl</kbd> + <kbd class="kbd-default">{{ isMac ? 'Option' : 'Alt'}}</kbd> + <kbd class="kbd-default">M</kbd>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="col-md-8">Toggle title</div>
+              </td>
+              <td>
+                <div class="keys">
+                  <kbd class="kbd-default">Ctrl</kbd> + <kbd class="kbd-default">{{ isMac ? 'Option' : 'Alt'}}</kbd> + <kbd class="kbd-default">T</kbd>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="col-md-8">Clear output</div>
+              </td>
+              <td>
+                <div class="keys">
+                  <kbd class="kbd-default">Ctrl</kbd> + <kbd class="kbd-default">{{ isMac ? 'Option' : 'Alt'}}</kbd> + <kbd class="kbd-default">L</kbd>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="col-md-8">Link this paragraph</div>
+              </td>
+              <td>
+                <div class="keys">
+                  <kbd class="kbd-default">Ctrl</kbd> + <kbd class="kbd-default">{{ isMac ? 'Option' : 'Alt'}}</kbd> + <kbd class="kbd-default">W</kbd>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="col-md-8">Reduce paragraph width</div>
+              </td>
+              <td>
+                <div class="keys">
+                  <kbd class="kbd-default">Ctrl</kbd> + <kbd class="kbd-default">Shift</kbd> + <kbd class="kbd-default">-</kbd>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="col-md-8">Increase paragraph width</div>
+              </td>
+              <td>
+                <div class="keys">
+                  <kbd class="kbd-default">Ctrl</kbd> + <kbd class="kbd-default">Shift</kbd> + <kbd class="kbd-default">+</kbd>
+                </div>
+              </td>
+            </tr>
+
+            <tr class="sub-title">
+              <th style="width:70%">Editor Keyboard Shortcuts</th>
+              <th></th>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="col-md-8">Auto-completion</div>
+              </td>
+              <td>
+                <div class="keys">
+                  <kbd class="kbd-default">Ctrl</kbd> + <kbd class="kbd-default">.</kbd>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="col-md-8">Cut the line</div>
+              </td>
+              <td>
+                <div class="keys">
+                  <kbd class="kbd-default">Ctrl</kbd> + <kbd class="kbd-default">K</kbd>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="col-md-8">Paste the line</div>
+              </td>
+              <td>
+                <div class="keys">
+                  <kbd class="kbd-default">Ctrl</kbd> + <kbd class="kbd-default">Y</kbd>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="col-md-8">Search inside the code</div>
+              </td>
+              <td>
+                <div class="keys">
+                  <kbd class="kbd-default">Ctrl</kbd> + <kbd class="kbd-default">S</kbd>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="col-md-8">Move cursor to the beginning</div>
+              </td>
+              <td>
+                <div class="keys">
+                  <kbd class="kbd-default">Ctrl</kbd> + <kbd class="kbd-default">A</kbd>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="col-md-8">Move cursor at the end</div>
+              </td>
+              <td>
+                <div class="keys">
+                  <kbd class="kbd-default">Ctrl</kbd> + <kbd class="kbd-default">E</kbd>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="col-md-8">Find in code</div>
+              </td>
+              <td>
+                <div class="keys">
+                  <kbd class="kbd-default">Ctrl</kbd> + <kbd class="kbd-default">{{ isMac ? 'Option' : 'Alt'}}</kbd> + <kbd class="kbd-default">F</kbd>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </p-dialog>
+
         <button pButton type="button" pTooltip="解析器绑定" tooltipPosition="bottom" class="success-btn" icon="fa-cog" *ngIf="!revisionView" (click)="toggleSetting()"></button>
         <button pButton type="button" pTooltip="权限配置" tooltipPosition="bottom" class="success-btn" icon="fa-lock" *ngIf="!revisionView" (click)="togglePermissions()"></button>
-        <p-splitButton label="default" icon="fa-bullseye" styleClass="ui-button-success" [model]="looknfeelOptionItems"></p-splitButton>
+
+        <p-splitButton label="{{note.config.looknfeel}}" icon="fa-bullseye" styleClass="ui-button-success" [model]="looknfeelOptionItems"></p-splitButton>
 
         <!--<p-dropdown [options]="getNoteRevisions(noteRevisions)" [(ngModel)]="currentRevision" pTooltip="版本选择" tooltipPosition="bottom" optionLabel="name"></p-dropdown>-->
       </div>
@@ -240,7 +579,9 @@
 
   <!-- 代码片段 -->
 
-  <div [ngClass]="this.columnWidthClass(currentParagraph.config.colWidth)" id="{{currentParagraph.id}}_paragraphColumn_main" *ngFor="let currentParagraph of this.note.paragraphs" style="padding-right: 3px; padding-left: 3px">
+  <div [ngClass]="this.columnWidthClass(currentParagraph.config.colWidth)"
+       id="{{currentParagraph.id}}_paragraphColumn_main"
+       *ngFor="let currentParagraph of this.note.paragraphs" style="padding-right: 3px; padding-left: 3px">
 
     <div class="new-paragraph"
          (click)="insertNew(currentParagraph.id,'above')"
@@ -249,17 +590,11 @@
       <span class="plus-sign">&#43;</span>
     </div>
 
-    <div class="card card-w-title shadow-box ui-shadow-1" id="{{currentParagraph.id}}_paragraphColumn" (dblclick)="paragraphOnDoubleClick(currentParagraph.id)">
+    <div class="card card-w-title shadow-box ui-shadow-1 paragraphColumn" id="{{currentParagraph.id}}_paragraphColumn"
+         (click)="paragraphOnClick(currentParagraph.id)"
+         (dblclick)="paragraphOnDoubleClick(currentParagraph.id)">
       <app-paragraph paragraphid="{{currentParagraph.id}}"></app-paragraph>
     </div>
-
-    <!--<div id="{{currentParagraph.id}}_paragraphColumn"
-         ng-include src="'app/notebook/paragraph/paragraph.html'"
-         ng-class="{'paragraph-space box paragraph-margin': !asIframe, 'focused': paragraphFocused,
-                    'lastEmptyParagraph': !paragraph.text && !paragraph.result}"
-         ng-hide="currentParagraph.config.tableHide && viewOnly"
-         ng-dblclick="paragraphOnDoubleClick(currentParagraph.id);">
-    </div>-->
 
     <div class="new-paragraph last-paragraph" (click)="insertNew(currentParagraph.id,'below');" *ngIf="!$last || viewOnly || asIframe || revisionView">
       <span class="plus-sign">&#43;</span>
