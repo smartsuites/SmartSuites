@@ -1,0 +1,22 @@
+<p-dialog header="{{clone? 'Clone Note':'Create New Note'}}" [(visible)]="dialogDisplay" >
+
+  <div class="ui-g">
+
+    <span>笔记名称：</span>
+    <div class="ui-g-12 ui-md-12" style="margin-bottom: 10px">
+      <input type="text" pInputText placeholder="Insert Note Name" style="width: 100%" [(ngModel)]="note.notename" ng-enter="noteCreateCtrl.handleNameEnter()" />
+    </div>
+
+    <span [hidden]="clone">默认解析器：</span>
+    <div class="ui-g-12 ui-md-12" style="margin-bottom: 10px" [hidden]="clone">
+      <p-dropdown [options]="interpreterSettingOptions" [(ngModel)]="selectInterpreterSetting"></p-dropdown>
+    </div>
+
+    <span>使用 '/' 来创建文件夹. 比如: /NoteDirA/Note1</span>
+  </div>
+
+  <p-footer>
+    <button type="button" pButton icon="fa-plus-circle" (click)="createNote()" label="{{clone? '克隆':'创建'}}笔记"></button>
+  </p-footer>
+
+</p-dialog>
