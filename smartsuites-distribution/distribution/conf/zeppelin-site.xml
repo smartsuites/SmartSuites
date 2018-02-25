@@ -21,35 +21,41 @@
 
     <!-- For Develop -->
 
-    <property>
+    <!--<property>
         <name>zeppelin.interpreter.dir</name>
         <value>smartsuites-interpreters/interpreter</value>
         <description>develop interpreters dir</description>
-    </property>
+    </property>-->
 
-    <property>
+    <!--<property>
         <name>zeppelin.conf.dir</name>
         <value>smartsuites-distribution/distribution/conf</value>
         <description>develop conf dir</description>
-    </property>
+    </property>-->
 
-    <property>
+    <!--<property>
         <name>zeppelin.notebook.dir</name>
         <value>smartsuites-distribution/distribution/notebook</value>
         <description>develop conf dir</description>
+    </property>-->
+
+    <property>
+        <name>zeppelin.home</name>
+        <value>${zeppelin.home}</value>
+        <description>zeppelin.home</description>
     </property>
 
     <property>
         <name>zeppelin.war</name>
-        <value>smartsuites-server/src/main/resources/dist</value>
+        <value>/Users/wuyufei/GitHub/SmartSuites/smartsuites-web/descriptor</value>
         <description>develop web dist dir</description>
     </property>
 
-    <property>
+    <!--<property>
         <name>zeppelin.interpreter.remoterunner</name>
         <value>smartsuites-distribution/distribution/bin/interpreter.sh</value>
         <description>develop remote runner</description>
-    </property>
+    </property>-->
 
     <!-- End Develop -->
 

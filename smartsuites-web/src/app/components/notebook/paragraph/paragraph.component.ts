@@ -5,13 +5,13 @@ import {EventService1} from "../../../service/event/event.service";
 import {isParagraphRunning, ParagraphStatus} from "./paragraph.status";
 import {NotebookComponent} from "../notebook.component";
 import {ConfirmationService} from "primeng/primeng";
-import * as moment from "moment";
 import {GlobalService} from "../../../service/global/global.service";
 import {CommonService} from "../../../service/common/common.service";
 import {MessageService} from "primeng/components/common/messageservice";
 import {SpellResult} from "../../../service/spell";
 import {HeliumService} from "../../../service/helium/helium.service";
 import * as Q from "Q"
+import * as moment from "moment";
 
 const ParagraphExecutor = {
   SPELL: 'SPELL',
@@ -28,6 +28,9 @@ const ParagraphExecutor = {
 export class ParagraphComponent implements OnInit,AfterViewInit {
 
   ANGULAR_FUNCTION_OBJECT_NAME_PREFIX = '_Z_ANGULAR_FUNC_'
+
+  /**************** 片段全屏 ***************/
+  fullScreen = false;
 
   /**************** 更新Note名称 ***************/
   //是否显示名称编辑器
@@ -407,13 +410,11 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
   /**************  保存当前的片段 ***************/
 
   saveParagraph(paragraph) {
-    console.log(">>>>>>>>>>>>>")
     let self = this;
     const dirtyText = paragraph.text
     if (dirtyText === undefined || dirtyText === this.originalText) {
       return
     }
-    console.log("!!!!>>>>>>>>>>>>>")
     self.bindBeforeUnload()
 
     /*self.commitParagraph(paragraph).then(function () {
@@ -1078,11 +1079,10 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
         newPara.config !== oldPara.config ||
         newPara.runtimeInfos !== oldPara.runtimeInfos))
 
+    //return false
     /*!angular.equals(newPara.settings, oldPara.settings) ||
     !angular.equals(newPara.config, oldPara.config) ||
     !angular.equals(newPara.runtimeInfos, oldPara.runtimeInfos)))*/
-
-    return false
   }
 
   updateAllScopeTexts(oldPara, newPara) {
@@ -1093,12 +1093,17 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
           self.paragraph.text = newPara.text
           self.dirtyText = undefined
           self.originalText = Object.assign("",newPara.text)
+          // TODO?
+          self.editor.setValue(self.originalText)
         } else { // if there're local update, keep it.
+          // TODO 合并两个字段
           self.paragraph.text = newPara.text
+          self.editor.setValue(newPara.text)
         }
       } else {
         self.paragraph.text = newPara.text
         self.originalText =  Object.assign("",newPara.text)
+        self.editor.setValue(self.originalText)
       }
     }
   }
@@ -1151,9 +1156,9 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
   updateParagraph(oldPara, newPara, updateCallback) {
     let self = this;
     // 1. can't update on revision view
-    /*if (self.revisionView === true) {
+    if (self.revisionView === true) {
       return
-    }*/
+    }
 
     // 2. get status, refreshed
     const statusChanged = (newPara.status !== oldPara.status)
@@ -1166,28 +1171,26 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
     self.updateAllScopeTexts(oldPara, newPara)
 
     // 4. execute callback to update result
-    updateCallback()
+    //updateCallback()
 
     // 5. update remaining paragraph objects
-    self.updateParagraphObjectWhenUpdated(newPara)
+    //self.updateParagraphObjectWhenUpdated(newPara)
 
     // 6. handle scroll down by key properly if new paragraph is added
-    if (statusChanged || resultRefreshed) {
+    /*if (statusChanged || resultRefreshed) {
       // when last paragraph runs, zeppelin automatically appends new paragraph.
       // this broadcast will focus to the newly inserted paragraph
 
-      /*const paragraphs = angular.element('div[id$="_paragraphColumn_main"]')
-      if (paragraphs.length >= 2 && paragraphs[paragraphs.length - 2].id.indexOf($scope.paragraph.id) === 0) {
+      const paragraphs = self.jQuery('div[id$="_paragraphColumn_main"]')
+      if (paragraphs.length >= 2 && paragraphs[paragraphs.length - 2].id.indexOf(self.paragraph.id) === 0) {
         // rendering output can took some time. So delay scrolling event firing for sometime.
-        setTimeout(() => { $rootScope.$broadcast('scrollToCursor') }, 500)
-      }*/
-    }
+        setTimeout(() => {
+          //$rootScope.$broadcast('scrollToCursor')
+          self.eventService.broadcast('scrollToCursor')
+        }, 500)
+      }
+    }*/
   }
-
-
-
-
-
 
 
   /**************** 公共的配置 *************/
@@ -1208,9 +1211,6 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
   fontSizeOption = [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
 
   asIframe = false
-
-  //是否全屏显示
-  display = false;
 
   revisionView
 
@@ -1633,6 +1633,10 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
       const oldPara = self.paragraph
       const newPara = data.paragraph
 
+      if(newPara.id != oldPara.id){
+        return
+      }
+
       if (!self.isUpdateRequired(oldPara, newPara)) {
         return
       }
@@ -1646,11 +1650,11 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
               ? oldPara.results.msg[i] : {}
             const newConfig = newPara.config.results ? newPara.config.results[i] : {}
             const oldConfig = oldPara.config.results ? oldPara.config.results[i] : {}
-            /*if (!angular.equals(newResult, oldResult) ||
-              !angular.equals(newConfig, oldConfig)) {
+
+            if (newResult != oldResult || newConfig != oldConfig) {
               //$rootScope.$broadcast('updateResult', newResult, newConfig, newPara, parseInt(i))
               self.eventService.broadcast('updateResult', newResult, newConfig, newPara, parseInt(i))
-            }*/
+            }
           }
         }
       }

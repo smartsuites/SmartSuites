@@ -6,7 +6,7 @@
 
     <groupId>com.smartsuites</groupId>
     <artifactId>smartsuites</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.8</version>
     <packaging>pom</packaging>
     <name>SmartSuites</name>
     <description>SmartSuites project</description>
@@ -18,9 +18,9 @@
         <module>smartsuites-engine</module>
         <module>smartsuites-jupyter</module>
         <module>smartsuites-interpreters</module>
-        <module>smartsuites-distribution</module>
         <module>smartsuites-spark</module>
         <module>smartsuites-hub</module>
+        <module>smartsuites-distribution</module>
     </modules>
 
     <scm>
@@ -32,6 +32,7 @@
     <inceptionYear>2017</inceptionYear>
 
     <properties>
+
         <!-- language versions -->
         <scala.version>2.10.5</scala.version>
         <scala.binary.version>2.10</scala.binary.version>
@@ -721,7 +722,7 @@
     </build>
 
     <profiles>
-        <profile>
+        <!--<profile>
             <id>dev</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
@@ -734,7 +735,7 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
         </profile>
-
+-->
         <profile>
             <id>scala-2.11</id>
             <activation>
@@ -807,7 +808,7 @@
             </modules>
         </profile>-->
 
-        <profile>
+        <!--<profile>
             <id>build-distr</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
@@ -839,9 +840,9 @@
                     </plugins>
                 </pluginManagement>
             </build>
-        </profile>
+        </profile>-->
 
-        <profile>
+        <!--<profile>
             <id>publish-distr</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
@@ -869,7 +870,7 @@
                         </executions>
                     </plugin>
 
-                    <!--<plugin>
+                    &lt;!&ndash;<plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
                         <version>2.10.3</version>
@@ -881,10 +882,10 @@
                                 </goals>
                             </execution>
                         </executions>
-                    </plugin>-->
+                    </plugin>&ndash;&gt;
                 </plugins>
             </build>
-        </profile>
+        </profile>-->
 
         <!--<profile>
             <id>release-sign-artifacts</id>

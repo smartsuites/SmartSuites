@@ -88,15 +88,14 @@
 
 <div class="ui-g configuration">
   <div class="ui-g-12">
-    <div class="card card-w-title">
-      <h1>系统配置</h1>
-      <p-dataTable [value]="configrations" selectionMode="single" [(selection)]="selectedItem"
-                   [responsive]="true">
-        <p-header>系统配置项</p-header>
-        <p-column field="name" header="配置项" [sortable]="false"></p-column>
-        <p-column field="value" header="配置值" [sortable]="false"></p-column>
-        <p-column field="desc" header="配置描述" [sortable]="false"></p-column>
-      </p-dataTable>
-    </div>
+    <p-dataTable [value]="configrations" selectionMode="single" [(selection)]="selectedItem"
+                 [responsive]="true">
+      <p-header>系统配置项</p-header>
+      <p-column field="name" header="配置项" [sortable]="false"></p-column>
+      <p-column field="value" header="配置值" [sortable]="false"></p-column>
+      <p-column field="desc" header="配置描述" [sortable]="false"></p-column>
+    </p-dataTable>
   </div>
 </div>
+
+

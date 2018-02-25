@@ -60,10 +60,10 @@ export class WebsocketEventService {
           vm.eventService.broadcast('setNoteMenu', data.notes)
         } else if (op === 'LIST_NOTE_JOBS') {
           // TODO $rootScope.$emit('jobmanager:set-jobs', data.noteJobs)
-          //$rootScope.$emit('jobmanager:set-jobs', data.noteJobs)
+          vm.eventService.broadcast('jobmanager:set-jobs', data.noteJobs)
         } else if (op === 'LIST_UPDATE_NOTE_JOBS') {
           // TODO $rootScope.$emit('jobmanager:update-jobs', data.noteRunningJobs)
-          //$rootScope.$emit('jobmanager:update-jobs', data.noteRunningJobs)
+          vm.eventService.broadcast('jobmanager:update-jobs', data.noteRunningJobs)
         } else if (op === 'AUTH_INFO') {
           let btn = []
           if (vm.globalService.ticket.roles === '[]') {

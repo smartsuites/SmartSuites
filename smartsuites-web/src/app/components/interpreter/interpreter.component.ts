@@ -4,6 +4,8 @@ import {BaseUrlService} from "../../service/base-url/base-url.service";
 import {Router} from "@angular/router";
 import {GlobalService} from "../../service/global/global.service";
 import {EventService1} from "../../service/event/event.service";
+import {MessageService} from "primeng/components/common/messageservice";
+import {ConfirmationService} from "primeng/primeng";
 
 @Component({
   selector: 'app-interpreter',
@@ -24,21 +26,25 @@ export class InterpreterComponent implements OnInit {
 
   showAddNewSetting = false
   showRepositoryInfo = false
+  showAddNewRepository = false
+  showEditSetting = false
   searchInterpreter = ''
 
   interpreterPropertyTypes = []
 
   newRepoSetting
 
+  repositories
+
   constructor(public httpClient:HttpClient,
               public baseUrlSrv:BaseUrlService,
               public router:Router,
               public globalService:GlobalService,
-              public eventService:EventService1) { }
+              public eventService:EventService1,
+              public messageService:MessageService,
+              public confirmationService:ConfirmationService) { }
 
   ngOnInit() {
-
-    //ngToast.dismiss()
 
     this.eventService.subscribe('ngRenderFinished', function (event, data) {
       for (let setting = 0; setting < this.interpreterSettings.length; setting++) {
@@ -54,7 +60,6 @@ export class InterpreterComponent implements OnInit {
     this.getInterpreterSettings()
     this.getAvailableInterpreters()
     this.getRepositories()
-
   }
 
 
@@ -64,9 +69,15 @@ export class InterpreterComponent implements OnInit {
       option = this.newInterpreterSetting.option
     } else {
       // TODO
-      /*let index = _.findIndex(this.interpreterSettings, {'id': settingId})
-      let setting = this.interpreterSettings[index]
-      option = setting.option*/
+      this.interpreterSettings.forEach((val, idx, array) => {
+        // val: 当前值
+        // idx：当前index
+        // array: Array
+        if(val.id == settingId){
+          let setting = this.interpreterSettings[idx]
+          option = setting.option
+        }
+      });
     }
 
     if (option.perNote === 'scoped') {
@@ -83,9 +94,15 @@ export class InterpreterComponent implements OnInit {
     if (settingId === undefined) {
       option = this.newInterpreterSetting.option
     } else {
-      /*let index = _.findIndex(this.interpreterSettings, {'id': settingId})
-      let setting = this.interpreterSettings[index]
-      option = setting.option*/
+      this.interpreterSettings.forEach((val, idx, array) => {
+        // val: 当前值
+        // idx：当前index
+        // array: Array
+        if(val.id == settingId){
+          let setting = this.interpreterSettings[idx]
+          option = setting.option
+        }
+      });
     }
 
     if (option.perUser === 'scoped') {
@@ -108,9 +125,15 @@ export class InterpreterComponent implements OnInit {
     if (settingId === undefined) {
       option = this.newInterpreterSetting.option
     } else {
-      /*let index = _.findIndex(this.interpreterSettings, {'id': settingId})
-      let setting = this.interpreterSettings[index]
-      option = setting.option*/
+      this.interpreterSettings.forEach((val, idx, array) => {
+        // val: 当前值
+        // idx：当前index
+        // array: Array
+        if(val.id == settingId){
+          let setting = this.interpreterSettings[idx]
+          option = setting.option
+        }
+      });
     }
 
     let perNote = option.perNote
@@ -144,9 +167,12 @@ export class InterpreterComponent implements OnInit {
     if (settingId === undefined) {
       option = this.newInterpreterSetting.option
     } else {
-      /*let index = _.findIndex(this.interpreterSettings, {'id': settingId})
-      let setting = this.interpreterSettings[index]
-      option = setting.option*/
+      this.interpreterSettings.forEach((val, idx, array) => {
+        if(val.id == settingId){
+          let setting = this.interpreterSettings[idx]
+          option = setting.option
+        }
+      });
     }
     option.perNote = isPerNoteMode
     option.perUser = isPerUserMode
@@ -228,30 +254,39 @@ export class InterpreterComponent implements OnInit {
   }
 
   resetInterpreterSetting(settingId) {
-    /*let index = _.findIndex(this.interpreterSettings, {'id': settingId})
-
-    // Set the old settings back
-    this.interpreterSettings[index] = angular.copy(interpreterSettingsTmp[index])
-    this.removeTMPSettings(index)*/
+    this.interpreterSettings.forEach((val, idx, array) => {
+      if(val.id == settingId){
+        this.interpreterSettings[idx] = Object.assign({},this.interpreterSettingsTmp[idx])
+        this.removeTMPSettings(idx)
+      }
+    });
   }
 
   removeInterpreterSetting(settingId) {
-    /*BootstrapDialog.confirm({
-      closable: true,
-      title: '',
+    let self = this;
+    self.confirmationService.confirm({
       message: 'Do you want to delete this interpreter setting?',
-      callback: function (result) {
-        if (result) {
-          $http.delete(baseUrlSrv.getRestApiBase() + '/interpreter/setting/' + settingId)
-            .then(function (res) {
-              let index = _.findIndex($scope.interpreterSettings, {'id': settingId})
-              $scope.interpreterSettings.splice(index, 1)
-            }).catch(function (res) {
-            console.log('Error %o %o', res.status, res.data ? res.data.message : '')
-          })
-        }
+      header: '删除解析器配置',
+      icon: 'fa fa-delete',
+      accept: () => {
+
+        self.httpClient.delete(this.baseUrlSrv.getRestApiBase() + '/interpreter/setting/' + settingId)
+          .subscribe(
+            response => {
+              self.interpreterSettings.forEach((val, idx, array) => {
+                if(val.id == settingId){
+                  self.interpreterSettings.splice(idx, 1)
+                }
+              });
+            },
+            errorResponse => {
+              console.log('Error %o', errorResponse)
+            }
+          );
+      },
+      reject: () => {
       }
-    })*/
+    });
   }
 
   newInterpreterGroupChange() {
@@ -271,54 +306,53 @@ export class InterpreterComponent implements OnInit {
   }
 
   restartInterpreterSetting(settingId) {
-    /*BootstrapDialog.confirm({
-      closable: true,
-      title: '',
+    let self = this;
+    self.confirmationService.confirm({
       message: 'Do you want to restart this interpreter?',
-      callback: function (result) {
-        if (result) {
-          $http.put(baseUrlSrv.getRestApiBase() + '/interpreter/setting/restart/' + settingId)
-            .then(function (res) {
-              let index = _.findIndex($scope.interpreterSettings, {'id': settingId})
-              $scope.interpreterSettings[index] = res.data.body
-              ngToast.info('Interpreter stopped. Will be lazily started on next run.')
-            }).catch(function (res) {
-            let errorMsg = (res.data !== null) ? res.data.message : 'Could not connect to server.'
-            console.log('Error %o %o', res.status, errorMsg)
-            ngToast.danger(errorMsg)
-          })
-        }
+      header: '重启解析器',
+      icon: 'fa fa-refresh',
+      accept: () => {
+
+        self.httpClient.delete(this.baseUrlSrv.getRestApiBase() + '/interpreter/setting/restart/' + settingId)
+          .subscribe(
+            response => {
+              self.interpreterSettings.forEach((val, idx, array) => {
+                if(val.id == settingId){
+                  self.interpreterSettings.splice(idx, 1)
+
+                  self.interpreterSettings.splice(idx, 1)
+                  self.interpreterSettings[idx] = response['body']
+                  self.messageService.add({severity:'info', summary:'', detail:'Interpreter stopped. Will be lazily started on next run.'});
+                }
+              });
+            },
+            errorResponse => {
+              console.log('Error %o', errorResponse)
+            }
+          );
+      },
+      reject: () => {
       }
-    })*/
+    });
   }
 
   addNewInterpreterSetting() {
+    let self = this;
     // user input validation on interpreter creation
     if (!this.newInterpreterSetting.name ||
       !this.newInterpreterSetting.name.trim() || !this.newInterpreterSetting.group) {
-      /*BootstrapDialog.alert({
-        closable: true,
-        title: 'Add interpreter',
-        message: 'Please fill in interpreter name and choose a group'
-      })*/
+      self.messageService.add({severity:'warn', summary:'Add interpreter', detail:'Please fill in interpreter name and choose a group'});
       return
     }
 
     if (this.newInterpreterSetting.name.indexOf('.') >= 0) {
-      /*BootstrapDialog.alert({
-        closable: true,
-        title: 'Add interpreter',
-        message: '\'.\' is invalid for interpreter name'
-      })*/
+      self.messageService.add({severity:'warn', summary:'Add interpreter', detail:'\'.\' is invalid for interpreter name'});
       return
     }
 
     /*if (_.findIndex($scope.interpreterSettings, {'name': this.newInterpreterSetting.name}) >= 0) {
-      BootstrapDialog.alert({
-        closable: true,
-        title: 'Add interpreter',
-        message: 'Name ' + this.newInterpreterSetting.name + ' already exists'
-      })
+      self.messageService.add({severity:'warn', summary:'Add interpreter', detail:'Name ' + this.newInterpreterSetting.name + ' already exists'});
+
       return
     }*/
 
@@ -571,44 +605,60 @@ export class InterpreterComponent implements OnInit {
   }
 
   getRepositories() {
-    /*this.httpClient.get(this.baseUrlSrv.getRestApiBase() + '/interpreter/repository')
-      .success(function (data, status, headers, config) {
-        this.repositories = data.body
-      }).error(function (data, status, headers, config) {
-      console.log('Error %o %o', status, data.message)
-    })*/
+    let self = this;
+    this.httpClient.get(this.baseUrlSrv.getRestApiBase() + '/interpreter/repository')
+      .subscribe(
+        response => {
+          self.repositories = response['body']
+        },
+        errorResponse => {
+          console.log('Error %o', errorResponse)
+        }
+      );
   }
 
   addNewRepository() {
-    /*let request = angular.copy(this.newRepoSetting)
-
-    this.httpClient.post(baseUrlSrv.getRestApiBase() + '/interpreter/repository', request)
-      .then(function (res) {
-        this.getRepositories()
-        this.resetNewRepositorySetting()
-        angular.element('#repoModal').modal('hide')
-      }).catch(function (res) {
-      console.log('Error %o %o', res.headers, res.config)
-    })*/
+    let request = Object.assign({},this.newRepoSetting)
+    let self = this;
+    self.httpClient.post(this.baseUrlSrv.getRestApiBase() + '/interpreter/repository',request)
+      .subscribe(
+        response => {
+          let result = response['body']
+          self.getRepositories()
+          self.resetNewRepositorySetting()
+          //angular.element('#repoModal').modal('hide')
+        },
+        errorResponse => {
+          console.log('Error %o', errorResponse)
+        }
+      );
   }
 
   removeRepository(repoId) {
-    /*BootstrapDialog.confirm({
-      closable: true,
-      title: '',
+    let self = this;
+    if(self.isDefaultRepository(repoId))
+      return;
+    self.confirmationService.confirm({
       message: 'Do you want to delete this repository?',
-      callback: function (result) {
-        if (result) {
-          $http.delete(baseUrlSrv.getRestApiBase() + '/interpreter/repository/' + repoId)
-            .then(function (res) {
-              let index = _.findIndex($scope.repositories, {'id': repoId})
-              $scope.repositories.splice(index, 1)
-            }).catch(function (res) {
-            console.log('Error %o %o', res.status, res.data ? res.data.message : '')
-          })
-        }
+      header: '删除仓库',
+      icon: 'fa fa-refresh',
+      accept: () => {
+
+        self.httpClient.delete(this.baseUrlSrv.getRestApiBase() + '/interpreter/repository/' + repoId)
+          .subscribe(
+            response => {
+              let index = self.repositories.findIndex({'id': repoId})
+              self.repositories.splice(index, 1)
+            },
+            errorResponse => {
+              console.log('Error %o', errorResponse)
+            }
+          );
+      },
+      reject: () => {
       }
-    })*/
+    });
+
   }
 
   isDefaultRepository(repoId) {
@@ -620,32 +670,30 @@ export class InterpreterComponent implements OnInit {
   }
 
   showErrorMessage(setting) {
-    /*BootstrapDialog.show({
-      title: 'Error downloading dependencies',
-      message: setting.errorReason
-    })*/
+    this.messageService.add({severity:'error', summary:'Error downloading dependencies', detail:setting.errorReason});
   }
 
 
   showSparkUI(settingId) {
-    /*this.httpClient.get(this.baseUrlSrv.getRestApiBase() + '/interpreter/metadata/' + settingId)
-      .then(function (res) {
-        if (res.data.body === undefined) {
-          BootstrapDialog.alert({
-            message: 'No spark application running'
-          })
-          return
+    let self = this;
+    self.httpClient.get(this.baseUrlSrv.getRestApiBase() + '/interpreter/metadata/' + settingId)
+      .subscribe(
+        response => {
+          let result = response['body']
+          if (result === undefined) {
+            self.messageService.add({severity:'warn', summary:'', detail:'No spark application running'});
+            return
+          }
+          if (result.url) {
+            window.open(result.url, '_blank')
+          } else {
+            self.messageService.add({severity:'warn', summary:'', detail:result.message});
+          }
+        },
+        errorResponse => {
+          console.log('Error %o', errorResponse)
         }
-        if (res.data.body.url) {
-          window.open(res.data.body.url, '_blank')
-        } else {
-          BootstrapDialog.alert({
-            message: res.data.body.message
-          })
-        }
-      }).catch(function (res) {
-      console.log('Error %o %o', res.status, res.data ? res.data.message : '')
-    })*/
+      );
   }
 
   getInterpreterBindingModeDocsLink = function() {
@@ -654,20 +702,29 @@ export class InterpreterComponent implements OnInit {
   }
 
   getAvailableInterpreters() {
-    /*this.httpClient.get(this.baseUrlSrv.getRestApiBase() + '/interpreter').then(function (res) {
-      this.availableInterpreters = res.data.body
-    }).catch(function (res) {
-      console.log('Error %o %o', res.status, res.data ? res.data.message : '')
-    })*/
+    let self = this;
+    this.httpClient.get(this.baseUrlSrv.getRestApiBase() + '/interpreter')
+      .subscribe(
+        response => {
+          self.availableInterpreters = response['body']
+        },
+        errorResponse => {
+          console.log('Error %o', errorResponse)
+        }
+      );
   }
 
   getAvailableInterpreterPropertyWidgets() {
-    /*this.httpClient.get(this.baseUrlSrv.getRestApiBase() + '/interpreter/property/types')
-      .then(function (res) {
-        this.interpreterPropertyTypes = res.data.body
-      }).catch(function (res) {
-      console.log('Error %o %o', res.status, res.data ? res.data.message : '')
-    })*/
+    let self = this;
+    this.httpClient.get(this.baseUrlSrv.getRestApiBase() + '/interpreter/property/types')
+      .subscribe(
+        response => {
+          self.interpreterPropertyTypes = response['body']
+        },
+        errorResponse => {
+          console.log('Error %o', errorResponse)
+        }
+      );
   }
 
   emptyNewProperty(object) {
@@ -683,23 +740,27 @@ export class InterpreterComponent implements OnInit {
   }
 
   getInterpreterSettings() {
-    /*this.httpClient.get(baseUrlSrv.getRestApiBase() + '/interpreter/setting')
-      .then(function (res) {
-        $scope.interpreterSettings = res.data.body
-        this.checkDownloadingDependencies()
-      }).catch(function (res) {
-      if (res.status === 401) {
-        ngToast.danger({
-          content: 'You don\'t have permission on this page',
-          verticalPosition: 'bottom',
-          timeout: '3000'
-        })
-        setTimeout(function () {
-          window.location = baseUrlSrv.getBase()
-        }, 3000)
-      }
-      console.log('Error %o %o', res.status, res.data ? res.data.message : '')
-    })*/
+    let self = this;
+    this.httpClient.get(this.baseUrlSrv.getRestApiBase() + '/interpreter/setting')
+      .subscribe(
+        response => {
+          self.interpreterSettings = response['body']
+          self.checkDownloadingDependencies()
+        },
+        errorResponse => {
+          /*if (res.status === 401) {
+            ngToast.danger({
+              content: 'You don\'t have permission on this page',
+              verticalPosition: 'bottom',
+              timeout: '3000'
+            })
+            setTimeout(function () {
+              window.location = baseUrlSrv.getBase()
+            }, 3000)
+          }*/
+          console.log('Error %o', errorResponse)
+        }
+      );
   }
 
   checkDownloadingDependencies() {

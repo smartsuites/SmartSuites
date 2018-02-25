@@ -9,12 +9,14 @@
     <parent>
         <artifactId>smartsuites</artifactId>
         <groupId>com.smartsuites</groupId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.8</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>smartsuites-hub</artifactId>
     <packaging>war</packaging>
+
+    <name>SmartSuites: Framework: Hub</name>
 
     <properties>
         <mysql.version>5.1.6</mysql.version>

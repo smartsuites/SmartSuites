@@ -94,8 +94,6 @@ import {NoteListService} from "./service/note-list/note-list.service";
 import {NotebookRepositoryComponent} from './components/notebook-repository/notebook-repository.component';
 import {InterpreterComponent} from './components/interpreter/interpreter.component';
 import {JobmanagerComponent} from './components/jobmanager/jobmanager.component';
-import {JobComponent} from './components/jobmanager/job/job.component';
-import {WidgetComponent} from './components/interpreter/widget/widget.component';
 import {HeliumComponent} from './components/helium/helium.component';
 import {NotebookComponent} from './components/notebook/notebook.component';
 import {ParagraphComponent} from './components/notebook/paragraph/paragraph.component';
@@ -141,6 +139,7 @@ import {CommonService} from "./service/common/common.service";
 import {HeliumService} from "./service/helium/helium.service";
 import {HighlightJsModule, HighlightJsService} from "angular2-highlight-js";
 import { NoteCreateComponent } from './components/note-create/note-create.component';
+import {JobmanagerService} from "./service/job/jobmanager.service";
 
 
 @NgModule({
@@ -151,14 +150,15 @@ import { NoteCreateComponent } from './components/note-create/note-create.compon
     NotebookComponent,
     ParagraphComponent,
     CredentialComponent,
-    /*
-
-    NotebookRepositoryComponent,
     InterpreterComponent,
     JobmanagerComponent,
-    JobComponent,
-    WidgetComponent,
+    NotebookRepositoryComponent,
     HeliumComponent,
+    /*
+
+
+    JobComponent,
+
 
     SearchComponent,*/
     AppProfileComponent,
@@ -294,6 +294,7 @@ import { NoteCreateComponent } from './components/note-create/note-create.compon
     ConfirmationService,
     HeliumService,
     HighlightJsService,
+    JobmanagerService,
 
     //DEMO ONLY
     {provide: LocationStrategy, useClass: HashLocationStrategy},

@@ -97,3 +97,13 @@
   -webkit-box-shadow: 0 6px 12px rgba(0,0,0,.175);
   box-shadow: 0 6px 12px rgba(0,0,0,.175);*/
 }
+
+.fullScreen {
+  position: fixed;
+  padding: 10px;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  z-index: 6000;
+  background-color: white;
+}

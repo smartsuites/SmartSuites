@@ -43,10 +43,10 @@ const routes: Routes = [
 
 
   {path: 'login', component: LoginComponent},
-  {path: 'notebookRepos', component: NotebookRepositoryComponent},
-  {path: 'interpreter', component: InterpreterComponent},
-  {path: 'helium', component: HeliumComponent},
-  {path: 'jobmanager', component: JobmanagerComponent},
+
+
+
+
   {path: 'search/:searchTerm', component: SearchComponent},
   {path: 'notebook', component: NotebookComponent},
 
@@ -68,6 +68,10 @@ const routes: Routes = [
   {path: 'catalog', component: CatalogComponent},
   {path: 'credential', component: CredentialComponent},
   {path: 'custom', component: CustomComponent},
+  {path: 'jobmanager', component: JobmanagerComponent},
+  {path: 'interpreter', component: InterpreterComponent},
+  {path: 'notebookRepos', component: NotebookRepositoryComponent},
+  {path: 'helium', component: HeliumComponent},
 
   {path: 'home', component: DashboardDemoComponent},
   {path: 'sample', component: SampleDemoComponent},

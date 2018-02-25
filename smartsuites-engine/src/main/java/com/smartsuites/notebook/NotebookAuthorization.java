@@ -38,8 +38,13 @@ public class NotebookAuthorization {
   private static final Logger LOG = LoggerFactory.getLogger(NotebookAuthorization.class);
   private static NotebookAuthorization instance = null;
   /*
-   * { "note1": { "owners": ["u1"], "readers": ["u1", "u2"], "runners": ["u2"],
-   * "writers": ["u1"] },  "note2": ... } }
+   * { "note1": {
+   *              "owners": ["u1"],
+   *              "readers": ["u1", "u2"],
+   *              "runners": ["u2"],
+   *              "writers": ["u1"]
+   *            },
+   *   "note2": ... } }
    */
   private static Map<String, Map<String, Set<String>>> authInfo = new HashMap<>();
   /*

@@ -28,7 +28,7 @@ import javax.ws.rs.core.Response;
 import java.util.*;
 
 /**
- * Zeppelin security rest api endpoint.
+ * SmartSuites security rest api endpoint.
  */
 @Path("/security")
 @Produces("application/json")

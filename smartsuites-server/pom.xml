@@ -9,7 +9,7 @@
     <parent>
         <artifactId>smartsuites</artifactId>
         <groupId>com.smartsuites</groupId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.8</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -247,7 +247,7 @@
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
             <version>3.1</version>
-            <scope>test</scope>
+            <!--<scope>test</scope>-->
         </dependency>
 
         <dependency>
@@ -340,6 +340,7 @@
     </dependencies>
 
     <build>
+        <finalName>smartsuites-server</finalName>
 
         <!-- filter properties values -->
         <resources>
@@ -454,32 +455,82 @@
     <profiles>
 
         <profile>
-            <id>dev</id>
+            <id>develop</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
+            <properties>
+                <zeppelin.home>/Users/wuyufei/GitHub/SmartSuites/smartsuites-distribution/distribution</zeppelin.home>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-antrun-plugin</artifactId>
+                        <artifactId>maven-resources-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>copy-zeppelin-site.xml</id>
-                                <phase>compile</phase>
-                                <configuration>
-                                    <tasks>
-                                        <copy file="src/main/resources/zeppelin-site-dev.xml" tofile="${project.build.outputDirectory}/zeppelin-site.xml"/>
-                                    </tasks>
-                                </configuration>
+                                <id>copy-conf-resources</id>
+                                <phase>validate</phase>
                                 <goals>
-                                    <goal>run</goal>
+                                    <goal>copy-resources</goal>
                                 </goals>
+                                <configuration>
+                                    <outputDirectory>${basedir}/target/classes</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>${basedir}/../smartsuites-distribution/distribution/conf</directory>
+                                            <filtering>true</filtering>
+                                            <includes>
+                                                <include>zeppelin-site.xml</include>
+                                            </includes>
+                                        </resource>
+                                    </resources>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+
+        <profile>
+            <id>release</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <zeppelin.home>/</zeppelin.home>
+            </properties>
+            <!--<build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-conf-resources</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${basedir}/target/classes</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>${basedir}/../smartsuites-distribution/distribution/conf</directory>
+                                            <filtering>true</filtering>
+                                            <includes>
+                                                &lt;!&ndash;<include>**/*</include>&ndash;&gt;
+                                                <include>zeppelin-site.xml</include>
+                                            </includes>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>-->
         </profile>
 
         <!-- 用于集成测试中的路径选择 -->

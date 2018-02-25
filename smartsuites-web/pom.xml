@@ -5,7 +5,7 @@
   <parent>
     <groupId>com.smartsuites</groupId>
     <artifactId>smartsuites</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.8</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>smartsuites-web</artifactId>
@@ -35,42 +35,9 @@
     <finalName>smartsuites-web</finalName>
 
     <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-war-plugin</artifactId>
-        <configuration>
-          <warSourceDirectory>dist</warSourceDirectory>
-          <webXml>src/WEB-INF/web.xml</webXml>
-        </configuration>
-      </plugin>
 
+      <!--
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>ng-build</id>
-            <phase>prepare-package</phase>
-            <goals>
-              <goal>exec</goal>
-            </goals>
-            <configuration>
-              <executable>ng</executable>
-              <arguments>
-                <argument>build</argument>
-              </arguments>
-              <workingDirectory>${basedir}/</workingDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-      </plugin>
-
-      <!--<plugin>
         <groupId>com.github.eirslett</groupId>
         <artifactId>frontend-maven-plugin</artifactId>
         <version>${plugin.frontend.version}</version>
@@ -224,37 +191,58 @@
       </plugin>-->
 
     </plugins>
+
   </build>
 
-  <!--<profiles>
+  <profiles>
     <profile>
-      <id>web-dist</id>
+      <id>develop</id>
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
-
-      &lt;!&ndash; TODO Remove &ndash;&gt;
-      <properties>
-        <web.build.command>run build:dist</web.build.command>
-      </properties>
+      <!-- 执行AngularJS ng serve命令来进行开发 -->
     </profile>
 
-    &lt;!&ndash; TODO Remove &ndash;&gt;
     <profile>
-      <id>web-ci</id>
-      <properties>
-        <web.build.command>run build:ci</web.build.command>
-      </properties>
+      <id>release</id>
+      <build>
+        <plugins>
+          <!-- 执行AngularJS ng build命令 -->
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>ng-build</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <executable>ng</executable>
+                  <arguments>
+                    <argument>build</argument>
+                  </arguments>
+                  <workingDirectory>${basedir}/</workingDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <!-- 将Build完成的程序达成War包 -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <version>3.2.0</version>
+            <configuration>
+              <warSourceDirectory>dist</warSourceDirectory>
+              <webXml>descriptor/WEB-INF/web.xml</webXml>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
 
-    &lt;!&ndash; TODO Remove &ndash;&gt;
-    <profile>
-      <id>web-e2e</id>
-      <properties>
-        <web.e2e.disabled>false</web.e2e.disabled>
-        <web.e2e.enabled>true</web.e2e.enabled>
-      </properties>
-    </profile>
-  </profiles>-->
+  </profiles>
 
 </project>

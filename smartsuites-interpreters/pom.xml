@@ -9,7 +9,7 @@
     <parent>
         <artifactId>smartsuites</artifactId>
         <groupId>com.smartsuites</groupId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.8</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -51,7 +51,7 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>smartsuites-interpreter</artifactId>
-                <version>1.0-SNAPSHOT</version>
+                <version>1.8</version>
             </dependency>
 
             <dependency>
