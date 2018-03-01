@@ -21,7 +21,7 @@ const JobStatus = {
   RUNNING: 'RUNNING',
 }
 
-export class Paragraph{
+/*export class Paragraph{
   name:string;
   id:string;
   status:string;
@@ -35,7 +35,7 @@ export class Job{
   noteType:string;
   paragraphs:Paragraph[];
   unixTimeLastRun:string;
-}
+}*/
 
 @Component({
   selector: 'app-jobmanager',
@@ -45,6 +45,8 @@ export class Job{
 export class JobmanagerComponent implements OnInit, OnDestroy {
 
   isFilterLoaded = false
+
+  min_height = window.innerHeight - 183 + 'px'
 
   jobs = []
 
@@ -62,15 +64,7 @@ export class JobmanagerComponent implements OnInit, OnDestroy {
     isSortByAsc: true,
   }
 
-  pagination = {
-    currentPage: 1,
-    itemsPerPage: 10,
-    maxPageCount: 5,
-  }
-
   defaultInterpreters = []
-
-  cars3: Car[];
 
   constructor(private messageService: MessageService,
               private jobManagerService:JobmanagerService,
@@ -85,7 +79,7 @@ export class JobmanagerComponent implements OnInit, OnDestroy {
     self.eventService.subscribe('jobmanager:set-jobs',function (data) {
       //console.log(data)
       self.setJobs(data.jobs)
-      //self.filterJobs(this.jobs, this.filterConfig)
+      self.filterJobs(self.jobs, self.filterConfig)
     })
 
     // self.jobManagerService.subscribeUpdateJobs($scope, self.updateJobsCallback)
@@ -105,12 +99,6 @@ export class JobmanagerComponent implements OnInit, OnDestroy {
 
   setJobDateSorter(dateSorter) {
     this.sorter.currentDateSorter = dateSorter
-  }
-
-  getJobsInCurrentPage(jobs) {
-    const cp = this.pagination.currentPage
-    const itp = this.pagination.itemsPerPage
-    return jobs.slice((cp - 1) * itp, (cp * itp))
   }
 
   asyncNotebookJobFilter(jobs, filterConfig) {
@@ -160,12 +148,6 @@ export class JobmanagerComponent implements OnInit, OnDestroy {
 
     return filteredJobs
   }
-
-  /*$scope.$watch('sorter.currentDateSorter', function() {
-    $scope.filterConfig.isSortByAsc =
-      $scope.sorter.currentDateSorter === JobDateSorter.OLDEST_UPDATED
-    asyncNotebookJobFilter($scope.jobs, $scope.filterConfig)
-  })*/
 
   getJobIconByStatus(jobStatus) {
     if (jobStatus === JobStatus.READY) {
@@ -373,11 +355,11 @@ export class JobmanagerComponent implements OnInit, OnDestroy {
 
   getJobTypeIcon(noteType) {
     if (noteType === 'normal') {
-      return 'icon-doc'
+      return 'fa fa-file-text-o'
     } else if (noteType === 'cron') {
-      return 'icon-clock'
+      return 'fa fa-clock-o'
     } else {
-      return 'icon-question'
+      return 'fa fa-question-circle-o'
     }
   }
 

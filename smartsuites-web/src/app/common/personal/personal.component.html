@@ -1,0 +1,49 @@
+<div>
+  <p-fieldset legend="基本信息">
+    <div class="ui-g">
+      <div class="ui-g-4" style="text-align: center">
+        <img src="assets/login/user.png" style="width: 100px">
+        <button pButton type="button" (click)="count()" icon="fa-user" label="更改头像"></button>
+      </div>
+      <div class="ui-g-8" style="color: #2e6b92;">
+        <h3>用户名称：{{this.loginService.getLoginUsername()}}</h3>
+        <h3>用户角色：{{this.loginService.getRole()}}</h3>
+        <h3>注册时间：2018/08/08 12:12:34</h3>
+      </div>
+    </div>
+  </p-fieldset>
+  <p-fieldset legend="修改电子邮箱">
+    <div style="margin-top: 15px;">
+      <span class="ui-float-label">
+          <input id="mail" type="text" pInputText size="60">
+          <label for="mail">电子邮箱</label>
+      </span>
+    </div>
+    <div style="margin-top: 15px;">
+      <button pButton type="button" (click)="count()" icon="fa-envelope-o" label="更新"></button>
+    </div>
+  </p-fieldset>
+  <p-fieldset legend="修改密码">
+    <div style="margin-top: 15px;">
+      <span class="ui-float-label">
+          <input id="spwd" pPassword type="password" size="60">
+          <label for="spwd">原始密码</label>
+      </span>
+    </div>
+    <div style="margin-top: 25px;">
+      <span class="ui-float-label">
+          <input id="npwd" pPassword type="password" size="60">
+          <label for="npwd">新密码</label>
+      </span>
+    </div>
+    <div style="margin-top: 25px;">
+      <span class="ui-float-label">
+          <input id="cpwd" pPassword type="password" size="60">
+          <label for="cpwd">重复密码</label>
+      </span>
+    </div>
+    <div style="margin-top: 15px;">
+      <button pButton type="button" (click)="count()" icon="fa-key" label="更新"></button>
+    </div>
+  </p-fieldset>
+</div>

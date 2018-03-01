@@ -5,7 +5,8 @@
 
 <div class="login-body">
   <div class="title">
-    <h1>DATA SMART</h1>
+    <!--<h1>DATA SMART</h1>-->
+    <img src="assets/login/logo.png" style="width: 500px;margin-top: 40px">
   </div>
 
   <div class="about">
@@ -49,7 +50,7 @@
           </button>
         </div>
         <div class="ui-g-12 ui-md-6 link-pane">
-          <a (click)="this.showForgetForm()">忘记密码?</a>
+          <a (click)="this.showForgetForm()" style="cursor: pointer">忘记密码?</a>
         </div>
       </div>
     </div>
@@ -67,7 +68,7 @@
         <div class="ui-g-12" style="text-align:left;">
           <div class="ui-inputgroup">
             <span class="ui-inputgroup-addon" style="color: #000000"><i class="fa fa-envelope"></i></span>
-            <input type="text" pInputText placeholder="用户名">
+            <input type="text" pInputText placeholder="注册邮箱">
           </div>
         </div>
         <div class="ui-g-12 ui-md-6 button-pane">
@@ -77,7 +78,7 @@
           </button>
         </div>
         <div class="ui-g-12 ui-md-6 link-pane">
-          <a (click)="this.showLoginForm()">返回登录</a>
+          <a (click)="this.showLoginForm()" style="cursor: pointer">返回登录</a>
         </div>
       </div>
     </div>

@@ -99,10 +99,10 @@ import {NotebookComponent} from './components/notebook/notebook.component';
 import {ParagraphComponent} from './components/notebook/paragraph/paragraph.component';
 import {SearchComponent} from './components/search/search.component';
 import {LoginService} from "./service/login/login.service";
-import {AppProfileComponent } from './common/profile/app.profile.component';
-import {AppFooterComponent } from './common/footer/app.footer.component';
+import {AppProfileComponent} from './common/profile/app.profile.component';
+import {AppFooterComponent} from './common/footer/app.footer.component';
 import {AppMenuComponent, AppSubMenuComponent} from './common/menu/app.menu.component';
-import {AppTopbarComponent } from './common/topbar/app.topbar.component';
+import {AppTopbarComponent} from './common/topbar/app.topbar.component';
 // DEMO ONLY
 import {DashboardDemoComponent} from './demo/view/dashboarddemo.component';
 import {SampleDemoComponent} from './demo/view/sampledemo.component';
@@ -122,24 +122,27 @@ import {CarService} from './demo/service/carservice';
 import {CountryService} from './demo/service/countryservice';
 import {EventService} from './demo/service/eventservice';
 import {NodeService} from './demo/service/nodeservice';
-import { ScreenComponent } from './components/screen/screen.component';
-import { MessageService} from "primeng/components/common/messageservice";
+import {ScreenComponent} from './components/screen/screen.component';
+import {MessageService} from "primeng/components/common/messageservice";
 import {HubComponent} from "./components/hub/hub.component";
 import {AdminDashboardComponent} from "./components/admin-dashboard/admin-dashboard.component";
 import {BussDashboardComponent} from "./components/buss-dashboard/buss-dashboard.component";
 import {AnalysisDashboardComponent} from "./components/analysis-dashboard/analysis-dashboard.component";
 import {NoteVarShareService} from "./service/note-var-share/note-var-share.service";
 import {SaveAsService} from "./service/save-as/save-as.service";
-import { ResultComponent } from './components/notebook/paragraph/result/result.component';
-import { DocumentComponent } from './components/document/document.component';
+import {ResultComponent} from './components/notebook/paragraph/result/result.component';
+import {DocumentComponent} from './components/document/document.component';
 import {BlockUIModule} from "primeng/components/blockui/blockui";
-import { CatalogComponent } from './components/catalog/catalog.component';
-import { CustomComponent } from './components/custom/custom.component';
+import {CatalogComponent} from './components/catalog/catalog.component';
+import {CustomComponent} from './components/custom/custom.component';
 import {CommonService} from "./service/common/common.service";
 import {HeliumService} from "./service/helium/helium.service";
 import {HighlightJsModule, HighlightJsService} from "angular2-highlight-js";
-import { NoteCreateComponent } from './components/note-create/note-create.component';
+import {NoteCreateComponent} from './components/note-create/note-create.component';
 import {JobmanagerService} from "./service/job/jobmanager.service";
+import {NotifyComponent} from './components/notify/notify.component';
+import {NotifyService} from './service/notify/notify.service';
+import { PersonalComponent } from './common/personal/personal.component';
 
 
 @NgModule({
@@ -192,6 +195,8 @@ import {JobmanagerService} from "./service/job/jobmanager.service";
     CatalogComponent,
     CustomComponent,
     NoteCreateComponent,
+    NotifyComponent,
+    PersonalComponent,
     DocumentationComponent,
   ],
   imports: [
@@ -273,8 +278,7 @@ import {JobmanagerService} from "./service/job/jobmanager.service";
     TreeModule,
     TreeTableModule
   ],
-  entryComponents: [
-  ],
+  entryComponents: [],
   providers: [
     CommonService,
     ArrayOrderingService,
@@ -295,6 +299,7 @@ import {JobmanagerService} from "./service/job/jobmanager.service";
     HeliumService,
     HighlightJsService,
     JobmanagerService,
+    NotifyService,
 
     //DEMO ONLY
     {provide: LocationStrategy, useClass: HashLocationStrategy},

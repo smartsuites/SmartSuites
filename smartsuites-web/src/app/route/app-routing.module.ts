@@ -35,6 +35,7 @@ import {BussDashboardComponent} from "../components/buss-dashboard/buss-dashboar
 import {DocumentComponent} from "../components/document/document.component";
 import {CatalogComponent} from "../components/catalog/catalog.component";
 import {CustomComponent} from "../components/custom/custom.component";
+import {NotifyComponent} from "../components/notify/notify.component";
 
 
 const routes: Routes = [
@@ -72,6 +73,7 @@ const routes: Routes = [
   {path: 'interpreter', component: InterpreterComponent},
   {path: 'notebookRepos', component: NotebookRepositoryComponent},
   {path: 'helium', component: HeliumComponent},
+  {path: 'notify', component: NotifyComponent},
 
   {path: 'home', component: DashboardDemoComponent},
   {path: 'sample', component: SampleDemoComponent},

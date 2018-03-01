@@ -3,7 +3,7 @@ import {HttpClient} from "@angular/common/http";
 import {BaseUrlService} from "../../service/base-url/base-url.service";
 import {Car} from "../../demo/domain/car";
 import {CarService} from "../../demo/service/carservice";
-//import {NzNotificationService} from "ng-zorro-antd";
+import {MenuItem, SelectItem, TreeNode} from "primeng/primeng";
 
 @Component({
   selector: 'app-credential',
@@ -11,6 +11,65 @@ import {CarService} from "../../demo/service/carservice";
   styleUrls: ['./credential.component.css']
 })
 export class CredentialComponent implements OnInit {
+
+  min_height = window.innerHeight - 183 + 'px'
+
+  showAddNewUser = false;
+  showEditUser = false;
+  showAddDirectory = false;
+
+  visionTree: TreeNode[] = [
+    {
+      label: "根目录",
+      data: "root",
+      expandedIcon: "fa-folder-open",
+      collapsedIcon: "fa-folder",
+      expanded:true,
+      children:[]
+    }
+  ];
+  loading:boolean = true;
+  selectedTreeNode;
+
+  selectedUserTreeNodes;
+
+  addNewVisionDir(pid,dirname){
+
+  }
+
+  removeVisionDir(id){
+
+  }
+
+  // 用户的类型
+  users = [{
+    username:'admin',
+    password:'admin',
+    email:'test@123.com',
+    role:'manager',
+    timestamp:123243224,
+    interpreters:'all',
+    visions:'all'
+  }]
+
+  types: SelectItem[];
+  userType;
+
+  selectUser;
+
+  createNewUser(){
+
+  }
+
+  removeUser(){
+
+  }
+
+  editUser(){
+
+  }
+
+
 
   // 认证信息
   credentialInfo = []
@@ -42,9 +101,14 @@ export class CredentialComponent implements OnInit {
   ngOnInit() {
     this.carService.getCarsMedium().then(cars => this.cars1 = cars);
 
-
     /*this.getAvailableInterpreters()
     this.getCredentialInfo()*/
+
+    this.types = [];
+    this.types.push({label: '管理人员', value: 'manager'});
+    this.types.push({label: '分析人员', value: 'analyst'});
+    this.types.push({label: '业务人员', value: 'business'});
+
   }
 
   hasCredential(){

@@ -1,0 +1,31 @@
+<div [ngStyle]="{'height':min_height}">
+  <div class="ui-g">
+
+    <div class="ui-g-12">
+      <p-dataList [value]="this.notifyService.events" [paginator]="true" [rows]="20">
+        <p-header>
+          事件列表
+        </p-header>
+        <ng-template let-event pTemplate="item">
+
+          <div style="padding: 10px">
+            <p-panel [toggleable]="true" [collapsed]="true" (onAfterToggle)="resolveEvent(event.id)">
+              <p-header>
+                <div style="float: left;" [ngStyle]="{'color': this.notifyService.getEventColorByStatus(event.resolve,event.level)}">
+                  <i [class]="this.notifyService.getEventIconByStatus(event.level)" style="font-size: 25px;vertical-align: middle;"></i>
+                  <span style="font-size: 16px;vertical-align: middle;margin-left: 20px;">{{event.title}}</span>
+                  <span style="font-size: 12px;vertical-align: middle;margin-left: 20px;">{{event.timestamp}}</span>
+                </div>
+              </p-header>
+
+              {{event.msg}}
+
+            </p-panel>
+          </div>
+
+        </ng-template>
+      </p-dataList>
+    </div>
+  </div>
+</div>
+

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {Message} from "primeng/primeng";
 
 @Component({
@@ -9,6 +9,8 @@ import {Message} from "primeng/primeng";
 export class CustomComponent implements OnInit {
   ngOnInit(): void {
   }
+
+  min_height = window.innerHeight - 183 + 'px'
 
   msgs: Message[];
 

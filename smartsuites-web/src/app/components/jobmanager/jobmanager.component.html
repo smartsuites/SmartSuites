@@ -1,128 +1,18 @@
-<p-dialog header="创建Maven仓库" [(visible)]="showAddNewRepository" [modal]=true>
-  <!--<div id="repoModal" class="modal fade" role="dialog"
-       tabindex="-1">
-    <div class="modal-dialog">
-
-      &lt;!&ndash; Modal content&ndash;&gt;
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">Add New Repository</h4>
+<div [ngStyle]="{'height':min_height}">
+  <div class="ui-g">
+    <div class="ui-g-12">
+      <p-toolbar>
+        <div class="ui-toolbar-group-left">
+          <div class="ui-inputgroup" style="float: left; margin-right: 10px;">
+            <input type="text" pInputText placeholder="Search Jobs" [(ngModel)]="filterConfig.noteNameFilterValue"
+                   style="width: 500px" (change)="filterJobs(jobs, filterConfig)">
+            <span class="ui-inputgroup-addon"><i class="fa fa-search"></i></span>
+          </div>
         </div>
 
-        <form class="form-horizontal" ng-submit="addNewRepository()">
-          <div class="modal-body">
-            <div class="form-group">
-              <label class="control-label col-sm-2" for="repoId">ID</label>
-              <div class="col-sm-10">
-                <input type="text" class="form-control" id="repoId" ng-model="newRepoSetting.id"
-                       placeholder="Repository id" required />
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="control-label col-sm-2" for="repoUrl">URL</label>
-              <div class="col-sm-10">
-                <input type="text" pattern="(http|https|file)://.*" title="Please enter URL starts with http://, https:// or file://"
-                       class="form-control" id="repoUrl" ng-model="newRepoSetting.url"
-                       placeholder="Repository url" required />
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="control-label col-sm-2" for="repoSnapshot">Snapshot</label>
-              <div class="col-sm-10">
-                <select class="form-control"
-                        id="repoSnapshot"
-                        ng-model="newRepoSetting.snapshot"
-                        ng-options="col for col in [false,true]">
-                </select>
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="control-label col-sm-2" for="repoUsername">Username</label>
-              <div class="col-sm-10">
-                <input type="text" class="form-control" id="repoUsername" ng-model="newRepoSetting.username" />
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="control-label col-sm-2" for="repoPassword">Password</label>
-              <div class="col-sm-10">
-                <input type="password" class="form-control" id="repoPassword" ng-model="newRepoSetting.password" />
-              </div>
-            </div>
-            <hr/>
-            <div class="center-block"><h4>Proxy Settings (optional)</h4></div>
-            <br/>
-            <div class="form-group">
-              <div class="col-sm-10">
-                <label class="control-label col-sm-2" for="proxyProtocol1">Protocol</label>
-                <label class="radio-inline">
-                  <input type="radio" name="proxyProtocol" id="proxyProtocol1" value="HTTP" ng-model="newRepoSetting.proxyProtocol"/> HTTP
-                </label>
-                <label class="radio-inline">
-                  <input type="radio" name="proxyProtocol" id="proxyProtocol2" value="HTTPS" ng-model="newRepoSetting.proxyProtocol"/> HTTPS
-                </label>
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="control-label col-sm-2" for="proxyHost">Host</label>
-              <div class="col-sm-10">
-                <input type="text" class="form-control" id="proxyHost" ng-model="newRepoSetting.proxyHost" />
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="control-label col-sm-2" for="proxyPort">Port</label>
-              <div class="col-sm-10">
-                <input type="text" class="form-control" id="proxyPort" ng-model="newRepoSetting.proxyPort" />
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="control-label col-sm-2" for="proxyLogin">Login</label>
-              <div class="col-sm-10">
-                <input type="text" class="form-control" id="proxyLogin" ng-model="newRepoSetting.proxyLogin" />
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="control-label col-sm-2" for="proxyPassword">Password</label>
-              <div class="col-sm-10">
-                <input type="text" class="form-control" id="proxyPassword" ng-model="newRepoSetting.proxyPassword" />
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="submit"
-                    class="btn btn-default">Add
-            </button>
-            <button type="button" data-dismiss="modal"
-                    class="btn btn-default" ng-click="resetNewRepositorySetting()">Cancel
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>-->
+        <div class="ui-toolbar-group-right">
 
-  <p-footer>
-    <button type="button" pButton icon="fa-plus-circle" (click)="display=false" label="创建笔记"></button>
-  </p-footer>
-</p-dialog>
-
-<div class="ui-g">
-
-  <div class="ui-g-12">
-    <p-toolbar>
-      <div class="ui-toolbar-group-left">
-        <div class="ui-inputgroup" style="float: left; margin-right: 10px;">
-          <input type="text" pInputText placeholder="Search interpreters" [(ngModel)]="searchInterpreter"
-                 style="width: 500px">
-          <span class="ui-inputgroup-addon"><i class="fa fa-search"></i></span>
-        </div>
-        <button pButton type="button" pTooltip="排序" tooltipPosition="bottom" icon="fa-sort-amount-asc"
-                (click)="showAddNewSetting = !showAddNewSetting"></button>
-      </div>
-
-      <div class="ui-toolbar-group-right">
-
-        <div style="margin-top: 7px">
+          <div style="margin-top: 7px">
           <span *ngFor="let jobStatus of ['READY', 'FINISHED', 'ABORT', 'ERROR','PENDING','RUNNING']">
           <span style="margin-right: 2px;">
             <i [class]="getJobIconByStatus(jobStatus)"
@@ -130,58 +20,58 @@
             {{jobStatus}}
           </span>
         </span>
+          </div>
         </div>
-      </div>
-    </p-toolbar>
-  </div>
+      </p-toolbar>
+    </div>
 
-  <div class="ui-g-12" style="min-height: 800px">
-    <p-dataList [value]="jobs" [paginator]="true" [rows]="20">
-      <p-header>
-        Monitoring Jobs
-      </p-header>
-      <ng-template let-job pTemplate="item">
+    <div class="ui-g-12">
+      <p-dataList [value]="filteredJobs" [paginator]="true" [rows]="20">
+        <p-header>
+          监控的运行任务
+        </p-header>
+        <ng-template let-job pTemplate="item">
 
-        <div class="card card-w-title" style="border: 1px solid #dddddd;">
-          <div>
-            <!-- job control: start -->
-            <div id="{{job.noteId}}_control" class="control" style="float: right">
-              <span>{{lastExecuteTime(job.unixTimeLastRun)}}</span>
-              <span>
+          <div class="card card-w-title" style="border: 1px solid #dddddd;">
+            <div>
+              <!-- job control: start -->
+              <div id="{{job.noteId}}_control" class="control" style="float: right;font-weight: 600;color: #999999">
+                <span>{{lastExecuteTime(job.unixTimeLastRun)}}</span>
+                <span>
                 <span>{{getRunningState(job.isRunningJob)}}</span>
               </span>
-              <span *ngIf="job.isRunningJob">{{getProgress(job.paragraphs)}}</span>
+                <span *ngIf="job.isRunningJob">{{getProgress(job.paragraphs)}}</span>
 
-              <span class="job-control-btn" pTooltip="{{job.isRunningJob ? 'Start All Paragraphs' : 'Stop All Paragraphs'}}" tooltipPosition="bottom"
-                (click)="job.isRunningJob ? stopJob(job.noteId) : runJob(job.noteId)"
-                [class]="job.isRunningJob ? 'icon-control-pause' : 'icon-control-play'"
-                [ngStyle]="{'color': job.isRunningJob ? '#CD5C5C' : '#3071A9' }">
+                <span class="job-control-btn" style="cursor: pointer"
+                      (click)="job.isRunningJob ? stopJob(job.noteId) : runJob(job.noteId)"
+                      [class]="job.isRunningJob ? 'fa fa-pause-circle-o' : 'fa fa-play-circle-o'"
+                      [ngStyle]="{'color': job.isRunningJob ? '#CD5C5C' : '#3071A9' }">
               </span>
-            </div>
-            <!-- job control: end -->
+              </div>
+              <!-- job control: end -->
 
-            <span class="job-types">
+              <span class="job-types">
               <i [class]="getJobTypeIcon(job.noteType)"></i>
             </span>
 
-            <a style="text-decoration: none !important;" [routerLink]="notebook/job.noteId">
-              <span>{{job.noteName}}</span>
-              <span [ngStyle]="getInterpreterNameStyle(job.interpreter)">{{getInterpreterName(job.interpreter)}}</span>
-            </a>
+              <a style="text-decoration: none !important;font-weight: 600" [routerLink]="'/notebook/job.noteId'">
+                <span>{{job.noteName}}</span> -
+                <span [ngStyle]="getInterpreterNameStyle(job.interpreter)">{{getInterpreterName(job.interpreter)}}</span>
+              </a>
 
-            <!-- job progress bar: start -->
-            <div id="{{job.noteId}}_runControl" class="runControl">
-              <div id="{{job.noteId}}_progress" class="progress" *ngIf="job.isRunningJob === true">
-                <div class="progress-bar" role="progressbar"
-                     [ngStyle]="showPercentProgressBar(job.interpreter) ? { 'width': getProgress(job.interpreter) } : { 'width': '100%' }"
-                     [class]="showPercentProgressBar(job.interpreter) ? '' : 'progress-bar-striped active'">
+              <!-- job progress bar: start -->
+              <div id="{{job.noteId}}_runControl" class="runControl">
+                <div id="{{job.noteId}}_progress" class="progress" *ngIf="job.isRunningJob === true">
+                  <div class="progress-bar" role="progressbar"
+                       [ngStyle]="showPercentProgressBar(job.interpreter) ? { 'width': getProgress(job.interpreter) } : { 'width': '100%' }"
+                       [class]="showPercentProgressBar(job.interpreter) ? '' : 'progress-bar-striped active'">
+                  </div>
                 </div>
               </div>
+              <!-- job progress bar: end -->
             </div>
-            <!-- job progress bar: end -->
-          </div>
 
-          <div style="margin-top: 10px">
+            <div style="margin-top: 10px">
             <span *ngFor="let paragraph of job.paragraphs">
               <a style="text-decoration: none !important;" [routerLink]="'notebook/job.noteId?paragraph=paragraph.id'" >
                 <i [ngStyle]="{'color': getJobColorByStatus(paragraph.status)}"
@@ -191,9 +81,10 @@
                 </i>
               </a>
             </span>
+            </div>
           </div>
-        </div>
-      </ng-template>
-    </p-dataList>
+        </ng-template>
+      </p-dataList>
+    </div>
   </div>
 </div>

@@ -25,25 +25,13 @@
           <span class="topbar-item-role" style="font-size: 11px">{{this.loginService.getRole()}}</span>
         </a>
 
-        <ul class="layout-menu fadeInDown">
+        <ul class="layout-menu fadeInDown personal">
           <li role="menuitem">
-            <a>
+            <a (click)="showPersonalSetting = true">
               <i class="fa fa-fw fa-user"></i>
               <span>用户配置</span>
             </a>
           </li>
-          <!--<li role="menuitem">
-            <a href="#">
-              <i class="fa fa-fw fa-user-secret"></i>
-              <span>Privacy</span>
-            </a>
-          </li>
-          <li role="menuitem">
-            <a href="#">
-              <i class="fa fa-fw fa-cog"></i>
-              <span>平台配置</span>
-            </a>
-          </li>-->
           <li role="menuitem">
             <a (click)="this.loginService.logout()">
               <i class="fa fa-fw fa-sign-out"></i>
@@ -59,7 +47,7 @@
         </a>
         <ul class="layout-menu fadeInDown">
           <li role="menuitem">
-            <a href="#">
+            <a routerLink="/document">
               <i class="fa fa-fw fa-book"></i>
               <span>在线文档</span>
             </a>
@@ -97,32 +85,20 @@
       <li #notifications [ngClass]="{'active-top-menu':app.activeTopbarItem === notifications}">
         <a href="#" (click)="app.onTopbarItemClick($event,notifications)">
           <i class="topbar-icon fa fa-fw fa-bell-o"></i>
-          <span class="topbar-badge animated rubberBand">4</span>
+          <span class="topbar-badge animated rubberBand">{{this.notifyService.events.length}}</span>
           <span class="topbar-item-name">Notifications</span>
         </a>
         <ul class="layout-menu fadeInDown">
-          <li role="menuitem">
-            <a href="#">
-              <i class="fa fa-fw fa-tasks"></i>
-              <span>Pending tasks</span>
+          <li role="menuitem" *ngFor="let item of this.notifyService.top10Event">
+            <a>
+              <i [class]="this.notifyService.getEventIconByStatus(item.level)" style="vertical-align: middle;"  [ngStyle]="{'color': this.notifyService.getEventColorByStatus(item.resolve,item.level)}"></i>
+              <span>{{item.title}}</span>
             </a>
           </li>
+
           <li role="menuitem">
-            <a href="#">
-              <i class="fa fa-fw fa-calendar-check-o"></i>
-              <span>Meeting today at 3pm</span>
-            </a>
-          </li>
-          <li role="menuitem">
-            <a href="#">
-              <i class="fa fa-fw fa-download"></i>
-              <span>Download documents</span>
-            </a>
-          </li>
-          <li role="menuitem">
-            <a href="#">
-              <i class="fa fa-fw fa-plane"></i>
-              <span>Book flight</span>
+            <a routerLink="/notify">
+              <button pButton type="button" icon="fa-info-circle" label="打开详细页面" style="width: 100%;"></button>
             </a>
           </li>
         </ul>
@@ -146,27 +122,26 @@
   </div>
 </div>
 
-<p-dialog [(visible)]="display">
+<p-dialog [(visible)]="display" [modal]="true">
   <p-header>
     关于 DataSmart
   </p-header>
   <div>
-    <img src="assets/images/zepLogo.png" alt="Apache Zeppelin" title="Apache Zeppelin"/>
+    <img src="assets/login/logo.png" title="Data Smart" style="width: 600px;"/>
   </div>
-  <div>
-    <h3>DataSmart</h3>
-    <br/>
-    <span id="i18n-14">Version</span>
-    <span> {{globalService.dataSmartVersion}} </span>
-    <br/>
-    <br/>
-    <a href="http://www.baidu.com" target="_blank"><span id="i18n-15">Get involved!</span></a><br/>
-    <br/>
+
+  <div class="caption" style="text-align: center">
+    <h3>
+      <a href="http://www.baidu.com" title="DATA SMART 智能数据平台" target="_blank">DATA SMART<br><small>VER {{globalService.dataSmartVersion}}. BY @联思智云(北京)科技有限公司</small></a>
+    </h3>
+    <p>A web-based notebook that enables interactive data analytics. You can make beautiful<br/> data-driven, interactive and collaborative documents with SQL, Scala and more.</p>
   </div>
   <p-footer>
     CopyRight @2017 联思智云(北京)科技有限公司
   </p-footer>
 
+</p-dialog>
 
-
+<p-dialog header="个人账户配置" [(visible)]="showPersonalSetting" [modal]=true >
+  <app-personal></app-personal>
 </p-dialog>

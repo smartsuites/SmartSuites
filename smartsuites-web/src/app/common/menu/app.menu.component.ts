@@ -203,12 +203,13 @@ export class AppMenuComponent implements OnInit {
         {
           label: '系统配置', icon: 'fa fa-fw fa-gears',
           items: [
-            {label: '解析器配置', icon: 'fa fa-fw fa-columns', routerLink: ['/interpreter']},
-            {label: '笔记仓库', icon: 'fa fa-fw fa-code', routerLink: ['/notebookRepos']},
-            {label: '用户管理', icon: 'fa fa-fw fa-table', routerLink: ['/credential']},
-            {label: 'Helium', icon: 'fa fa-fw fa-list-alt', routerLink: ['/helium']},
-            {label: '参数配置', icon: 'fa fa-fw fa-cog', routerLink: ['/configuration']},
-            {label: '目录管理', icon: 'fa fa-fw fa-list', routerLink: ['/catalog']}
+            {label: '解析器配置管理', icon: 'fa fa-fw fa-columns', routerLink: ['/interpreter']},
+            {label: '笔记仓库管理', icon: 'fa fa-fw fa-code', routerLink: ['/notebookRepos']},
+            {label: '用户权限管理', icon: 'fa fa-fw fa-table', routerLink: ['/credential']},
+            {label: '插件配置管理', icon: 'fa fa-fw fa-list-alt', routerLink: ['/helium']},
+            /*{label: '目录管理', icon: 'fa fa-fw fa-list', routerLink: ['/catalog']},*/
+            {label: '个性化配置管理', icon: 'fa fa-fw fa-pencil-square-o', routerLink: ['/custom']},
+            {label: '参数配置管理', icon: 'fa fa-fw fa-cog', routerLink: ['/configuration']}
           ]
         },
         {
@@ -434,8 +435,7 @@ export class AppMenuComponent implements OnInit {
                   ]
                 }
               ]
-            },
-            {label: '个性化', icon: 'fa fa-fw fa-pencil-square-o', routerLink: ['/custom']},
+            }
           ]
         }/*,
         {

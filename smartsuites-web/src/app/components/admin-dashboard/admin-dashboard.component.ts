@@ -13,41 +13,51 @@ import {CommonService} from "../../service/common/common.service";
   styleUrls: ['./admin-dashboard.component.css']
 })
 export class AdminDashboardComponent implements OnInit {
-
   echarts:any
   nv:any
   d3:any
   THREE:any
 
-  // 所有的NotesList
-  notesList = []
+  interpreters = [];
 
   constructor(private carService: CarService,
               private eventService: EventService1,
               public appCom: AppComponent,
               private commonService:CommonService) {
     let self = this;
-    self.notesList = self.appCom.notes ? self.appCom.notes.flatList[0] : []
-    self.eventService.subscribe('setNoteMenu', function (notes) {
-      self.notesList = notes
-    })
 
     self.echarts = commonService._echarts
     self.nv = commonService._nv
     self.d3 = commonService._d3
     self.THREE = commonService._three
+
+    this.interpreters = [
+      {image: 'alluxio.png'},
+      {image: 'bigquery.png'},
+      {image: 'beam.png'},
+      {image: 'cassandra.png'},
+      {image: 'ealstic.png'},
+      {image: 'flink.png'},
+      {image: 'geode.png'},
+      {image: 'hbase.png'},
+      {image: 'ignite.png'},
+      {image: 'jdbc.png'},
+      {image: 'kylin.png'},
+      {image: 'neo4j.png'},
+      {image: 'pig.png'},
+      {image: 'hive.png'},
+      {image: 'hadoop.png'},
+      {image: 'scalding.png'},
+      {image: 'spark.png'}
+    ];
   }
 
   generatePieChart(){
     let self = this;
     var testdata = [
-      {key: "One", y: 5},
-      {key: "Two", y: 2},
-      {key: "Three", y: 9},
-      {key: "Four", y: 7},
-      {key: "Five", y: 4},
-      {key: "Six", y: 3},
-      {key: "Seven", y: 0.5}
+      {key: "管理人员", y: 1},
+      {key: "业务人员", y: 20},
+      {key: "分析人员", y: 9}
     ];
 
     var height = 350;
@@ -64,7 +74,7 @@ export class AdminDashboardComponent implements OnInit {
       .id('donut1'); // allow custom CSS for this one svg
 
     chart1.title("100%");
-    chart1.pie.labelsOutside(true).donut(true);
+    chart1.pie.showLabels(false).donut(true);
 
     self.d3.select('#piechart').append("svg")
       .datum(testdata)
@@ -121,6 +131,7 @@ export class AdminDashboardComponent implements OnInit {
       .rotateLabels(0)      //Angle to rotate x-axis labels.
       .showControls(true)   //Allow user to switch between 'Grouped' and 'Stacked' mode.
       .groupSpacing(0.1)    //Distance between each group of bars.
+      .stacked(true)
     ;
 
     chart.xAxis
@@ -136,7 +147,7 @@ export class AdminDashboardComponent implements OnInit {
     self.nv.utils.windowResize(chart.update);
   }
 
-  generateStackedArea(){
+  /*generateStackedArea(){
     let self = this;
     var histcatexplong = [
       {
@@ -209,9 +220,9 @@ export class AdminDashboardComponent implements OnInit {
       });
 
     self.nv.utils.windowResize(chart.update);
-  }
+  }*/
 
-  generateScatterPlusLineChart(){
+  /*generateScatterPlusLineChart(){
     let self = this;
     function randomData(groups, points) { //# groups,# points per group
       var data = [],
@@ -367,18 +378,12 @@ export class AdminDashboardComponent implements OnInit {
       .call(chart);
 
     self.nv.utils.windowResize(chart.update);
-  }
+  }*/
 
   ngOnInit() {
 
-    //this.generatePieChart()
-
     this.generateMultiBarChart()
 
-    //this.generateStackedArea()
-
-    this.generateScatterPlusLineChart()
-
-    this.generateData()
+    this.generatePieChart()
   }
 }

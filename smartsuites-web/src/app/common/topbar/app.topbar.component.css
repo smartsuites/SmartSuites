@@ -16,3 +16,7 @@
   background-image: 'assets/login/pattern.svg' !important;
 
 }
+
+.personal li{
+  cursor: pointer;
+}
