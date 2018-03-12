@@ -5,7 +5,7 @@
 package com.smartsuites.interpreter;
 
 /**
- *
+ *  一个Note某个片段的可运行任务
  */
 public abstract class InterpreterContextRunner implements Runnable {
   String noteId;

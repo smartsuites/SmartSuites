@@ -333,6 +333,12 @@ public class InterpreterSetting {
     return group;
   }
 
+  /**
+   * 主要通过生成不同的GroupID来选择是否公用一个InterpreterGroup 主要考虑 Isolated
+   * @param user
+   * @param noteId
+   * @return
+   */
   private String getInterpreterGroupId(String user, String noteId) {
     String key;
     if (option.isExistingProcess) {
@@ -347,6 +353,12 @@ public class InterpreterSetting {
     return id + ":" + key;
   }
 
+  /**
+   * 主要通过生成不同的SessionID来选择是否公用一个Interpreter实例，主要考虑scope
+   * @param user
+   * @param noteId
+   * @return
+   */
   private String getInterpreterSessionId(String user, String noteId) {
     String key;
     if (option.isExistingProcess()) {

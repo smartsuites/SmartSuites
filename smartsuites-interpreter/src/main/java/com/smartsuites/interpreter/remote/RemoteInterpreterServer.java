@@ -86,6 +86,7 @@ public class RemoteInterpreterServer
   implements RemoteInterpreterService.Iface, AngularObjectRegistryListener {
   Logger logger = LoggerFactory.getLogger(RemoteInterpreterServer.class);
 
+  // 一个远程JVM只有一个解析器组
   InterpreterGroup interpreterGroup;
   AngularObjectRegistry angularObjectRegistry;
   InterpreterHookRegistry hookRegistry;
@@ -167,6 +168,7 @@ public class RemoteInterpreterServer
           if (!interrupted) {
             CallbackInfo callbackInfo = new CallbackInfo(host, port);
             try {
+              // 向远程Master注册当前的JVM Thrift通信地址
               RemoteInterpreterUtils.registerInterpreter(callbackHost, callbackPort, callbackInfo);
             } catch (TException e) {
               logger.error("Error while registering interpreter: {}", callbackInfo, e);
@@ -242,8 +244,7 @@ public class RemoteInterpreterServer
       callbackHost = args[0];
       port = Integer.parseInt(args[1]);
     }
-    RemoteInterpreterServer remoteInterpreterServer =
-        new RemoteInterpreterServer(callbackHost, port);
+    RemoteInterpreterServer remoteInterpreterServer = new RemoteInterpreterServer(callbackHost, port);
     remoteInterpreterServer.start();
     remoteInterpreterServer.join();
     System.exit(0);
@@ -392,10 +393,8 @@ public class RemoteInterpreterServer
     }
   }
 
-
   @Override
-  public RemoteInterpreterResult interpret(String noteId, String className, String st,
-                                           RemoteInterpreterContext interpreterContext) throws TException {
+  public RemoteInterpreterResult interpret(String noteId, String className, String st,RemoteInterpreterContext interpreterContext) throws TException {
     if (logger.isDebugEnabled()) {
       logger.debug("st:\n{}", st);
     }
@@ -438,6 +437,7 @@ public class RemoteInterpreterServer
         result = new InterpreterResult(InterpreterResult.Code.KEEP_PREVIOUS_RESULT);
       }
     }
+    // 具体将结构转换为相对应的类型
     return convert(result,
         context.getConfig(),
         context.getGui());
@@ -613,8 +613,7 @@ public class RemoteInterpreterServer
         // put result into resource pool
         if (resultMessages.size() > 0) {
           int lastMessageIndex = resultMessages.size() - 1;
-          if (resultMessages.get(lastMessageIndex).getType() ==
-              InterpreterResult.Type.TABLE) {
+          if (resultMessages.get(lastMessageIndex).getType() == InterpreterResult.Type.TABLE) {
             context.getResourcePool().put(
                 context.getNoteId(),
                 context.getParagraphId(),

@@ -1,101 +1,29 @@
-<!--
-
-&lt;!&ndash;
-  ~ Copyright (c) 2017. 联思智云（北京）科技有限公司. All rights reserved.
-  &ndash;&gt;
-
-<nz-row class="submenu">
-
-  <div nz-col [nzSpan]="8" [nzOffset]="1">
-
-    <nz-breadcrumb [nzSeparator]="'>'">
-      <nz-breadcrumb-item>
-        <i class="anticon anticon-home"></i>
-      </nz-breadcrumb-item>
-      <nz-breadcrumb-item>
-        <a href="">系统配置</a>
-      </nz-breadcrumb-item>
-      <nz-breadcrumb-item>
-        <a href="">参数配置</a>
-      </nz-breadcrumb-item>
-    </nz-breadcrumb>
-
-  </div>
-
-  <div nz-col [nzSpan]="14">
-
-    <nz-input [nzType]="'search'" [nzPlaceHolder]="'input search text'" [(ngModel)]="_value" style="width: 220px; float:right; margin-left: 20px"></nz-input>
-
-    <div class="action" style="float: right;">
-      <button nz-button [nzType]="'primary'" [nzSize]="size" nz-tooltip="修改平台配置参数">
-        <i class="anticon anticon-edit"></i><span>修改配置项</span>
-      </button>
-    </div>
-
-  </div>
-
-</nz-row>
-
-<div class="configurationHead">
-  <div class="header">
-    <nz-row>
-      <div nz-col [nzSpan]="22" [nzOffset]="1">
-        <h2>
-          参数配置项
-        </h2>
-      </div>
-    </nz-row>
-    <nz-row>
-      <div nz-col [nzSpan]="22" [nzOffset]="1">
-        Shows current configurations for SmartSuites Server.<br/>
-        Note: For security reasons, some key/value pairs including passwords would not be shown.
-      </div>
-    </nz-row>
-  </div>
-</div>
-
-<nz-row class="configuration">
-  <div nz-col [nzSpan]="22" [nzOffset]="1">
-
-    <nz-table #nzTable [nzPageSize]="10" nzShowSizeChanger nzBordered>
-      <span nz-table-title>Here is Title</span>
-      <thead nz-thead>
-      <tr>
-        <th nz-th style="width: 30%"><span>配置项</span></th>
-        <th nz-th style="width: 30%"><span>配置值</span></th>
-        <th nz-th style="width: 30%"><span>配置描述</span></th>
-      </tr>
-      </thead>
-      <tbody nz-tbody>
-      <tr nz-tbody-tr *ngFor="let data of configrations">
-        <td nz-td>
-          <a>{{data.name}}</a>
-        </td>
-        <td nz-td>{{data.value}}</td>
-        <td nz-td>{{data.desc}}</td>
-      </tr>
-      </tbody>
-      <span nz-table-footer>Here is footer</span>
-    </nz-table>
-
-  </div>
-</nz-row>
-
-
-
-
--->
-
-<div class="ui-g configuration">
+<div class="ui-g configuration" [style]="{'min-height':min_height}">
   <div class="ui-g-12">
-    <p-dataTable [value]="configrations" selectionMode="single" [(selection)]="selectedItem"
-                 [responsive]="true">
-      <p-header>系统配置项</p-header>
-      <p-column field="name" header="配置项" [sortable]="false"></p-column>
-      <p-column field="value" header="配置值" [sortable]="false"></p-column>
-      <p-column field="desc" header="配置描述" [sortable]="false"></p-column>
-    </p-dataTable>
+    <!--TODO Filter-->
+    <p-panel [style]="{'margin-bottom':'10px'}">
+      <p-header>
+        <div class="ui-helper-clearfix">
+          <span class="ui-panel-title" style="font-size:16px;display:inline-block;margin-top:2px">系统配置项</span>
+
+          <button pButton style="float: right" type="button" icon="fa-edit" label="编辑" class="ui-button-info" (click)="edit=true" [disabled]="edit"></button>
+        </div>
+      </p-header>
+      <div>
+        <p-dataTable [value]="configrations" [responsive]="true" [editable]="edit">
+          <p-column field="name" header="配置项" [sortable]="false"></p-column>
+          <p-column field="value" header="配置值" [sortable]="false" [editable]="edit"></p-column>
+          <p-column field="desc" header="配置描述" [sortable]="false"></p-column>
+        </p-dataTable>
+      </div>
+      <p-footer *ngIf="edit">
+        <button pButton type="button" icon="fa-save" label="保存" class="ui-button-info"></button>
+        <button pButton type="button" icon="fa-trash-o" label="取消" class="ui-button-danger" (click)="edit=false"></button>
+      </p-footer>
+    </p-panel>
+
   </div>
 </div>
+
 
 

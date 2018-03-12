@@ -67,3 +67,7 @@
 .ui-tree{
   width: 100%;
 }
+
+.interpreterConfig .ui-datatable-footer{
+  text-align: left;
+}

@@ -138,6 +138,13 @@ public class RemoteInterpreterUtils {
     return key.matches("^[A-Z_0-9]*");
   }
 
+  /**
+   * 向Master注册Interpreter JVM Thrift的主机和端口号
+   * @param callbackHost
+   * @param callbackPort
+   * @param callbackInfo
+   * @throws TException
+   */
   public static void registerInterpreter(String callbackHost, int callbackPort,
       final CallbackInfo callbackInfo) throws TException {
     LOGGER.info("callbackHost: {}, callbackPort: {}, callbackInfo: {}", callbackHost, callbackPort,

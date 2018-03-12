@@ -146,6 +146,10 @@ public abstract class Interpreter {
     this.properties = properties;
   }
 
+  /**
+   * 将默认的属性与当前的属性合并
+   * @return
+   */
   @ZeppelinApi
   public Properties getProperties() {
     Properties p = new Properties();

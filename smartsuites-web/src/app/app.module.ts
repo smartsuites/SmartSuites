@@ -1,4 +1,5 @@
-/*
+;
+import { FilterPipe } from './pipe/filter.pipe'/*
  * Copyright (c) 2017. 联思智云（北京）科技有限公司. All rights reserved.
  */
 
@@ -197,6 +198,7 @@ import { PersonalComponent } from './common/personal/personal.component';
     NoteCreateComponent,
     NotifyComponent,
     PersonalComponent,
+    FilterPipe,
     DocumentationComponent,
   ],
   imports: [
@@ -300,6 +302,7 @@ import { PersonalComponent } from './common/personal/personal.component';
     HighlightJsService,
     JobmanagerService,
     NotifyService,
+    HeliumService,
 
     //DEMO ONLY
     {provide: LocationStrategy, useClass: HashLocationStrategy},

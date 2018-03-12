@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * 将数据从独立JVM发送回Master节点
  * Thread connection ZeppelinServer -> RemoteInterpreterServer does not provide
  * remote method invocation from RemoteInterpreterServer -> ZeppelinServer
  *
@@ -34,6 +35,8 @@ import java.util.Map;
  */
 public class RemoteInterpreterEventClient implements ResourcePoolConnector {
   private final Logger logger = LoggerFactory.getLogger(RemoteInterpreterEventClient.class);
+
+  // 提供给Master的时间队列
   private final List<RemoteInterpreterEvent> eventQueue = new LinkedList<>();
   private final List<ResourceSet> getAllResourceResponse = new LinkedList<>();
   private final Map<ResourceId, Object> getResourceResponse = new HashMap<>();

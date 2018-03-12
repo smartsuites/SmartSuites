@@ -10,8 +10,52 @@ import com.smartsuites.common.JsonSerializable;
 import java.util.Map;
 
 /**
- * Helium package definition
+ * Helium package definition 可插拔的包的定义
  */
+
+/*
+
+{
+  "type" : "SPELL",
+  "name" : "echo-spell",
+  "description" : "Return just what receive (example)",
+  "artifact" : "./zeppelin-examples/zeppelin-example-spell-echo",
+  "license" : "Apache-2.0",
+  "icon" : "<i class='fa fa-repeat'></i>",
+  "config": {
+    "repeat": {
+      "type": "number",
+      "description": "How many times to repeat",
+      "defaultValue": 1
+    }
+  },
+  "spell": {
+    "magic": "%echo",
+    "usage": "%echo <TEXT>"
+  }
+}
+
+{
+  "type" : "VISUALIZATION",
+  "name" : "zeppelin_horizontalbar",
+  "description" : "Horizontal Bar chart (example)",
+  "artifact" : "./zeppelin-examples/zeppelin-example-horizontalbar",
+  "license" : "Apache-2.0",
+  "icon" : "<i class='fa fa-bar-chart rotate90flipX'></i>"
+}
+
+{
+  "type" : "APPLICATION",
+  "name" : "zeppelin.clock",
+  "description" : "Clock (example)",
+  "artifact" : "zeppelin-examples/zeppelin-example-clock/target/zeppelin-example-clock-0.9.0-SNAPSHOT.jar",
+  "className" : "org.apache.zeppelin.example.app.clock.Clock",
+  "resources" : [[":java.util.Date"]],
+  "license" : "Apache-2.0",
+  "icon" : '<i class="fa fa-clock-o"></i>'
+}
+*/
+
 @Experimental
 public class HeliumPackage implements JsonSerializable {
   private static final Gson gson = new Gson();
@@ -70,6 +114,7 @@ public class HeliumPackage implements JsonSerializable {
     return type;
   }
 
+  // 只有前端服务才会打成 Bundle 包
   public static boolean isBundleType(HeliumType type) {
     return (type == HeliumType.VISUALIZATION ||
         type == HeliumType.SPELL);

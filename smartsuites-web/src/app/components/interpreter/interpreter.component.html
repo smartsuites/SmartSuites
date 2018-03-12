@@ -1,873 +1,340 @@
+<p-dialog header="创建解析器" [(visible)]="showAddNewSetting" [modal]=true>
+  <div style="height: 800px;overflow-y: auto">
 
-<p-dialog header="创建解析器" [(visible)]="showAddNewSetting" [modal]=true >
-  <div class="row interpreter">
-    <!--<div class="col-md-12">
-      <hr />
-      <div class="interpreterSettingAdd">
-        <h4>Create new interpreter</h4>
+    <p-fieldset legend="解析器基本属性" [toggleable]="true" [style]="{'margin-bottom': '10px'}">
 
-        <div class="form-group" style="width:200px">
-          <b>Interpreter Name</b>
-          <input id="newInterpreterSettingName" input pu-elastic-input
-                 pu-elastic-input-minwidth="180px" ng-model="newInterpreterSetting.name" />
+      <div class="ui-g">
+        <div class="ui-g-12">
+          <span class="ui-g-3">Interpreter Name</span>
+          <input class="ui-g-9" type="text" pInputText placeholder="Interpreter Name" [(ngModel)]="newInterpreterSetting.name">
         </div>
 
-        <b>Interpreter group</b>
-        <div class="form-group"
-             style="width:180px">
-          <select class="form-control input-sm" ng-model="newInterpreterSetting.group"
-                  ng-change="newInterpreterGroupChange()">
-            <option ng-repeat="availableInterpreter in availableInterpreters | unique: 'name'| orderBy: 'name'" value="{{availableInterpreter.name}}">
-              {{availableInterpreter.name}}
-            </option>
+        <div class="ui-g-12">
+          <span class="ui-g-3">Interpreter group</span>
+          <p-dropdown [options]="availableInterpretersArray" [(ngModel)]="newInterpreterSetting.group" (onChange)="newInterpreterGroupChange()"></p-dropdown>
+        </div>
+      </div>
+
+    </p-fieldset>
+
+    <p-fieldset legend="解析器模式" [toggleable]="true" [style]="{'margin-bottom': '10px'}">
+
+      <div class="ui-g">
+        <div class="ui-g-12">
+
+          The interpreter will be instantiated
+
+          <select #instance (change)="onInstanceModeChange(instance.value)">
+            <option value="Globally" [selected]="getInterpreterRunningOption() == 'Globally'">Globally</option>
+            <option value="Per Note" [selected]="getInterpreterRunningOption() == 'Per Note'">Per Note</option>
+            <option value="Per User" [selected]="getInterpreterRunningOption() == 'Per User'" *ngIf="this.globalService.ticket.principal !== 'anonymous'">Per User</option>
           </select>
-        </div>
 
-        <div>
-          <h5>Option</h5>
-          <div class="row interpreter" style="margin-top: 5px;">
-            <div class="col-md-6">
-              The interpreter will be instantiated
-              <span class="btn-group">
-              <button type="button" class="btn btn-default btn-xs dropdown-toggle"
-                      data-toggle="dropdown">
-                {{getInterpreterRunningOption(setting.id)}} <span class="caret"></span>
-              </button>
-              <ul class="dropdown-menu" role="menu">
-                <li>
-                  <a style="cursor:pointer"
-                     ng-click="setInterpreterRunningOption(setting.id, 'shared', 'shared')">
-                    Globally
-                  </a>
-                </li>
-                <li>
-                  <a style="cursor:pointer"
-                     ng-click="setInterpreterRunningOption(setting.id, 'scoped', '')">
-                    Per Note
-                  </a>
-                </li>
-                <li ng-if="ticket.principal !== 'anonymous'">
-                  <a style="cursor:pointer"
-                     ng-click="setInterpreterRunningOption(setting.id, 'shared', 'scoped')">
-                    Per User
-                  </a>
-                </li>
-              </ul>
-            </span>
-              in
-              <span class="btn-group">
-              <button type="button" class="btn btn-default btn-xs dropdown-toggle"
-                      data-toggle="dropdown"
-                      ng-disabled="getInterpreterRunningOption(setting.id) === 'Globally'">
-                <span ng-if="getInterpreterRunningOption(setting.id) !== 'Per User'">
-                  {{getPerNoteOption(setting.id)}}
+          in
+
+          <select #option (change)="onOptionModeChange(option.value)">
+            <option value="shared per note" *ngIf="getInterpreterRunningOption() === 'Globally'" [selected]="getOption() === 'shared per note'"
+                    pTooltip="Single interpreter instance are shared across notes">shared per note</option>
+            <option value="scoped per note" *ngIf="getInterpreterRunningOption() === 'Per Note'"  [selected]="getOption() === 'scoped per note'"
+                    pTooltip="Separate Interpreter instance for each note">scoped per note</option>
+            <option value="scoped per user" *ngIf="getInterpreterRunningOption() === 'Per User'"  [selected]="getOption() === 'scoped per user'"
+                    pTooltip="Separate Interpreter instance for each note">scoped per user</option>
+            <option value="isolated per note" *ngIf="getInterpreterRunningOption() === 'Per Note'"  [selected]="getOption() === 'isolated per note'"
+                    pTooltip="Separate Interpreter process for each note">isolated per note</option>
+            <option value="isolated per user" *ngIf="getInterpreterRunningOption() === 'Per User'"  [selected]="getOption() === 'isolated per user'"
+                    pTooltip="Separate Interpreter process for each note">isolated per user</option>
+          </select>
+
+          process
+
+          <a class="fa fa-info-circle interpreter-binding-mode-info-link"
+             ptooltip="Can manage interpreter sessions differently by setting this option. Click this button to learn more"
+             href="{{getInterpreterBindingModeDocsLink()}}" target="_blank"></a>
+
+          <span *ngIf="getInterpreterRunningOption() === 'Per User' && this.globalService.ticket.principal !== 'anonymous'">
+                <span *ngIf="getPerNoteOption() === 'shared'">
+                  <button type="button" class="btn btn-default btn-xs"
+                          (click)="setPerNoteOption('scoped')">
+                    <i class="fa fa-plus"></i>
+                  </button>
                 </span>
-                <span ng-if="getInterpreterRunningOption(setting.id) === 'Per User'">
-                  {{getPerUserOption(setting.id)}}
-                </span>
-                  <span class="caret"></span>
-              </button>
-              <ul class="dropdown-menu" role="menu">
-                <li
-                  ng-if="getInterpreterRunningOption(setting.id) === 'Globally'">
-                  <a style="cursor:pointer"
-                     uib-tooltip="Single interpreter instance are shared across notes"
-                     ng-click="setPerNoteOption(setting.id, 'shared')">
-                    shared per note
-                  </a>
-                </li>
-
-                <li>
-                  <a style="cursor:pointer"
-                     ng-if="getInterpreterRunningOption(setting.id) === 'Per Note'"
-                     uib-tooltip="Separate Interpreter instance for each note"
-                     ng-click="setPerNoteOption(setting.id, 'scoped')">
-                    scoped per note
-                  </a>
-                </li>
-                <li>
-                  <a style="cursor:pointer"
-                     ng-if="getInterpreterRunningOption(setting.id) === 'Per User'"
-                     uib-tooltip="Separate Interpreter instance for each note"
-                     ng-click="setPerUserOption(setting.id, 'scoped')">
-                    scoped per user
-                  </a>
-                </li>
-
-                <li>
-                  <a style="cursor:pointer"
-                     ng-if="getInterpreterRunningOption(setting.id) === 'Per Note'"
-                     uib-tooltip="Separate Interpreter process for each note"
-                     ng-click="setPerNoteOption(setting.id, 'isolated')">
-                    isolated per note
-                  </a>
-                </li>
-                <li>
-                  <a style="cursor:pointer"
-                     ng-if="getInterpreterRunningOption(setting.id) === 'Per User'"
-                     uib-tooltip="Separate Interpreter process for each note"
-                     ng-click="setPerUserOption(setting.id, 'isolated')">
-                    isolated per user
-                  </a>
-                </li>
-              </ul>
-            </span>
-              process
-              <a class="fa fa-info-circle interpreter-binding-mode-info-link"
-                 aria-hidden="true"
-                 uib-tooltip="Can manage interpreter sessions differently by setting this option. Click this button to learn more"
-                 ng-href="{{getInterpreterBindingModeDocsLink()}}" target="_blank"></a>
-              <span ng-if="getInterpreterRunningOption(setting.id) === 'Per User' && ticket.principal !== 'anonymous'">
-              <span ng-if="getPerNoteOption(setting.id) === 'shared'">
-                <button type="button" class="btn btn-default btn-xs"
-                        ng-click="setPerNoteOption(setting.id, 'scoped')"
-                        data-toggle="dropdown">
-                  <i class="fa fa-plus"></i>
-                </button>
               </span>
-            </span>
-            </div>
-          </div>
+
           <div class="row interpreter"
                style="margin-top: 6px;"
-               ng-if="getInterpreterRunningOption(setting.id) === 'Per User'
-                      && ticket.principal !== 'anonymous'
-                      && getPerNoteOption(setting.id) !== 'shared'">
+               *ngIf="getInterpreterRunningOption() === 'Per User' && this.globalService.ticket.principal != 'anonymous' && getPerNoteOption() !== 'shared'">
             <div class="col-md-12">
-              <span>
-                <span class="hidden-xs" style="padding-left: 190px;">And </span>
-                <span class="visible-xs" style="padding-left: 0px;">And </span>
-                <span class="btn-group">
-                  <button type="button" class="btn btn-default btn-xs dropdown-toggle"
-                          data-toggle="dropdown"
-                          ng-disabled="true">
-                    <span>
-                      Per Note
-                    </span>
-                    <span class="caret"></span>
-                  </button>
-                </span>
-                in
-                <span class="btn-group">
-                  <button type="button" class="btn btn-default btn-xs dropdown-toggle"
-                          data-toggle="dropdown">
-                    <span>
-                      {{getPerNoteOption(setting.id)}}
-                    </span>
-                    <span class="caret"></span>
-                  </button>
-                  <ul class="dropdown-menu" role="menu">
-                    <li>
-                      <a style="cursor:pointer"
-                         uib-tooltip="Separate Interpreter instance for each note"
-                         ng-click="setPerNoteOption(setting.id, 'scoped')">
-                        scoped per note
-                      </a>
-                    </li>
-                    <li>
-                      <a style="cursor:pointer"
-                         uib-tooltip="Separate Interpreter process for each note"
-                         ng-click="setPerNoteOption(setting.id, 'isolated')">
-                        isolated per note
-                      </a>
-                    </li>
-                  </ul>
-                </span>
-                process.
-                <button type="button" class="btn btn-default btn-xs"
-                        ng-click="setPerNoteOption(setting.id, 'shared')"
-                        data-toggle="dropdown">
-                  <i class="fa fa-minus"></i>
-                </button>
-              </span>
-            </div>
-          </div>
-        </div>
-        <div class="row interpreter" style="margin-top: 5px;"
-             ng-show="getInterpreterRunningOption(setting.id)=='Per User' && getPerUserOption(setting.id)=='isolated'">
-          <div class="col-md-12">
-            <div class="checkbox remove-margin-top-bottom">
-          <span class="input-group" style="line-height:30px;">
-            <label>
-              <input type="checkbox" style="width:20px" ng-model="newInterpreterSetting.option.isUserImpersonate" />
-                User Impersonate
-            </label>
-          </span>
-            </div>
-          </div>
-        </div>
-        <div class="row interpreter">
-          <div class="col-md-12">
-            <div class="checkbox remove-margin-top-bottom">
-          <span class="input-group" style="line-height:30px;">
-            <label>
-              <input type="checkbox" style="width:20px" id="isExistingProcess" ng-model="newInterpreterSetting.option.isExistingProcess"/>
-              Connect to existing process
-            </label>
-          </span>
-            </div>
-          </div>
-        </div>
-        <div class="row interpreter" ng-show="newInterpreterSetting.option.isExistingProcess" >
-          <div class="col-md-12">
-            <b>Host</b>
-            <input id="newInterpreterSettingHost" input pu-elastic-input
-                   pu-elastic-input-minwidth="180px" ng-model="newInterpreterSetting.option.host"/>
-          </div>
-          <div class="col-md-12">
-            <b>Port</b>
-            <input id="newInterpreterSettingPort" input pu-elastic-input
-                   pu-elastic-input-minwidth="180px" ng-model="newInterpreterSetting.option.port"/>
-          </div>
-        </div>
-        <div class="row interpreter">
-          <div class="col-md-12">
-            <div class="checkbox remove-margin-top-bottom">
-          <span class="input-group" style="line-height:30px;">
-            <label>
-              <input type="checkbox" style="width:20px !important" id="idShowPermission" ng-click="togglePermissions('newInterpreter')" ng-model="newInterpreterSetting.option.setPermission"/>
-               Set permission
-            </label>
-          </span>
-            </div>
-          </div>
-        </div>
-        <br/>
+                  <span>
+                    <span class="hidden-xs" style="padding-left: 190px;">And </span>
+                    <span class="visible-xs" style="padding-left: 0px;">And </span>
 
-        <div class="row interpreter">
-          <div class="col-md-12">
-            &lt;!&ndash; permissions &ndash;&gt;
-            <div ng-show="newInterpreterSetting.option.setPermission" class="permissionsForm">
-              <div>
-                <p>
-                  Enter comma separated users and groups in the fields. <br />
-                  Empty field (*) implies anyone can run this interpreter.
-                </p>
-                <div>
-                  <span class="owners">Owners </span>
-                  <select id="newInterpreterOwners" class="form-control" multiple="multiple">
-                    <option ng-repeat="owner in newInterpreterSetting.option.owners" selected="selected">{{owner}}</option>
-                  </select>
-                </div>
-              </div>
+                    <select disabled="true">
+                      <option value="Per Note" selected="true">Per Note</option>
+                    </select>
+
+                    in
+
+                    <select #option1 (change)="onOptionModeChange(option1.value)">
+                      <option value="scoped per note" [selected]="getPerNoteOption() === 'scoped per note'"
+                              pTooltip="Separate Interpreter instance for each note">scoped per note</option>
+                      <option value="isolated per note" [selected]="getPerNoteOption() === 'isolated per note'"
+                              pTooltip="Separate Interpreter process for each note">isolated per note</option>
+                    </select>
+
+                    process
+
+                    <a class="fa fa-info-circle interpreter-binding-mode-info-link"
+                       pTooltip="Can manage interpreter sessions differently by setting this option. Click this button to learn more"
+                       href="{{getInterpreterBindingModeDocsLink()}}" target="_blank"></a>
+
+                    <button type="button" class="btn btn-default btn-xs"
+                            [disabled]="!isCurrentEdit(setting.id)"
+                            (click)="setPerNoteOption('shared')">
+                      <i class="fa fa-minus"></i>
+                    </button>
+                  </span>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="ui-g-12" *ngIf="getInterpreterRunningOption()=='Per User' && getPerUserOption()=='isolated'">
+          <p-checkbox label="User Impersonate" binary="true" [(ngModel)]="newInterpreterSetting.option.isUserImpersonate"></p-checkbox>
+        </div>
+
+        <div class="ui-g-12">
+          <p-checkbox label="Connect to existing process" binary="true" [(ngModel)]="newInterpreterSetting.option.isExistingProcess"></p-checkbox>
+          <!-- ExistingProcess -->
+          <div class="ui-g" *ngIf="newInterpreterSetting.option.isExistingProcess">
+            <div class="ui-g-6">
+              <h3>远程主机：</h3>
+              <span class="ui-float-label">
+                      <input id="ninterpreterSettingHost" type="text" pInputText [(ngModel)]="newInterpreterSetting.option.host" style="width: 100%">
+                      <label for="ninterpreterSettingHost">Host</label>
+                  </span>
+            </div>
+            <div class="ui-g-6">
+              <h3>主机端口：</h3>
+              <span class="ui-float-label">
+                      <input id="ninterpreterSettingPort" type="text" pInputText [(ngModel)]="newInterpreterSetting.option.port" style="width: 100%">
+                      <label for="ninterpreterSettingPort">Port</label>
+                  </span>
             </div>
           </div>
         </div>
 
-        <div>
-          <h5>Properties</h5>
-          <table class="table table-striped properties">
-            <tr>
-              <th>name</th>
-              <th>value</th>
-              <th>action</th>
-              <th>description</th>
-            </tr>
-            <tr ng-repeat="key in newInterpreterSetting.properties | sortByKey">
-              <td>{{key}}</td>
-              <td style="vertical-align: middle;">
-                <textarea ng-if="newInterpreterSetting.properties[key].type === 'textarea'"
-                          msd-elastic ng-model="newInterpreterSetting.properties[key].value"></textarea>
-                <input ng-if="newInterpreterSetting.properties[key].type === 'string'"
-                       type="text" msd-elastic ng-model="newInterpreterSetting.properties[key].value" />
-                <input ng-if="newInterpreterSetting.properties[key].type === 'number'"
-                       type="text" number-widget msd-elastic ng-model="newInterpreterSetting.properties[key].value" />
-                <input ng-if="newInterpreterSetting.properties[key].type === 'url'"
-                       type="text" msd-elastic ng-model="newInterpreterSetting.properties[key].value" />
-                <input ng-if="newInterpreterSetting.properties[key].type === 'password'"
-                       type="password" msd-elastic ng-model="newInterpreterSetting.properties[key].value" />
-                <input ng-if="newInterpreterSetting.properties[key].type === 'checkbox'"
-                       type="checkbox" msd-elastic ng-model="newInterpreterSetting.properties[key].value" />
-              </td>
-              <td style="vertical-align: middle;">
-                <button class="btn btn-default btn-sm fa fa-remove" ng-click="removeInterpreterProperty(key)">
-                </button>
-              </td>
-              <td style="vertical-align: middle;">
-                {{newInterpreterSetting.properties[key].description}}
-              </td>
-            </tr>
+        <div class="ui-g-12">
+          <p-checkbox label="Set permission" binary="true" [(ngModel)]="newInterpreterSetting.option.setPermission"></p-checkbox>
+          <!-- permissions -->
+          <div *ngIf="newInterpreterSetting.option.setPermission">
 
-            <tr>
-              <td style="vertical-align: middle;">
-                <input pu-elastic-input pu-elastic-input-minwidth="180px"
-                       ng-model="newInterpreterSetting.propertyKey" />
-              </td>
-              <td style="vertical-align: middle;" ng-switch on="newInterpreterSetting.propertyType">
-                <textarea ng-switch-default msd-elastic ng-model="newInterpreterSetting.propertyValue"></textarea>
-                <input ng-switch-when="string" type="text" msd-elastic ng-model="newInterpreterSetting.propertyValue" />
-                <input ng-switch-when="number" type="text" number-widget msd-elastic ng-model="newInterpreterSetting.propertyValue" />
-                <input ng-switch-when="url" type="text" msd-elastic ng-model="newInterpreterSetting.propertyValue" />
-                <input ng-switch-when="password" type="password" msd-elastic ng-model="newInterpreterSetting.propertyValue" />
-                <input ng-switch-when="checkbox" type="checkbox" msd-elastic ng-model="newInterpreterSetting.propertyValue" />
-              </td>
-              <td style="vertical-align: middle;">
-                <select msd-elastic ng-model="newInterpreterSetting.propertyType" ng-init="newInterpreterSetting.propertyType=interpreterPropertyTypes[0]"
-                        ng-options="item for item in interpreterPropertyTypes" ng-change="defaultValueByType(newInterpreterSetting)">
-                </select>
-                <button class="btn btn-default btn-sm fa fa-plus" ng-click="addNewInterpreterProperty()">
-                </button>
-              </td>
-              <td></td>
-            </tr>
-          </table>
+            <p>Enter comma separated users and groups in the fields. Empty field (*) implies anyone can run this interpreter.</p>
+
+            <p-multiSelect id="nowners" [options]="newInterpreterSetting.option.owners" [(ngModel)]="selectedUsers" [panelStyle]="{width:'40em'}"></p-multiSelect>
+
+            <!--<select id="{{setting.name}}Owners" class="form-control" multiple="multiple" [disabled]="!isCurrentEdit(setting.id)">
+              <option *ngFor="let owner of setting.option.owners" selected="selected">{{owner}}</option>
+            </select>-->
+
+          </div>
         </div>
 
-        <div>
-          <h5>Dependencies</h5>
-          <table class="table table-striped properties">
-            <tr>
-              <th>artifact</th>
-              <th>exclude</th>
-              <th>action</th>
-            </tr>
-
-            <tr ng-repeat="dep in newInterpreterSetting.dependencies">
-              <td>
-                <input ng-model="dep.groupArtifactVersion" style="width:100%" />
-              </td>
-              <td>
-                <textarea msd-elastic ng-model="dep.exclusions"
-                          ng-list
-                          placeholder="(Optional) comma separated groupId:artifactId list">
-                </textarea>
-              </td>
-              <td>
-                <button class="btn btn-default btn-sm fa fa-remove"
-                        ng-click="removeInterpreterDependency(dep.groupArtifactVersion)">
-                </button>
-              </td>
-            </tr>
-
-            <tr>
-              <td>
-                <input ng-model="newInterpreterSetting.depArtifact"
-                       placeholder="groupId:artifactId:version or local file path"
-                       style="width: 100%" />
-              </td>
-              <td>
-                <textarea msd-elastic ng-model="newInterpreterSetting.depExclude"
-                          ng-list
-                          placeholder="(Optional) comma separated groupId:artifactId list">
-                </textarea>
-              </td>
-              <td>
-                <button class="btn btn-default btn-sm fa fa-plus" ng-click="addNewInterpreterDependency()">
-                </button>
-              </td>
-            </tr>
-          </table>
-        </div>
-
-        <span class="btn btn-primary" ng-click="addNewInterpreterSetting()">
-          Save
-        </span>
-        <span class="btn btn-default" ng-click="cancelInterpreterSetting()">
-          Cancel
-        </span>
       </div>
-    </div>-->
+
+    </p-fieldset>
+
+    <p-fieldset legend="解析器属性" [toggleable]="true" [style]="{'margin-bottom': '10px'}">
+
+      <div class="ui-g">
+        <table class="interPro ui-g-12">
+          <thead>
+          <tr>
+            <th style="width:30%">配置项</th>
+            <th style="width:30%">配置值</th>
+            <th style="width:30%">描述</th>
+            <th style="width:10%;text-align: center">动作</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let key of getKeys(newInterpreterSetting.properties)">
+            <td>{{key}}</td>
+            <td><input type="text" style="width: 100%;" pInputText [(ngModel)]="newInterpreterSetting.properties[key].value"></td>
+            <td>{{newInterpreterSetting.properties[key].description}}</td>
+            <td style="text-align: center"><button type="button" pButton (click)="removeInterpreterProperty(key)" icon="fa-remove"></button></td>
+          </tr>
+          </tbody>
+
+        </table>
+      </div>
+
+      <button pButton type="button" icon="fa-plus" label="添加新属性" class="ui-button-info" (click)="showAddNewPro=true"></button>
+
+
+    </p-fieldset>
+    <p-fieldset legend="类路径依赖" [toggleable]="true">
+
+      <div class="ui-g">
+        <table class="interPro ui-g-12">
+          <thead>
+          <tr>
+            <th style="width:40%">依赖Jar包</th>
+            <th style="width:50%">移除包（逗号分隔）</th>
+            <th style="width:10%;text-align: center">动作</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let dep of newInterpreterSetting.dependencies">
+            <td><input type="text" style="width: 100%;" pInputText [(ngModel)]="dep.groupArtifactVersion"></td>
+            <td><input type="text" style="width: 100%;" pInputText [(ngModel)]="dep.exclusions"></td>
+            <td style="text-align: center"><button type="button" pButton (click)="removeInterpreterDependency(dep.groupArtifactVersion)" icon="fa-remove"></button></td>
+          </tr>
+          </tbody>
+
+        </table>
+      </div>
+
+      <button pButton type="button" icon="fa-plus" label="添加新依赖" class="ui-button-info" (click)="showAddNewDep=true"></button>
+
+    </p-fieldset>
+
   </div>
 
   <p-footer>
-    <button type="button" pButton icon="fa-plus-circle" (click)="display=false" label="创建笔记"></button>
+    <button type="button" pButton icon="fa-plus-circle" (click)="showAddNewSetting=false;addNewInterpreterSetting()" label="创建"></button>
+    <button type="button" pButton icon="fa-minus-circle" (click)="showAddNewSetting=false;cancelInterpreterSetting()" label="删除"></button>
   </p-footer>
 </p-dialog>
 
-<p-dialog header="编辑解析器配置" [(visible)]="showEditSetting" [modal]=true >
-  <div class="row interpreter">
-    <!--<div class="col-md-12">
-      <hr />
-      <div class="interpreterSettingAdd">
-        <h4>Create new interpreter</h4>
+<p-dialog header="创建Maven仓库" [(visible)]="showAddNewRepository" [modal]=true>
 
-        <div class="form-group" style="width:200px">
-          <b>Interpreter Name</b>
-          <input id="newInterpreterSettingName" input pu-elastic-input
-                 pu-elastic-input-minwidth="180px" ng-model="newInterpreterSetting.name" />
-        </div>
+  <p-fieldset legend="仓库设置" [style]="{'margin-bottom': '10px'}">
 
-        <b>Interpreter group</b>
-        <div class="form-group"
-             style="width:180px">
-          <select class="form-control input-sm" ng-model="newInterpreterSetting.group"
-                  ng-change="newInterpreterGroupChange()">
-            <option ng-repeat="availableInterpreter in availableInterpreters | unique: 'name'| orderBy: 'name'" value="{{availableInterpreter.name}}">
-              {{availableInterpreter.name}}
-            </option>
-          </select>
-        </div>
-
-        <div>
-          <h5>Option</h5>
-          <div class="row interpreter" style="margin-top: 5px;">
-            <div class="col-md-6">
-              The interpreter will be instantiated
-              <span class="btn-group">
-              <button type="button" class="btn btn-default btn-xs dropdown-toggle"
-                      data-toggle="dropdown">
-                {{getInterpreterRunningOption(setting.id)}} <span class="caret"></span>
-              </button>
-              <ul class="dropdown-menu" role="menu">
-                <li>
-                  <a style="cursor:pointer"
-                     ng-click="setInterpreterRunningOption(setting.id, 'shared', 'shared')">
-                    Globally
-                  </a>
-                </li>
-                <li>
-                  <a style="cursor:pointer"
-                     ng-click="setInterpreterRunningOption(setting.id, 'scoped', '')">
-                    Per Note
-                  </a>
-                </li>
-                <li ng-if="ticket.principal !== 'anonymous'">
-                  <a style="cursor:pointer"
-                     ng-click="setInterpreterRunningOption(setting.id, 'shared', 'scoped')">
-                    Per User
-                  </a>
-                </li>
-              </ul>
-            </span>
-              in
-              <span class="btn-group">
-              <button type="button" class="btn btn-default btn-xs dropdown-toggle"
-                      data-toggle="dropdown"
-                      ng-disabled="getInterpreterRunningOption(setting.id) === 'Globally'">
-                <span ng-if="getInterpreterRunningOption(setting.id) !== 'Per User'">
-                  {{getPerNoteOption(setting.id)}}
-                </span>
-                <span ng-if="getInterpreterRunningOption(setting.id) === 'Per User'">
-                  {{getPerUserOption(setting.id)}}
-                </span>
-                  <span class="caret"></span>
-              </button>
-              <ul class="dropdown-menu" role="menu">
-                <li
-                  ng-if="getInterpreterRunningOption(setting.id) === 'Globally'">
-                  <a style="cursor:pointer"
-                     uib-tooltip="Single interpreter instance are shared across notes"
-                     ng-click="setPerNoteOption(setting.id, 'shared')">
-                    shared per note
-                  </a>
-                </li>
-
-                <li>
-                  <a style="cursor:pointer"
-                     ng-if="getInterpreterRunningOption(setting.id) === 'Per Note'"
-                     uib-tooltip="Separate Interpreter instance for each note"
-                     ng-click="setPerNoteOption(setting.id, 'scoped')">
-                    scoped per note
-                  </a>
-                </li>
-                <li>
-                  <a style="cursor:pointer"
-                     ng-if="getInterpreterRunningOption(setting.id) === 'Per User'"
-                     uib-tooltip="Separate Interpreter instance for each note"
-                     ng-click="setPerUserOption(setting.id, 'scoped')">
-                    scoped per user
-                  </a>
-                </li>
-
-                <li>
-                  <a style="cursor:pointer"
-                     ng-if="getInterpreterRunningOption(setting.id) === 'Per Note'"
-                     uib-tooltip="Separate Interpreter process for each note"
-                     ng-click="setPerNoteOption(setting.id, 'isolated')">
-                    isolated per note
-                  </a>
-                </li>
-                <li>
-                  <a style="cursor:pointer"
-                     ng-if="getInterpreterRunningOption(setting.id) === 'Per User'"
-                     uib-tooltip="Separate Interpreter process for each note"
-                     ng-click="setPerUserOption(setting.id, 'isolated')">
-                    isolated per user
-                  </a>
-                </li>
-              </ul>
-            </span>
-              process
-              <a class="fa fa-info-circle interpreter-binding-mode-info-link"
-                 aria-hidden="true"
-                 uib-tooltip="Can manage interpreter sessions differently by setting this option. Click this button to learn more"
-                 ng-href="{{getInterpreterBindingModeDocsLink()}}" target="_blank"></a>
-              <span ng-if="getInterpreterRunningOption(setting.id) === 'Per User' && ticket.principal !== 'anonymous'">
-              <span ng-if="getPerNoteOption(setting.id) === 'shared'">
-                <button type="button" class="btn btn-default btn-xs"
-                        ng-click="setPerNoteOption(setting.id, 'scoped')"
-                        data-toggle="dropdown">
-                  <i class="fa fa-plus"></i>
-                </button>
-              </span>
-            </span>
-            </div>
-          </div>
-          <div class="row interpreter"
-               style="margin-top: 6px;"
-               ng-if="getInterpreterRunningOption(setting.id) === 'Per User'
-                      && ticket.principal !== 'anonymous'
-                      && getPerNoteOption(setting.id) !== 'shared'">
-            <div class="col-md-12">
-              <span>
-                <span class="hidden-xs" style="padding-left: 190px;">And </span>
-                <span class="visible-xs" style="padding-left: 0px;">And </span>
-                <span class="btn-group">
-                  <button type="button" class="btn btn-default btn-xs dropdown-toggle"
-                          data-toggle="dropdown"
-                          ng-disabled="true">
-                    <span>
-                      Per Note
-                    </span>
-                    <span class="caret"></span>
-                  </button>
-                </span>
-                in
-                <span class="btn-group">
-                  <button type="button" class="btn btn-default btn-xs dropdown-toggle"
-                          data-toggle="dropdown">
-                    <span>
-                      {{getPerNoteOption(setting.id)}}
-                    </span>
-                    <span class="caret"></span>
-                  </button>
-                  <ul class="dropdown-menu" role="menu">
-                    <li>
-                      <a style="cursor:pointer"
-                         uib-tooltip="Separate Interpreter instance for each note"
-                         ng-click="setPerNoteOption(setting.id, 'scoped')">
-                        scoped per note
-                      </a>
-                    </li>
-                    <li>
-                      <a style="cursor:pointer"
-                         uib-tooltip="Separate Interpreter process for each note"
-                         ng-click="setPerNoteOption(setting.id, 'isolated')">
-                        isolated per note
-                      </a>
-                    </li>
-                  </ul>
-                </span>
-                process.
-                <button type="button" class="btn btn-default btn-xs"
-                        ng-click="setPerNoteOption(setting.id, 'shared')"
-                        data-toggle="dropdown">
-                  <i class="fa fa-minus"></i>
-                </button>
-              </span>
-            </div>
-          </div>
-        </div>
-        <div class="row interpreter" style="margin-top: 5px;"
-             ng-show="getInterpreterRunningOption(setting.id)=='Per User' && getPerUserOption(setting.id)=='isolated'">
-          <div class="col-md-12">
-            <div class="checkbox remove-margin-top-bottom">
-          <span class="input-group" style="line-height:30px;">
-            <label>
-              <input type="checkbox" style="width:20px" ng-model="newInterpreterSetting.option.isUserImpersonate" />
-                User Impersonate
-            </label>
-          </span>
-            </div>
-          </div>
-        </div>
-        <div class="row interpreter">
-          <div class="col-md-12">
-            <div class="checkbox remove-margin-top-bottom">
-          <span class="input-group" style="line-height:30px;">
-            <label>
-              <input type="checkbox" style="width:20px" id="isExistingProcess" ng-model="newInterpreterSetting.option.isExistingProcess"/>
-              Connect to existing process
-            </label>
-          </span>
-            </div>
-          </div>
-        </div>
-        <div class="row interpreter" ng-show="newInterpreterSetting.option.isExistingProcess" >
-          <div class="col-md-12">
-            <b>Host</b>
-            <input id="newInterpreterSettingHost" input pu-elastic-input
-                   pu-elastic-input-minwidth="180px" ng-model="newInterpreterSetting.option.host"/>
-          </div>
-          <div class="col-md-12">
-            <b>Port</b>
-            <input id="newInterpreterSettingPort" input pu-elastic-input
-                   pu-elastic-input-minwidth="180px" ng-model="newInterpreterSetting.option.port"/>
-          </div>
-        </div>
-        <div class="row interpreter">
-          <div class="col-md-12">
-            <div class="checkbox remove-margin-top-bottom">
-          <span class="input-group" style="line-height:30px;">
-            <label>
-              <input type="checkbox" style="width:20px !important" id="idShowPermission" ng-click="togglePermissions('newInterpreter')" ng-model="newInterpreterSetting.option.setPermission"/>
-               Set permission
-            </label>
-          </span>
-            </div>
-          </div>
-        </div>
-        <br/>
-
-        <div class="row interpreter">
-          <div class="col-md-12">
-            &lt;!&ndash; permissions &ndash;&gt;
-            <div ng-show="newInterpreterSetting.option.setPermission" class="permissionsForm">
-              <div>
-                <p>
-                  Enter comma separated users and groups in the fields. <br />
-                  Empty field (*) implies anyone can run this interpreter.
-                </p>
-                <div>
-                  <span class="owners">Owners </span>
-                  <select id="newInterpreterOwners" class="form-control" multiple="multiple">
-                    <option ng-repeat="owner in newInterpreterSetting.option.owners" selected="selected">{{owner}}</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <h5>Properties</h5>
-          <table class="table table-striped properties">
-            <tr>
-              <th>name</th>
-              <th>value</th>
-              <th>action</th>
-              <th>description</th>
-            </tr>
-            <tr ng-repeat="key in newInterpreterSetting.properties | sortByKey">
-              <td>{{key}}</td>
-              <td style="vertical-align: middle;">
-                <textarea ng-if="newInterpreterSetting.properties[key].type === 'textarea'"
-                          msd-elastic ng-model="newInterpreterSetting.properties[key].value"></textarea>
-                <input ng-if="newInterpreterSetting.properties[key].type === 'string'"
-                       type="text" msd-elastic ng-model="newInterpreterSetting.properties[key].value" />
-                <input ng-if="newInterpreterSetting.properties[key].type === 'number'"
-                       type="text" number-widget msd-elastic ng-model="newInterpreterSetting.properties[key].value" />
-                <input ng-if="newInterpreterSetting.properties[key].type === 'url'"
-                       type="text" msd-elastic ng-model="newInterpreterSetting.properties[key].value" />
-                <input ng-if="newInterpreterSetting.properties[key].type === 'password'"
-                       type="password" msd-elastic ng-model="newInterpreterSetting.properties[key].value" />
-                <input ng-if="newInterpreterSetting.properties[key].type === 'checkbox'"
-                       type="checkbox" msd-elastic ng-model="newInterpreterSetting.properties[key].value" />
-              </td>
-              <td style="vertical-align: middle;">
-                <button class="btn btn-default btn-sm fa fa-remove" ng-click="removeInterpreterProperty(key)">
-                </button>
-              </td>
-              <td style="vertical-align: middle;">
-                {{newInterpreterSetting.properties[key].description}}
-              </td>
-            </tr>
-
-            <tr>
-              <td style="vertical-align: middle;">
-                <input pu-elastic-input pu-elastic-input-minwidth="180px"
-                       ng-model="newInterpreterSetting.propertyKey" />
-              </td>
-              <td style="vertical-align: middle;" ng-switch on="newInterpreterSetting.propertyType">
-                <textarea ng-switch-default msd-elastic ng-model="newInterpreterSetting.propertyValue"></textarea>
-                <input ng-switch-when="string" type="text" msd-elastic ng-model="newInterpreterSetting.propertyValue" />
-                <input ng-switch-when="number" type="text" number-widget msd-elastic ng-model="newInterpreterSetting.propertyValue" />
-                <input ng-switch-when="url" type="text" msd-elastic ng-model="newInterpreterSetting.propertyValue" />
-                <input ng-switch-when="password" type="password" msd-elastic ng-model="newInterpreterSetting.propertyValue" />
-                <input ng-switch-when="checkbox" type="checkbox" msd-elastic ng-model="newInterpreterSetting.propertyValue" />
-              </td>
-              <td style="vertical-align: middle;">
-                <select msd-elastic ng-model="newInterpreterSetting.propertyType" ng-init="newInterpreterSetting.propertyType=interpreterPropertyTypes[0]"
-                        ng-options="item for item in interpreterPropertyTypes" ng-change="defaultValueByType(newInterpreterSetting)">
-                </select>
-                <button class="btn btn-default btn-sm fa fa-plus" ng-click="addNewInterpreterProperty()">
-                </button>
-              </td>
-              <td></td>
-            </tr>
-          </table>
-        </div>
-
-        <div>
-          <h5>Dependencies</h5>
-          <table class="table table-striped properties">
-            <tr>
-              <th>artifact</th>
-              <th>exclude</th>
-              <th>action</th>
-            </tr>
-
-            <tr ng-repeat="dep in newInterpreterSetting.dependencies">
-              <td>
-                <input ng-model="dep.groupArtifactVersion" style="width:100%" />
-              </td>
-              <td>
-                <textarea msd-elastic ng-model="dep.exclusions"
-                          ng-list
-                          placeholder="(Optional) comma separated groupId:artifactId list">
-                </textarea>
-              </td>
-              <td>
-                <button class="btn btn-default btn-sm fa fa-remove"
-                        ng-click="removeInterpreterDependency(dep.groupArtifactVersion)">
-                </button>
-              </td>
-            </tr>
-
-            <tr>
-              <td>
-                <input ng-model="newInterpreterSetting.depArtifact"
-                       placeholder="groupId:artifactId:version or local file path"
-                       style="width: 100%" />
-              </td>
-              <td>
-                <textarea msd-elastic ng-model="newInterpreterSetting.depExclude"
-                          ng-list
-                          placeholder="(Optional) comma separated groupId:artifactId list">
-                </textarea>
-              </td>
-              <td>
-                <button class="btn btn-default btn-sm fa fa-plus" ng-click="addNewInterpreterDependency()">
-                </button>
-              </td>
-            </tr>
-          </table>
-        </div>
-
-        <span class="btn btn-primary" ng-click="addNewInterpreterSetting()">
-          Save
-        </span>
-        <span class="btn btn-default" ng-click="cancelInterpreterSetting()">
-          Cancel
-        </span>
+    <div class="ui-g">
+      <div class="ui-g-12">
+        <span class="ui-g-3">ID</span>
+        <input class="ui-g-9" type="text" pInputText placeholder="Repository id" id="repoId"
+               [(ngModel)]="newRepoSetting.id">
       </div>
-    </div>-->
-  </div>
 
-  <p-footer>
-    <button type="button" pButton icon="fa-plus-circle" (click)="display=false" label="创建笔记"></button>
-  </p-footer>
-</p-dialog>
+      <div class="ui-g-12">
+        <span class="ui-g-3">Repository Url</span>
+        <input class="ui-g-9" type="text" pInputText id="repoUrl" [(ngModel)]="newRepoSetting.url"
+               placeholder="Repository url" pTooltip="Please enter URL starts with http://, https:// or file://">
+      </div>
 
-<p-dialog header="创建Maven仓库" [(visible)]="showAddNewRepository" [modal]=true >
-  <!--<div id="repoModal" class="modal fade" role="dialog"
-       tabindex="-1">
-    <div class="modal-dialog">
+      <div class="ui-g-12">
+        <span class="ui-g-3">Snapshot</span>
+        <p-checkbox [(ngModel)]="newRepoSetting.snapshot" id="repoSnapshot" binary="true"></p-checkbox>
+      </div>
 
-      &lt;!&ndash; Modal content&ndash;&gt;
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">Add New Repository</h4>
-        </div>
+      <div class="ui-g-12">
+        <span class="ui-g-3">Username</span>
+        <input class="ui-g-9" type="text" pInputText id="repoUsername" [(ngModel)]="newRepoSetting.username">
+      </div>
 
-        <form class="form-horizontal" ng-submit="addNewRepository()">
-          <div class="modal-body">
-            <div class="form-group">
-              <label class="control-label col-sm-2" for="repoId">ID</label>
-              <div class="col-sm-10">
-                <input type="text" class="form-control" id="repoId" ng-model="newRepoSetting.id"
-                       placeholder="Repository id" required />
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="control-label col-sm-2" for="repoUrl">URL</label>
-              <div class="col-sm-10">
-                <input type="text" pattern="(http|https|file)://.*" title="Please enter URL starts with http://, https:// or file://"
-                       class="form-control" id="repoUrl" ng-model="newRepoSetting.url"
-                       placeholder="Repository url" required />
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="control-label col-sm-2" for="repoSnapshot">Snapshot</label>
-              <div class="col-sm-10">
-                <select class="form-control"
-                        id="repoSnapshot"
-                        ng-model="newRepoSetting.snapshot"
-                        ng-options="col for col in [false,true]">
-                </select>
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="control-label col-sm-2" for="repoUsername">Username</label>
-              <div class="col-sm-10">
-                <input type="text" class="form-control" id="repoUsername" ng-model="newRepoSetting.username" />
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="control-label col-sm-2" for="repoPassword">Password</label>
-              <div class="col-sm-10">
-                <input type="password" class="form-control" id="repoPassword" ng-model="newRepoSetting.password" />
-              </div>
-            </div>
-            <hr/>
-            <div class="center-block"><h4>Proxy Settings (optional)</h4></div>
-            <br/>
-            <div class="form-group">
-              <div class="col-sm-10">
-                <label class="control-label col-sm-2" for="proxyProtocol1">Protocol</label>
-                <label class="radio-inline">
-                  <input type="radio" name="proxyProtocol" id="proxyProtocol1" value="HTTP" ng-model="newRepoSetting.proxyProtocol"/> HTTP
-                </label>
-                <label class="radio-inline">
-                  <input type="radio" name="proxyProtocol" id="proxyProtocol2" value="HTTPS" ng-model="newRepoSetting.proxyProtocol"/> HTTPS
-                </label>
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="control-label col-sm-2" for="proxyHost">Host</label>
-              <div class="col-sm-10">
-                <input type="text" class="form-control" id="proxyHost" ng-model="newRepoSetting.proxyHost" />
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="control-label col-sm-2" for="proxyPort">Port</label>
-              <div class="col-sm-10">
-                <input type="text" class="form-control" id="proxyPort" ng-model="newRepoSetting.proxyPort" />
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="control-label col-sm-2" for="proxyLogin">Login</label>
-              <div class="col-sm-10">
-                <input type="text" class="form-control" id="proxyLogin" ng-model="newRepoSetting.proxyLogin" />
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="control-label col-sm-2" for="proxyPassword">Password</label>
-              <div class="col-sm-10">
-                <input type="text" class="form-control" id="proxyPassword" ng-model="newRepoSetting.proxyPassword" />
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="submit"
-                    class="btn btn-default">Add
-            </button>
-            <button type="button" data-dismiss="modal"
-                    class="btn btn-default" ng-click="resetNewRepositorySetting()">Cancel
-            </button>
-          </div>
-        </form>
+      <div class="ui-g-12">
+        <span class="ui-g-3">Password</span>
+        <input class="ui-g-9" type="text" pInputText id="repoPassword" [(ngModel)]="newRepoSetting.password">
       </div>
     </div>
-  </div>-->
+
+  </p-fieldset>
+
+  <p-fieldset legend="代理设置(可选)" [style]="{'margin-bottom': '10px'}">
+
+    <div class="ui-g">
+      <div class="ui-g-12">
+        <span class="ui-g-3">Protocol</span>
+        <p-radioButton name="proxyProtocol" id="proxyProtocol1" value="HTTP" [(ngModel)]="newRepoSetting.proxyProtocol"
+                       label="HTTP" inputId="opt1"></p-radioButton>
+        <p-radioButton name="proxyProtocol" id="proxyProtocol2" value="HTTPS" [(ngModel)]="newRepoSetting.proxyProtocol"
+                       label="HTTPS" inputId="opt2"></p-radioButton>
+      </div>
+
+      <div class="ui-g-12">
+        <span class="ui-g-3">Host</span>
+        <input class="ui-g-9" type="text" pInputText id="proxyHost" [(ngModel)]="newRepoSetting.proxyHost">
+      </div>
+
+      <div class="ui-g-12">
+        <span class="ui-g-3">Port</span>
+        <input class="ui-g-9" type="text" pInputText id="proxyPort" [(ngModel)]="newRepoSetting.proxyPort">
+      </div>
+
+      <div class="ui-g-12">
+        <span class="ui-g-3">Login</span>
+        <input class="ui-g-9" type="text" pInputText id="proxyLogin" [(ngModel)]="newRepoSetting.proxyLogin">
+      </div>
+
+      <div class="ui-g-12">
+        <span class="ui-g-3">Password</span>
+        <input class="ui-g-9" type="text" pInputText id="proxyPassword" [(ngModel)]="newRepoSetting.proxyPassword">
+      </div>
+    </div>
+
+  </p-fieldset>
 
   <p-footer>
-    <button type="button" pButton icon="fa-plus-circle" (click)="display=false" label="创建笔记"></button>
+    <button type="button" pButton icon="fa-plus-circle" (click)="showAddNewRepository = false;addNewRepository()"
+            label="创建"></button>
+    <button type="button" pButton icon="fa-minus-circle"
+            (click)="showAddNewRepository = false;resetNewRepositorySetting()" label="取消"></button>
   </p-footer>
 </p-dialog>
 
-<div class="ui-g">
+<p-dialog header="添加新属性" [(visible)]="showAddNewPro" [modal]=true>
+
+  <div>
+    <div class="ui-float-label" style="margin-top: 15px">
+      <input id="key" type="text" size="60" pInputText [(ngModel)]="newInterpreterPropertyKey">
+      <label for="key">属性键</label>
+    </div>
+
+    <div class="ui-float-label" style="margin-top: 30px">
+      <input id="value" type="text" size="60" pInputText [(ngModel)]="newInterpreterPropertyValue">
+      <label for="value">属性值</label>
+    </div>
+  </div>
+
+  <p-footer>
+    <button type="button" pButton icon="fa-plus-circle" (click)="showAddNewPro = false;addNewInterpreterProperty(currentEditSetting);newInterpreterPropertyKey='';newInterpreterPropertyValue=''" label="添加"></button>
+    <button type="button" pButton icon="fa-minus-circle" (click)="showAddNewPro = false;newInterpreterPropertyKey='';newInterpreterPropertyValue=''" label="取消"></button>
+  </p-footer>
+</p-dialog>
+
+<p-dialog header="添加新依赖" [(visible)]="showAddNewDep" [modal]=true>
+
+  <div>
+    <div class="ui-float-label" style="margin-top: 15px">
+        <input id="dep" type="text" size="60" pInputText [(ngModel)]="newGroupArtifactVersion">
+        <label for="dep">groupId:artifactId:version or local file path</label>
+    </div>
+
+    <div class="ui-float-label" style="margin-top: 30px">
+        <input id="exclude" type="text" size="60" pInputText [(ngModel)]="newExclusions">
+        <label for="exclude">(Optional) comma separated groupId:artifactId list</label>
+    </div>
+  </div>
+
+  <p-footer>
+    <button type="button" pButton icon="fa-plus-circle" (click)="showAddNewDep = false;addNewInterpreterDependency(currentEditSetting);newGroupArtifactVersion='';newExclusions=''" label="添加"></button>
+    <button type="button" pButton icon="fa-minus-circle" (click)="showAddNewDep = false;newGroupArtifactVersion='';newExclusions=''" label="取消"></button>
+  </p-footer>
+</p-dialog>
+
+<div class="ui-g interpreterConfig">
 
   <div class="ui-g-12">
     <p-toolbar>
       <div class="ui-toolbar-group-left">
-        <button pButton type="button" label="新建解析器" pTooltip="新建解析器" tooltipPosition="bottom" icon="fa-plus-circle" (click)="showAddNewSetting = !showAddNewSetting"></button>
+        <button pButton type="button" label="新建解析器" pTooltip="新建解析器" tooltipPosition="bottom" icon="fa-plus-circle"
+                (click)="showAddNewSetting = true;currentEditSetting = -2"></button>
       </div>
 
       <div class="ui-toolbar-group-right">
         <div class="ui-inputgroup" style="float: left; margin-right: 10px;">
-          <input type="text" pInputText placeholder="Search interpreters" [(ngModel)]="searchInterpreter" style="width: 500px">
+          <input type="text" pInputText placeholder="Search interpreters" [(ngModel)]="searchInterpreter"
+                 style="width: 500px">
           <span class="ui-inputgroup-addon"><i class="fa fa-search"></i></span>
         </div>
 
@@ -877,101 +344,169 @@
                 tooltipPosition="bottom" icon="fa-database"
                 (click)="removeRepository(repo.id)" style="margin-right: 5px"></button>
 
-        <button pButton type="button" pTooltip="添加新的Maven仓库，用来提供解析器外部依赖" tooltipPosition="bottom" class="danger-btn" icon="fa-plus-circle"
+        <button pButton type="button" class="danger-btn" icon="fa-plus-circle"
                 (click)="showAddNewRepository = !showAddNewRepository"></button>
       </div>
     </p-toolbar>
   </div>
 
   <div class="ui-g-12" style="min-height: 800px">
-    <!--TODO Filter-->
-    <p-panel [style]="{'margin-bottom':'10px'}" *ngFor="let setting of interpreterSettings" id="{{setting.name | lowercase}}">
+
+    <p-panel [style]="{'margin-bottom':'10px'}"
+             *ngFor="let setting of interpreterSettings | filter: {name:searchInterpreter}"
+             id="{{setting.name | lowercase}}">
       <p-header>
         <div class="ui-helper-clearfix">
-          <span class="ui-panel-title" style="font-size:16px;display:inline-block;margin-top:2px">{{setting.name}}</span>
+          <span class="ui-panel-title"
+                style="font-size:16px;display:inline-block;margin-top:2px">{{setting.name}}</span>
           <small>
             <span style="display:inline-block" *ngFor="let interpreter of setting.interpreterGroup"
                   title="{{interpreter.class}}">
-              <span>, </span> % <span>{{setting.name}}</span><span>.</span><span>{{interpreter.name}}</span>
+              <span>&nbsp;&nbsp;</span>[%<span>{{setting.name}}</span><span>.</span><span>{{interpreter.name}}]</span>
             </span>
           </small>
 
           <a [ngSwitch]="setting.status">
-            <i *ngSwitchCase="'READY'" style="color: green;" class="fa fa-fw fa-circle" pTooltip="Ready" tooltipPosition="bottom"></i>
-            <i *ngSwitchCase="'ERROR'" style="color: red; cursor: pointer" class="fa fa-fw fa-circle" pTooltip="Error downloading dependencies" tooltipPosition="bottom" (click)="showErrorMessage(setting)"></i>
-            <i *ngSwitchDefault style="color: blue" class="fa fa-fw fa-spinner" pTooltip="Dependencies are downloading" tooltipPosition="bottom"></i>
+            <i *ngSwitchCase="'READY'" style="color: green;" class="fa fa-fw fa-circle" pTooltip="Ready"
+               tooltipPosition="bottom"></i>
+            <i *ngSwitchCase="'ERROR'" style="color: red; cursor: pointer" class="fa fa-fw fa-circle"
+               pTooltip="Error downloading dependencies" tooltipPosition="bottom"
+               (click)="showErrorMessage(setting)"></i>
+            <i *ngSwitchDefault style="color: blue" class="fa fa-fw fa-spinner" pTooltip="Dependencies are downloading"
+               tooltipPosition="bottom"></i>
           </a>
 
-
-          <!-- TODO  -->
-          <button pButton style="float: right" type="button" icon="fa-edit" label="编辑" class="ui-button-info"
-                  (click)="showEditSetting = !showEditSetting; copyOriginInterpreterSettingProperties(setting.id)"></button>
-          <button pButton style="float: right" type="button" icon="fa-refresh" label="重启" class="ui-button-success"
+          <button pButton style="float: right;margin-left: 5px" type="button" icon="fa-edit" label="编辑" [disabled]="isCurrentEdit(setting.id)"
+                  (click)="currentEditSetting = setting.id; copyOriginInterpreterSettingProperties(setting.id)"></button>
+          <button pButton style="float: right;margin-left: 5px" type="button" icon="fa-refresh" label="重启" [disabled]="isCurrentEdit(setting.id)"
                   (click)="restartInterpreterSetting(setting.id)"></button>
-          <button pButton style="float: right" type="button" icon="fa-remove" label="删除" class="ui-button-danger"
+          <button pButton style="float: right;margin-left: 5px" type="button" icon="fa-remove" label="删除" [disabled]="isCurrentEdit(setting.id)"
                   (click)="removeInterpreterSetting(setting.id)"></button>
 
-          <button pButton style="float: right" type="button" icon="fa-external-link" label="Spark界面" class="ui-button-info"
-                  *ngIf="setting.group == 'spark'"
-                  (click)="showSparkUI(setting.id)"></button>
+          <button pButton style="float: right" type="button" icon="fa-external-link" label="Spark界面" [disabled]="isCurrentEdit(setting.id)"
+                  *ngIf="setting.group == 'spark'" (click)="showSparkUI(setting.id)"></button>
         </div>
       </p-header>
       <div>
+        <!--TODO-->
         <p-fieldset legend="解析器模式" [toggleable]="true" [style]="{'margin-bottom': '10px'}">
           <div class="ui-g">
             <div class="ui-g-12">
-              <!--<div class="ui-g">
-                <div class="ui-g-6">
-                  <h3>Host</h3>
-                  <span class="ui-float-label">
-                      <input id="newInterpreterSettingHost" type="text" size="80" pInputText [(ngModel)]="setting.option.host">
-                      <label for="newInterpreterSettingHost">Host</label>
+
+              The interpreter will be instantiated
+
+              <select #instance (change)="onInstanceModeChange(instance.value,setting)" [disabled]="!isCurrentEdit(setting.id)">
+                <option value="Globally" [selected]="getInterpreterRunningOption(setting) == 'Globally'">Globally</option>
+                <option value="Per Note" [selected]="getInterpreterRunningOption(setting) == 'Per Note'">Per Note</option>
+                <option value="Per User" [selected]="getInterpreterRunningOption(setting) == 'Per User'" *ngIf="this.globalService.ticket.principal !== 'anonymous'">Per User</option>
+              </select>
+
+              in
+
+              <select #option (change)="onOptionModeChange(option.value,setting)" [disabled]="!isCurrentEdit(setting.id)">
+                <option value="shared per note" *ngIf="getInterpreterRunningOption(setting) === 'Globally'" [selected]="getOption(setting) === 'shared per note'"
+                        pTooltip="Single interpreter instance are shared across notes">shared per note</option>
+                <option value="scoped per note" *ngIf="getInterpreterRunningOption(setting) === 'Per Note'"  [selected]="getOption(setting) === 'scoped per note'"
+                        pTooltip="Separate Interpreter instance for each note">scoped per note</option>
+                <option value="scoped per user" *ngIf="getInterpreterRunningOption(setting) === 'Per User'"  [selected]="getOption(setting) === 'scoped per user'"
+                        pTooltip="Separate Interpreter instance for each note">scoped per user</option>
+                <option value="isolated per note" *ngIf="getInterpreterRunningOption(setting) === 'Per Note'"  [selected]="getOption(setting) === 'isolated per note'"
+                        pTooltip="Separate Interpreter process for each note">isolated per note</option>
+                <option value="isolated per user" *ngIf="getInterpreterRunningOption(setting) === 'Per User'"  [selected]="getOption(setting) === 'isolated per user'"
+                        pTooltip="Separate Interpreter process for each note">isolated per user</option>
+              </select>
+
+              process
+
+              <a class="fa fa-info-circle interpreter-binding-mode-info-link"
+                 ptooltip="Can manage interpreter sessions differently by setting this option. Click this button to learn more"
+                 href="{{getInterpreterBindingModeDocsLink()}}" target="_blank"></a>
+
+              <span *ngIf="getInterpreterRunningOption(setting) === 'Per User' && this.globalService.ticket.principal !== 'anonymous'">
+                <span *ngIf="getPerNoteOption(setting) === 'shared'">
+                  <button type="button" class="btn btn-default btn-xs"
+                          (click)="setPerNoteOption('scoped',setting)"
+                          [disabled]="!isCurrentEdit(setting.id)">
+                    <i class="fa fa-plus"></i>
+                  </button>
+                </span>
+              </span>
+
+              <div class="row interpreter"
+                   style="margin-top: 6px;"
+                   *ngIf="getInterpreterRunningOption(setting) === 'Per User' && this.globalService.ticket.principal != 'anonymous' && getPerNoteOption(setting) !== 'shared'">
+                <div class="col-md-12">
+                  <span>
+                    <span class="hidden-xs" style="padding-left: 190px;">And </span>
+                    <span class="visible-xs" style="padding-left: 0px;">And </span>
+
+                    <select disabled="true">
+                      <option value="Per Note" selected="true">Per Note</option>
+                    </select>
+
+                    in
+
+                    <select #option1 (change)="onOptionModeChange(option1.value,setting)" [disabled]="!isCurrentEdit(setting.id)">
+                      <option value="scoped per note" [selected]="getPerNoteOption(setting) === 'scoped per note'"
+                              pTooltip="Separate Interpreter instance for each note">scoped per note</option>
+                      <option value="isolated per note" [selected]="getPerNoteOption(setting) === 'isolated per note'"
+                              pTooltip="Separate Interpreter process for each note">isolated per note</option>
+                    </select>
+
+                    process
+
+                    <a class="fa fa-info-circle interpreter-binding-mode-info-link"
+                       pTooltip="Can manage interpreter sessions differently by setting this option. Click this button to learn more"
+                       href="{{getInterpreterBindingModeDocsLink()}}" target="_blank"></a>
+
+                    <button type="button" class="btn btn-default btn-xs"
+                            [disabled]="!isCurrentEdit(setting.id)"
+                            (click)="setPerNoteOption('shared',setting)">
+                      <i class="fa fa-minus"></i>
+                    </button>
                   </span>
                 </div>
-                <div class="ui-g-6">
-                  <h3>Port</h3>
-                  <span class="ui-float-label">
-                      <input id="newInterpreterSettingPort" type="text" size="80" pInputText [(ngModel)]="setting.option.port">
-                      <label for="newInterpreterSettingPort">Port</label>
-                  </span>
-                </div>
-              </div>-->
+              </div>
 
             </div>
 
+            <div class="ui-g-12" *ngIf="getInterpreterRunningOption(setting)=='Per User' && getPerUserOption(setting)=='isolated'">
+              <p-checkbox label="User Impersonate" binary="true" [(ngModel)]="setting.option.isUserImpersonate" [disabled]="!isCurrentEdit(setting.id)"></p-checkbox>
+            </div>
+
             <div class="ui-g-12">
-              <p-checkbox label="Connect to existing process" value="true" (onChange)="togglePermissions(setting.name)" [(ngModel)]="setting.option.isExistingProcess"></p-checkbox>
+              <p-checkbox label="Connect to existing process" binary="true" [(ngModel)]="setting.option.isExistingProcess" [disabled]="!isCurrentEdit(setting.id)"></p-checkbox>
               <!-- ExistingProcess -->
               <div class="ui-g" *ngIf="setting.option.isExistingProcess">
                 <div class="ui-g-6">
-                  <h3>Host</h3>
+                  <h3>远程主机：</h3>
                   <span class="ui-float-label">
-                      <input id="newInterpreterSettingHost" type="text" size="80" pInputText [(ngModel)]="setting.option.host">
-                      <label for="newInterpreterSettingHost">Host</label>
+                      <input id="interpreterSettingHost" type="text" size="80" pInputText [(ngModel)]="setting.option.host" [disabled]="!isCurrentEdit(setting.id)">
+                      <label for="interpreterSettingHost">Host</label>
                   </span>
                 </div>
                 <div class="ui-g-6">
-                  <h3>Port</h3>
+                  <h3>主机端口：</h3>
                   <span class="ui-float-label">
-                      <input id="newInterpreterSettingPort" type="text" size="80" pInputText [(ngModel)]="setting.option.port">
-                      <label for="newInterpreterSettingPort">Port</label>
+                      <input id="interpreterSettingPort" type="text" size="80" pInputText [(ngModel)]="setting.option.port" [disabled]="!isCurrentEdit(setting.id)">
+                      <label for="interpreterSettingPort">Port</label>
                   </span>
                 </div>
               </div>
             </div>
 
             <div class="ui-g-12">
-              <p-checkbox label="Set permission" value="true" (onChange)="togglePermissions(setting.name)" [(ngModel)]="setting.option.setPermission"></p-checkbox>
+              <p-checkbox label="Set permission" binary="true" [(ngModel)]="setting.option.setPermission" [disabled]="!isCurrentEdit(setting.id)"></p-checkbox>
               <!-- permissions -->
               <div *ngIf="setting.option.setPermission" class="ui-g-12">
 
-                <h3>Enter comma separated users and groups in the fields. <br />
+                <h3>Enter comma separated users and groups in the fields. <br/>
                   Empty field (*) implies anyone can run this interpreter.</h3>
-                <p-multiSelect id="owners" [options]="setting.option.owners" [(ngModel)]="selectedCars1" [panelStyle]="{width:'40em'}"></p-multiSelect>
+                <p-multiSelect id="owners" [options]="setting.option.owners" [(ngModel)]="selectedUsers" [panelStyle]="{width:'40em'}" [disabled]="!isCurrentEdit(setting.id)"></p-multiSelect>
 
-                <!--<select id="{{setting.name}}Owners" class="form-control" multiple="multiple" ng-disabled="!valueform.$visible">
-                  <option ng-repeat="owner in setting.option.owners" selected="selected">{{owner}}</option>
-                </select>-->
+                <select id="{{setting.name}}Owners" class="form-control" multiple="multiple" [disabled]="!isCurrentEdit(setting.id)">
+                  <option *ngFor="let owner of setting.option.owners" selected="selected">{{owner}}</option>
+                </select>
 
               </div>
             </div>
@@ -979,26 +514,111 @@
           </div>
         </p-fieldset>
         <p-fieldset legend="解析器属性" [toggleable]="true" [style]="{'margin-bottom': '10px'}">
-          <p-dataTable [value]="configrations" selectionMode="single" [(selection)]="selectedItem"
-                       [responsive]="true">
-            <p-column field="name" header="配置项" [sortable]="false"></p-column>
-            <p-column field="value" header="配置值" [sortable]="false"></p-column>
-            <p-column field="desc" header="配置描述" [sortable]="false"></p-column>
-          </p-dataTable>
+
+          <!--<p-dataTable [value]="setting.propertiesArray" [editable]="true">
+            <p-column field="key" header="配置项"></p-column>
+            <p-column field="value" header="配置值" [editable]="isCurrentEdit(setting.id)"></p-column>
+            <p-column header="动作" [style]="{'width':'50px','text-align':'center'}" [hidden]="!isCurrentEdit(setting.id)">
+              <ng-template let-pro="rowData" pTemplate="body">
+                <button type="button" pButton (click)="removeInterpreterProperty(pro.key, setting.id)" icon="fa-remove"></button>
+              </ng-template>
+            </p-column>
+            <p-footer *ngIf="isCurrentEdit(setting.id)">
+              <button pButton type="button" icon="fa-plus" label="添加新属性" class="ui-button-info" (click)="showAddNewPro=true"></button>
+            </p-footer>
+          </p-dataTable>-->
+
+          <!--<div class="ui-g">
+            <table class="interPro ui-g-12">
+              <thead>
+              <tr>
+                <th style="width:40%">配置项</th>
+                <th [ngStyle]="{'width': isCurrentEdit(setting.id)? '50%':'60%'}">配置值</th>
+                <th style="width:10%;text-align: center" [hidden]="!isCurrentEdit(setting.id)">动作</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let pro of setting.propertiesArray">
+                <td>{{pro.key}}</td>
+                <td *ngIf="!isCurrentEdit(setting.id)">{{pro.value}}</td>
+                <td *ngIf="isCurrentEdit(setting.id)"><input type="text" style="width: 100%;" pInputText [(ngModel)]="pro.value"></td>
+                <td style="text-align: center" [hidden]="!isCurrentEdit(setting.id)"><button type="button" pButton (click)="removeInterpreterProperty(pro.key, setting.id)" icon="fa-remove"></button></td>
+              </tr>
+              </tbody>
+
+            </table>
+          </div>-->
+
+          <div class="ui-g">
+            <table class="interPro ui-g-12">
+              <thead>
+              <tr>
+                <th style="width:40%">配置项</th>
+                <th [ngStyle]="{'width': isCurrentEdit(setting.id)? '50%':'60%'}">配置值</th>
+                <th style="width:10%;text-align: center" [hidden]="!isCurrentEdit(setting.id)">动作</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let key of getKeys(setting.properties)">
+                <td>{{key}}</td>
+                <td *ngIf="!isCurrentEdit(setting.id)">{{setting.properties[key]}}</td>
+                <td *ngIf="isCurrentEdit(setting.id)"><input type="text" style="width: 100%;" pInputText [(ngModel)]="setting.properties[key]"></td>
+                <td style="text-align: center" [hidden]="!isCurrentEdit(setting.id)"><button type="button" pButton (click)="removeInterpreterProperty(key, setting.id)" icon="fa-remove"></button></td>
+              </tr>
+              </tbody>
+
+            </table>
+          </div>
+
+          <button pButton type="button" icon="fa-plus" label="添加新属性" class="ui-button-info" (click)="showAddNewPro=true" *ngIf="isCurrentEdit(setting.id)"></button>
+
         </p-fieldset>
-        <p-fieldset legend="解析器依赖" [toggleable]="true">
-          <p-dataTable [value]="configrations" selectionMode="single" [(selection)]="selectedItem"
-                       [responsive]="true">
-            <p-column field="name" header="配置项" [sortable]="false"></p-column>
-            <p-column field="value" header="配置值" [sortable]="false"></p-column>
-            <p-column field="desc" header="配置描述" [sortable]="false"></p-column>
-          </p-dataTable>
+        <p-fieldset legend="类路径依赖" [toggleable]="true">
+
+          <!--<p-dataTable [value]="setting.dependencies" selectionMode="single" [responsive]="true" [editable]="true">
+            <p-column field="groupArtifactVersion" header="依赖Jar包" [sortable]="false" [editable]="isCurrentEdit(setting.id)"></p-column>
+            <p-column field="exclusions" header="移除包（逗号分隔）" [sortable]="false" [editable]="isCurrentEdit(setting.id)"></p-column>
+            <p-column header="动作" [style]="{'width':'50px','text-align':'center'}" [hidden]="!isCurrentEdit(setting.id)">
+              <ng-template let-dep="rowData" pTemplate="body">
+                <button type="button" pButton (click)="removeInterpreterDependency(dep.groupArtifactVersion, setting.id)" icon="fa-remove"></button>
+              </ng-template>
+            </p-column>
+            <p-footer *ngIf="isCurrentEdit(setting.id)">
+              <button pButton type="button" icon="fa-plus" label="添加新依赖" class="ui-button-info" (click)="showAddNewDep=true"></button>
+            </p-footer>
+          </p-dataTable>-->
+
+          <div class="ui-g">
+            <table class="interPro ui-g-12">
+              <thead>
+              <tr>
+                <th style="width:40%">依赖Jar包</th>
+                <th [ngStyle]="{'width': isCurrentEdit(setting.id)? '50%':'60%'}">移除包（逗号分隔）</th>
+                <th style="width:10%;text-align: center" [hidden]="!isCurrentEdit(setting.id)">动作</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let dep of setting.dependencies">
+                <td>{{dep.groupArtifactVersion}}</td>
+                <td *ngIf="!isCurrentEdit(setting.id)">{{dep.exclusions.join()}}</td>
+                <td *ngIf="isCurrentEdit(setting.id)"><input type="text" style="width: 100%;" pInputText [(ngModel)]="dep.exclusions"></td>
+                <td style="text-align: center" [hidden]="!isCurrentEdit(setting.id)"><button type="button" pButton (click)="removeInterpreterDependency(dep.groupArtifactVersion, setting.id)" icon="fa-remove"></button></td>
+              </tr>
+              </tbody>
+
+            </table>
+          </div>
+
+          <button pButton type="button" icon="fa-plus" label="添加新依赖" class="ui-button-info" (click)="showAddNewDep=true" *ngIf="isCurrentEdit(setting.id)"></button>
+
         </p-fieldset>
       </div>
-      <p-footer>
-        <button pButton type="button" icon="fa-save" label="保存" class="ui-button-info"></button>
-        <button pButton type="button" icon="fa-trash-o" label="取消" class="ui-button-danger"></button>
+
+      <p-footer *ngIf="isCurrentEdit(setting.id)">
+        <button pButton type="button" icon="fa-plus" label="保存" class="ui-button-info" (click)="currentEditSetting = -1;updateInterpreterSetting(setting.id)"></button>
+        <button pButton type="button" icon="fa-list" label="取消" class="ui-button-success" (click)="currentEditSetting = -1;resetInterpreterSetting(setting.id)"></button>
       </p-footer>
+
     </p-panel>
 
   </div>

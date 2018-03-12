@@ -9,7 +9,7 @@ import com.smartsuites.display.AngularObjectRegistry;
 import java.util.List;
 
 /**
- * Angular Registry for helium app
+ * Angular Registry for helium app 将后台APP和前端的字段绑定 双向通信
  */
 public class HeliumAppAngularObjectRegistry {
   private final String noteId;

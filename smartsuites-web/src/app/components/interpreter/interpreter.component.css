@@ -130,3 +130,28 @@
   margin-left: 2px;
   text-decoration: none !important;
 }
+
+
+table.interPro {
+  font-family: verdana,arial,sans-serif;
+  font-size:13px;
+  color:#333333;
+  border-width: 1px;
+  border-color: #dddddd;
+  border-collapse: collapse;
+  margin-bottom: 10px;
+}
+table.interPro th {
+  border-width: 1px;
+  padding: 8px;
+  border-style: solid;
+  border-color: #dddddd;
+  background-color: #f9f9f9;
+}
+table.interPro td {
+  border-width: 1px;
+  padding: 8px;
+  border-style: solid;
+  border-color: #dddddd;
+  background-color: #ffffff;
+}

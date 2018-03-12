@@ -41,6 +41,10 @@ export class CredentialComponent implements OnInit {
 
   }
 
+  renameVisionDir(id,dirname){
+
+  }
+
   // 用户的类型
   users = [{
     username:'admin',

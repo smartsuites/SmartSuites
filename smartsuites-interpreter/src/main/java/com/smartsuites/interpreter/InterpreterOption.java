@@ -9,6 +9,7 @@ import java.util.List;
 
 /**
  * 解析器的模式
+ * ISOLATED 主要控制 InterpreterGroup 的模式
  */
 public class InterpreterOption {
   // 多个Note共享同一个InterpreterGroup，一个进程
@@ -106,7 +107,6 @@ public class InterpreterOption {
   public int getPort() {
     return port;
   }
-
 
   public boolean perUserShared() {
     return SHARED.equals(perUser);

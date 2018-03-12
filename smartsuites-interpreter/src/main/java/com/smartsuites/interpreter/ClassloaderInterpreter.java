@@ -13,7 +13,7 @@ import com.smartsuites.scheduler.Scheduler;
 
 /**
  * Add to the classpath interpreters.
- *
+ * 可以更改intp的类路径
  */
 public class ClassloaderInterpreter
     extends Interpreter

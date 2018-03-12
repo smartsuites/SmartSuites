@@ -10,7 +10,10 @@ package com.smartsuites.helium;
 public enum HeliumType {
   INTERPRETER,
   NOTEBOOK_REPO,
+  //运行在解析器进程的包
   APPLICATION,
+  //基于前端的可视化组件
   VISUALIZATION,
+  //基于前端的解析器
   SPELL
 }

@@ -17,8 +17,11 @@ import java.security.SecureRandom;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * 一个Group就是解析器Session的集合。
+ * 一个Session是多个Interperter实例的集合。集合中的实例都不同。
+ * 一个Session多个用户或者多个Note可以共用。
  * InterpreterGroup is collections of interpreter sessions.
- * One session could include multiple interpreters.
+ * One session could include multiple interpreters. 一个Session可以有多个解析器实例
  * For example spark, pyspark, sql interpreters are in the same 'spark' interpreter session.
  *
  * Remember, list of interpreters are dedicated to a session. Session could be shared across user
@@ -28,6 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * A InterpreterGroup runs interpreter process while its subclass ManagedInterpreterGroup runs
  * in zeppelin server process.
+ * 该
  */
 public class InterpreterGroup {
 

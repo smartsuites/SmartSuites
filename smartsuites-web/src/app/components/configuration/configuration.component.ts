@@ -24,9 +24,13 @@ class Item{
 })
 export class ConfigurationComponent implements OnInit {
 
+  min_height = window.innerHeight - 183 + 'px'
+
   selectedItem: Item;
 
   configrations : Item[] = []
+
+  edit = false
 
   constructor(public httpClient:HttpClient,
               public baseUrlSrv:BaseUrlService,

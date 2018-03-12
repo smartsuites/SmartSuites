@@ -203,9 +203,9 @@ export class AppMenuComponent implements OnInit {
         {
           label: '系统配置', icon: 'fa fa-fw fa-gears',
           items: [
-            {label: '解析器配置管理', icon: 'fa fa-fw fa-columns', routerLink: ['/interpreter']},
-            {label: '笔记仓库管理', icon: 'fa fa-fw fa-code', routerLink: ['/notebookRepos']},
-            {label: '用户权限管理', icon: 'fa fa-fw fa-table', routerLink: ['/credential']},
+            {label: '解析器配置管理', icon: 'fa fa-fw fa-cube', routerLink: ['/interpreter']},
+            {label: '笔记仓库管理', icon: 'fa fa-fw fa-database', routerLink: ['/notebookRepos']},
+            {label: '用户权限管理', icon: 'fa fa-fw fa-users', routerLink: ['/credential']},
             {label: '插件配置管理', icon: 'fa fa-fw fa-list-alt', routerLink: ['/helium']},
             /*{label: '目录管理', icon: 'fa fa-fw fa-list', routerLink: ['/catalog']},*/
             {label: '个性化配置管理', icon: 'fa fa-fw fa-pencil-square-o', routerLink: ['/custom']},
@@ -213,7 +213,7 @@ export class AppMenuComponent implements OnInit {
           ]
         },
         {
-          label: '平台定制化', icon: 'fa fa-fw fa-gear', badge: '8',
+          label: '平台定制化', icon: 'fa fa-fw fa-eye', badge: '8',
           items: [
             {
               label: '菜单模式',
