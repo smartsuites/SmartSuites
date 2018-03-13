@@ -78,7 +78,7 @@ import java.util.concurrent.ConcurrentMap;
 
 /**
  * Entry point for Interpreter process.
- * Accepting thrift connections from ZeppelinServer.
+ * Accepting thrift connections from SmartsuitesServer.
  * 用于脚本的启动类，
  */
 public class RemoteInterpreterServer
@@ -989,7 +989,7 @@ public class RemoteInterpreterServer
   }
 
   /**
-   * When zeppelinserver initiate angular object add.
+   * When SmartsuitesServer initiate angular object add.
    * Dont't need to emit event to zeppelin server
    */
   @Override
@@ -1047,7 +1047,7 @@ public class RemoteInterpreterServer
 
   @Override
   public List<String> resourcePoolGetAll() throws TException {
-    logger.debug("Request getAll from ZeppelinServer");
+    logger.debug("Request getAll from SmartsuitesServer");
     List<String> result = new LinkedList<>();
 
     if (resourcePool == null) {
@@ -1072,7 +1072,7 @@ public class RemoteInterpreterServer
   @Override
   public ByteBuffer resourceGet(String noteId, String paragraphId, String resourceName)
       throws TException {
-    logger.debug("Request resourceGet {} from ZeppelinServer", resourceName);
+    logger.debug("Request resourceGet {} from SmartsuitesServer", resourceName);
     Resource resource = resourcePool.get(noteId, paragraphId, resourceName, false);
 
     if (resource == null || resource.get() == null || !resource.isSerializable()) {

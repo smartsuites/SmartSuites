@@ -31,7 +31,7 @@ if [[ "$1" == "--config" ]]; then
     echo ${USAGE}
     exit 1
   else
-    export ZEPPELIN_CONF_DIR="${conf_dir}"
+    export SMARTSUITES_CONF_DIR="${conf_dir}"
   fi
   shift
 fi
@@ -47,60 +47,60 @@ BIN=$(cd "${BIN}">/dev/null; pwd)
 . "${BIN}/functions.sh"
 
 HOSTNAME=$(hostname)
-ZEPPELIN_NAME="Zeppelin"
-ZEPPELIN_LOGFILE="${ZEPPELIN_LOG_DIR}/zeppelin-${ZEPPELIN_IDENT_STRING}-${HOSTNAME}.log"
-ZEPPELIN_OUTFILE="${ZEPPELIN_LOG_DIR}/zeppelin-${ZEPPELIN_IDENT_STRING}-${HOSTNAME}.out"
-ZEPPELIN_PID="${ZEPPELIN_PID_DIR}/zeppelin-${ZEPPELIN_IDENT_STRING}-${HOSTNAME}.pid"
-ZEPPELIN_MAIN=org.apache.zeppelin.server.ZeppelinServer
-JAVA_OPTS+=" -Dzeppelin.log.file=${ZEPPELIN_LOGFILE}"
+SMARTSUITES_NAME="SMartSuites"
+SMARTSUITES_LOGFILE="${SMARTSUITES_LOG_DIR}/smartsuites-${SMARTSUITES_IDENT_STRING}-${HOSTNAME}.log"
+SMARTSUITES_OUTFILE="${SMARTSUITES_LOG_DIR}/smartsuites-${SMARTSUITES_IDENT_STRING}-${HOSTNAME}.out"
+SMARTSUITES_PID="${SMARTSUITES_PID_DIR}/smartsuites-${SMARTSUITES_IDENT_STRING}-${HOSTNAME}.pid"
+SMARTSUITES_MAIN=com.smartsuites.server.SmartsuitesServer
+JAVA_OPTS+=" -Dzeppelin.log.file=${SMARTSUITES_LOGFILE}"
 
 # construct classpath
-if [[ -d "${ZEPPELIN_HOME}/zeppelin-interpreter/target/classes" ]]; then
-  ZEPPELIN_CLASSPATH+=":${ZEPPELIN_HOME}/zeppelin-interpreter/target/classes"
+if [[ -d "${SMARTSUITES_HOME}/smartsuites-interpreter/target/classes" ]]; then
+  SMARTSUITES_CLASSPATH+=":${SMARTSUITES_HOME}/smartsuites-interpreter/target/classes"
 fi
 
-if [[ -d "${ZEPPELIN_HOME}/zeppelin-zengine/target/classes" ]]; then
-  ZEPPELIN_CLASSPATH+=":${ZEPPELIN_HOME}/zeppelin-zengine/target/classes"
+if [[ -d "${SMARTSUITES_HOME}/smartsuites-engine/target/classes" ]]; then
+  SMARTSUITES_CLASSPATH+=":${SMARTSUITES_HOME}/smartsuites-engine/target/classes"
 fi
 
-if [[ -d "${ZEPPELIN_HOME}/zeppelin-server/target/classes" ]]; then
-  ZEPPELIN_CLASSPATH+=":${ZEPPELIN_HOME}/zeppelin-server/target/classes"
+if [[ -d "${SMARTSUITES_HOME}/smartsuites-server/target/classes" ]]; then
+  SMARTSUITES_CLASSPATH+=":${SMARTSUITES_HOME}/smartsuites-server/target/classes"
 fi
 
 if [[ -n "${HADOOP_CONF_DIR}" ]] && [[ -d "${HADOOP_CONF_DIR}" ]]; then
-  ZEPPELIN_CLASSPATH+=":${HADOOP_CONF_DIR}"
+  SMARTSUITES_CLASSPATH+=":${HADOOP_CONF_DIR}"
 fi
 
 # Add jdbc connector jar
 # ZEPPELIN_CLASSPATH+=":${ZEPPELIN_HOME}/jdbc/jars/jdbc-connector-jar"
 
-addJarInDir "${ZEPPELIN_HOME}"
-addJarInDir "${ZEPPELIN_HOME}/lib"
-addJarInDir "${ZEPPELIN_HOME}/lib/interpreter"
-addJarInDir "${ZEPPELIN_HOME}/zeppelin-interpreter/target/lib"
-addJarInDir "${ZEPPELIN_HOME}/zeppelin-zengine/target/lib"
-addJarInDir "${ZEPPELIN_HOME}/zeppelin-server/target/lib"
-addJarInDir "${ZEPPELIN_HOME}/zeppelin-web/target/lib"
+addJarInDir "${SMARTSUITES_HOME}"
+addJarInDir "${SMARTSUITES_HOME}/lib"
+addJarInDir "${SMARTSUITES_HOME}/lib/interpreter"
+addJarInDir "${SMARTSUITES_HOME}/smartsuites-interpreter/target/lib"
+addJarInDir "${SMARTSUITES_HOME}/smartsuites-engine/target/lib"
+addJarInDir "${SMARTSUITES_HOME}/smartsuites-server/target/lib"
+addJarInDir "${SMARTSUITES_HOME}/smartsuites-web/target/lib"
 
-CLASSPATH+=":${ZEPPELIN_CLASSPATH}"
+CLASSPATH+=":${SMARTSUITES_CLASSPATH}"
 
-if [[ "${ZEPPELIN_NICENESS}" = "" ]]; then
-    export ZEPPELIN_NICENESS=0
+if [[ "${SMARTSUITES_NICENESS}" = "" ]]; then
+    export SMARTSUITES_NICENESS=0
 fi
 
 function initialize_default_directories() {
-  if [[ ! -d "${ZEPPELIN_LOG_DIR}" ]]; then
-    echo "Log dir doesn't exist, create ${ZEPPELIN_LOG_DIR}"
-    $(mkdir -p "${ZEPPELIN_LOG_DIR}")
+  if [[ ! -d "${SMARTSUITES_LOG_DIR}" ]]; then
+    echo "Log dir doesn't exist, create ${SMARTSUITES_LOG_DIR}"
+    $(mkdir -p "${SMARTSUITES_LOG_DIR}")
   fi
 
-  if [[ ! -d "${ZEPPELIN_PID_DIR}" ]]; then
-    echo "Pid dir doesn't exist, create ${ZEPPELIN_PID_DIR}"
-    $(mkdir -p "${ZEPPELIN_PID_DIR}")
+  if [[ ! -d "${SMARTSUITES_PID_DIR}" ]]; then
+    echo "Pid dir doesn't exist, create ${SMARTSUITES_PID_DIR}"
+    $(mkdir -p "${SMARTSUITES_PID_DIR}")
   fi
 }
 
-function wait_for_zeppelin_to_die() {
+function wait_for_smartsuites_to_die() {
   local pid
   local count
   pid=$1
@@ -127,7 +127,7 @@ function wait_for_zeppelin_to_die() {
   fi
 }
 
-function wait_zeppelin_is_up_for_ci() {
+function wait_smartsuites_is_up_for_ci() {
   if [[ "${CI}" == "true" ]]; then
     local count=0;
     while [[ "${count}" -lt 30 ]]; do
@@ -145,15 +145,15 @@ function wait_zeppelin_is_up_for_ci() {
 
 function print_log_for_ci() {
   if [[ "${CI}" == "true" ]]; then
-    tail -1000 "${ZEPPELIN_LOGFILE}" | sed 's/^/  /'
+    tail -1000 "${SMARTSUITES_LOGFILE}" | sed 's/^/  /'
   fi
 }
 
 function check_if_process_is_alive() {
   local pid
-  pid=$(cat ${ZEPPELIN_PID})
+  pid=$(cat ${SMARTSUITES_PID})
   if ! kill -0 ${pid} >/dev/null 2>&1; then
-    action_msg "${ZEPPELIN_NAME} process died" "${SET_ERROR}"
+    action_msg "${SMARTSUITES_NAME} process died" "${SET_ERROR}"
     print_log_for_ci
     return 1
   fi
@@ -166,37 +166,37 @@ function upstart() {
   # where the service manager starts and stops the process
   initialize_default_directories
 
-  echo "ZEPPELIN_CLASSPATH: ${ZEPPELIN_CLASSPATH_OVERRIDES}:${CLASSPATH}" >> "${ZEPPELIN_OUTFILE}"
+  echo "SMARTSUITES_CLASSPATH: ${SMARTSUITES_CLASSPATH_OVERRIDES}:${CLASSPATH}" >> "${SMARTSUITES_OUTFILE}"
 
-  $ZEPPELIN_RUNNER $JAVA_OPTS -cp $ZEPPELIN_CLASSPATH_OVERRIDES:$CLASSPATH $ZEPPELIN_MAIN >> "${ZEPPELIN_OUTFILE}"
+  $SMARTSUITES_RUNNER $JAVA_OPTS -cp $SMARTSUITES_CLASSPATH_OVERRIDES:$CLASSPATH $SMARTSUITES_MAIN >> "${SMARTSUITES_OUTFILE}"
 }
 
 function start() {
   local pid
 
-  if [[ -f "${ZEPPELIN_PID}" ]]; then
-    pid=$(cat ${ZEPPELIN_PID})
+  if [[ -f "${SMARTSUITES_PID}" ]]; then
+    pid=$(cat ${SMARTSUITES_PID})
     if kill -0 ${pid} >/dev/null 2>&1; then
-      echo "${ZEPPELIN_NAME} is already running"
+      echo "${SMARTSUITES_NAME} is already running"
       return 0;
     fi
   fi
 
   initialize_default_directories
 
-  echo "ZEPPELIN_CLASSPATH: ${ZEPPELIN_CLASSPATH_OVERRIDES}:${CLASSPATH}" >> "${ZEPPELIN_OUTFILE}"
+  echo "SMARTSUITES_CLASSPATH: ${SMARTSUITES_CLASSPATH_OVERRIDES}:${CLASSPATH}" >> "${SMARTSUITES_OUTFILE}"
 
-  nohup nice -n $ZEPPELIN_NICENESS $ZEPPELIN_RUNNER $JAVA_OPTS -cp $ZEPPELIN_CLASSPATH_OVERRIDES:$CLASSPATH $ZEPPELIN_MAIN >> "${ZEPPELIN_OUTFILE}" 2>&1 < /dev/null &
+  nohup nice -n $SMARTSUITES_NICENESS $SMARTSUITES_RUNNER $JAVA_OPTS -cp $SMARTSUITES_CLASSPATH_OVERRIDES:$CLASSPATH $SMARTSUITES_MAIN >> "${SMARTSUITES_OUTFILE}" 2>&1 < /dev/null &
   pid=$!
   if [[ -z "${pid}" ]]; then
-    action_msg "${ZEPPELIN_NAME} start" "${SET_ERROR}"
+    action_msg "${SMARTSUITES_NAME} start" "${SET_ERROR}"
     return 1;
   else
-    action_msg "${ZEPPELIN_NAME} start" "${SET_OK}"
-    echo ${pid} > ${ZEPPELIN_PID}
+    action_msg "${SMARTSUITES_NAME} start" "${SET_OK}"
+    echo ${pid} > ${SMARTSUITES_PID}
   fi
 
-  wait_zeppelin_is_up_for_ci
+  wait_smartsuites_is_up_for_ci
   sleep 2
   check_if_process_is_alive
 }
@@ -205,45 +205,45 @@ function stop() {
   local pid
 
   # zeppelin daemon kill
-  if [[ ! -f "${ZEPPELIN_PID}" ]]; then
-    echo "${ZEPPELIN_NAME} is not running"
+  if [[ ! -f "${SMARTSUITES_PID}" ]]; then
+    echo "${SMARTSUITES_NAME} is not running"
   else
-    pid=$(cat ${ZEPPELIN_PID})
+    pid=$(cat ${SMARTSUITES_PID})
     if [[ -z "${pid}" ]]; then
-      echo "${ZEPPELIN_NAME} is not running"
+      echo "${SMARTSUITES_NAME} is not running"
     else
-      wait_for_zeppelin_to_die $pid 40
-      $(rm -f ${ZEPPELIN_PID})
-      action_msg "${ZEPPELIN_NAME} stop" "${SET_OK}"
+      wait_for_smartsuites_to_die $pid 40
+      $(rm -f ${SMARTSUITES_PID})
+      action_msg "${SMARTSUITES_NAME} stop" "${SET_OK}"
     fi
   fi
 
   # list all pid that used in remote interpreter and kill them
-  for f in ${ZEPPELIN_PID_DIR}/*.pid; do
+  for f in ${SMARTSUITES_PID_DIR}/*.pid; do
     if [[ ! -f ${f} ]]; then
       continue;
     fi
 
     pid=$(cat ${f})
-    wait_for_zeppelin_to_die $pid 20
+    wait_for_smartsuites_to_die $pid 20
     $(rm -f ${f})
   done
 
 }
 
-function find_zeppelin_process() {
+function find_smartsuites_process() {
   local pid
 
-  if [[ -f "${ZEPPELIN_PID}" ]]; then
-    pid=$(cat ${ZEPPELIN_PID})
+  if [[ -f "${SMARTSUITES_PID}" ]]; then
+    pid=$(cat ${SMARTSUITES_PID})
     if ! kill -0 ${pid} > /dev/null 2>&1; then
-      action_msg "${ZEPPELIN_NAME} running but process is dead" "${SET_ERROR}"
+      action_msg "${SMARTSUITES_NAME} running but process is dead" "${SET_ERROR}"
       return 1
     else
-      action_msg "${ZEPPELIN_NAME} is running" "${SET_OK}"
+      action_msg "${SMARTSUITES_NAME} is running" "${SET_OK}"
     fi
   else
-    action_msg "${ZEPPELIN_NAME} is not running" "${SET_ERROR}"
+    action_msg "${SMARTSUITES_NAME} is not running" "${SET_ERROR}"
     return 1
   fi
 }
@@ -263,15 +263,15 @@ case "${1}" in
     start
     ;;
   restart)
-    echo "${ZEPPELIN_NAME} is restarting" >> "${ZEPPELIN_OUTFILE}"
+    echo "${SMARTSUITES_NAME} is restarting" >> "${SMARTSUITES_OUTFILE}"
     stop
     start
     ;;
   status)
-    find_zeppelin_process
+    find_smartsuites_process
     ;;
   -v | --version)
-    getZeppelinVersion
+    getSmartsuitesVersion
     ;;
   *)
     echo ${USAGE}

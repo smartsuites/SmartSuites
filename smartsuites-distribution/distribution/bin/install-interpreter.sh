@@ -24,23 +24,23 @@ bin=$(cd "${bin}">/dev/null; pwd)
 
 . "${bin}/common.sh"
 
+# 安装解析器的主入口
+SMARTSUITES_INSTALL_INTERPRETER_MAIN=com.smartsuites.interpreter.install.InstallInterpreter
+SMARTSUITES_LOGFILE="${SMARTSUITES_LOG_DIR}/install-interpreter.log"
+JAVA_OPTS+=" -Dzeppelin.log.file=${SMARTSUITES_LOGFILE}"
 
-ZEPPELIN_INSTALL_INTERPRETER_MAIN=com.smartsuites.interpreter.install.InstallInterpreter
-ZEPPELIN_LOGFILE="${ZEPPELIN_LOG_DIR}/install-interpreter.log"
-JAVA_OPTS+=" -Dzeppelin.log.file=${ZEPPELIN_LOGFILE}"
-
-if [[ -d "${ZEPPELIN_HOME}/zeppelin-zengine/target/classes" ]]; then
-  ZEPPELIN_CLASSPATH+=":${ZEPPELIN_HOME}/zeppelin-zengine/target/classes"
+if [[ -d "${SMARTSUITES_HOME}/smartsuites-engine/target/classes" ]]; then
+  SMARTSUITES_CLASSPATH+=":${SMARTSUITES_HOME}/smartsuites-engine/target/classes"
 fi
-addJarInDir "${ZEPPELIN_HOME}/zeppelin-server/target/lib"
+addJarInDir "${SMARTSUITES_HOME}/smartsuites-server/target/lib"
 
-if [[ -d "${ZEPPELIN_HOME}/zeppelin-interpreter/target/classes" ]]; then
-  ZEPPELIN_CLASSPATH+=":${ZEPPELIN_HOME}/zeppelin-interpreter/target/classes"
+if [[ -d "${SMARTSUITES_HOME}/smartsuites-interpreter/target/classes" ]]; then
+  SMARTSUITES_CLASSPATH+=":${SMARTSUITES_HOME}/smartsuites-interpreter/target/classes"
 fi
-addJarInDir "${ZEPPELIN_HOME}/zeppelin-interpreter/target/lib"
+addJarInDir "${SMARTSUITES_HOME}/smartsuites-interpreter/target/lib"
 
-addJarInDir "${ZEPPELIN_HOME}/lib"
-addJarInDir "${ZEPPELIN_HOME}/lib/interpreter"
+addJarInDir "${SMARTSUITES_HOME}/lib"
+addJarInDir "${SMARTSUITES_HOME}/lib/interpreter"
 
-CLASSPATH+=":${ZEPPELIN_CLASSPATH}"
-$ZEPPELIN_RUNNER $JAVA_OPTS -cp $CLASSPATH $ZEPPELIN_INSTALL_INTERPRETER_MAIN ${@}
+CLASSPATH+=":${SMARTSUITES_CLASSPATH}"
+$SMARTSUITES_RUNNER $JAVA_OPTS -cp $CLASSPATH $SMARTSUITES_INSTALL_INTERPRETER_MAIN ${@}

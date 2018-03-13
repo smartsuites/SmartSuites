@@ -7,10 +7,10 @@ package com.smartsuites.rest;
 import com.google.gson.Gson;
 import com.google.gson.internal.StringMap;
 import com.google.gson.reflect.TypeToken;
+import com.smartsuites.server.SmartsuitesServer;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import com.smartsuites.helium.*;
-import com.smartsuites.server.ZeppelinServer;
 import org.junit.*;
 
 import java.io.IOException;
@@ -37,8 +37,8 @@ public class HeliumRestApiTest extends AbstractTestRestApi {
     @Before
     public void setUp() throws IOException {
         HeliumTestRegistry registry = new HeliumTestRegistry("r1", "r1");
-        ZeppelinServer.helium.clear();
-        ZeppelinServer.helium.addRegistry(registry);
+        SmartsuitesServer.helium.clear();
+        SmartsuitesServer.helium.addRegistry(registry);
 
         registry.add(new HeliumPackage(
                 HeliumType.APPLICATION,
@@ -63,7 +63,7 @@ public class HeliumRestApiTest extends AbstractTestRestApi {
 
     @After
     public void tearDown() throws Exception {
-        ZeppelinServer.helium.clear();
+        SmartsuitesServer.helium.clear();
     }
 
     @Test
@@ -90,7 +90,7 @@ public class HeliumRestApiTest extends AbstractTestRestApi {
         assertEquals(body1.size(), 0);
 
         // Enable "name1" package
-        ZeppelinServer.helium.enable("name1","artifact1");
+        SmartsuitesServer.helium.enable("name1","artifact1");
 
         GetMethod get2 = httpGet("/helium/enabledPackage");
         assertThat(get2, isAllowed());
@@ -174,7 +174,7 @@ public class HeliumRestApiTest extends AbstractTestRestApi {
         assertEquals(body1.size(), 0);
 
         //We assume allPackages list has been refreshed before sorting
-        ZeppelinServer.helium.getAllPackageInfo();
+        SmartsuitesServer.helium.getAllPackageInfo();
 
         String postRequestJson = "[name2, name1]";
         PostMethod post = httpPost("/helium/order/visualization", postRequestJson);

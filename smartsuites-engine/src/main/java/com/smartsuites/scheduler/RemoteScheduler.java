@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 /**
- * RemoteScheduler runs in ZeppelinServer and proxies Scheduler running on RemoteInterpreter
+ * RemoteScheduler runs in SmartsuitesServer and proxies Scheduler running on RemoteInterpreter
  * 主要的调度类
  */
 public class RemoteScheduler implements Scheduler {

@@ -270,7 +270,7 @@ public class InterpreterOutput extends OutputStream {
   }
 
   /**
-   * In dev mode, it monitors file and update ZeppelinServer
+   * In dev mode, it monitors file and update SmartsuitesServer
    * @param file
    * @throws IOException
    */

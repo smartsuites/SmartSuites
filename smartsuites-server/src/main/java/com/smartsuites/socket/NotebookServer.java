@@ -49,7 +49,7 @@ import com.smartsuites.notebook.socket.WatcherMessage;
 import com.smartsuites.rest.exception.ForbiddenException;
 import com.smartsuites.scheduler.Job;
 import com.smartsuites.scheduler.Job.Status;
-import com.smartsuites.server.ZeppelinServer;
+import com.smartsuites.server.SmartsuitesServer;
 import com.smartsuites.ticket.TicketContainer;
 import com.smartsuites.types.InterpreterSettingsList;
 import com.smartsuites.user.AuthenticationInfo;
@@ -119,7 +119,7 @@ public class NotebookServer extends WebSocketServlet
   final Queue<NotebookSocket> watcherSockets = Queues.newConcurrentLinkedQueue();
 
   private Notebook notebook() {
-    return ZeppelinServer.notebook;
+    return SmartsuitesServer.notebook;
   }
 
   @Override
@@ -1988,7 +1988,7 @@ public class NotebookServer extends WebSocketServlet
   }
 
   /**
-   * This callback is for the paragraph that runs on ZeppelinServer
+   * This callback is for the paragraph that runs on SmartsuitesServer
    *
    * @param output output to append
    */
@@ -2000,7 +2000,7 @@ public class NotebookServer extends WebSocketServlet
   }
 
   /**
-   * This callback is for the paragraph that runs on ZeppelinServer
+   * This callback is for the paragraph that runs on SmartsuitesServer
    *
    * @param output output to update (replace)
    */
@@ -2022,7 +2022,7 @@ public class NotebookServer extends WebSocketServlet
 
 
   /**
-   * This callback is for the paragraph that runs on ZeppelinServer
+   * This callback is for the paragraph that runs on SmartsuitesServer
    */
   @Override
   public void onOutputClear(String noteId, String paragraphId) {

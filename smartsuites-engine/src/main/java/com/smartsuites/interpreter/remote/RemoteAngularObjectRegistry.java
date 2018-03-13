@@ -35,7 +35,7 @@ public class RemoteAngularObjectRegistry extends AngularObjectRegistry {
   }
 
   /**
-   * When ZeppelinServer side code want to add angularObject to the registry,
+   * When SmartsuitesServer side code want to add angularObject to the registry,
    * this method should be used instead of add()
    * @param name
    * @param o
@@ -68,7 +68,7 @@ public class RemoteAngularObjectRegistry extends AngularObjectRegistry {
   }
 
   /**
-   * When ZeppelinServer side code want to remove angularObject from the registry,
+   * When SmartsuitesServer side code want to remove angularObject from the registry,
    * this method should be used instead of remove()
    * @param name
    * @param noteId

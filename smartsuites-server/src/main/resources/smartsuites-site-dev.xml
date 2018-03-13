@@ -41,7 +41,7 @@
 
     <property>
         <name>zeppelin.home</name>
-        <value>/Users/wuyufei/GitHub/SmartSuites/smartsuites-distribution/distribution</value>
+        <value>/Users/wuyufei/GitHub/SmartSuites/smartsuites-distribution/develop</value>
         <description>zeppelin.home</description>
     </property>
 

@@ -28,7 +28,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Test Zeppelin with web browser.
  *
- * To test, ZeppelinServer should be running on port 8080
+ * To test, SmartsuitesServer should be running on port 8080
  * On OSX, you'll need firefox 42.0 installed, then you can run with
  *
  * PATH=~/Applications/Firefox.app/Contents/MacOS/:$PATH TEST_SELENIUM="" \

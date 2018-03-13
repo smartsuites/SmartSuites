@@ -6,6 +6,7 @@ package com.smartsuites.rest;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.smartsuites.server.SmartsuitesServer;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
@@ -13,7 +14,6 @@ import com.smartsuites.interpreter.InterpreterResult;
 import com.smartsuites.notebook.Note;
 import com.smartsuites.notebook.Paragraph;
 import com.smartsuites.scheduler.Job;
-import com.smartsuites.server.ZeppelinServer;
 import com.smartsuites.user.AuthenticationInfo;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -57,7 +57,7 @@ public class NotebookRestApiTest extends AbstractTestRestApi {
 
   @Test
   public void testGetNoteParagraphJobStatus() throws IOException {
-    Note note1 = ZeppelinServer.notebook.createNote(anonymous);
+    Note note1 = SmartsuitesServer.notebook.createNote(anonymous);
     note1.addNewParagraph(AuthenticationInfo.ANONYMOUS);
 
     String paragraphId = note1.getLastParagraph().getId();
@@ -73,13 +73,13 @@ public class NotebookRestApiTest extends AbstractTestRestApi {
     assertEquals(paragraphStatus.get("status"), "READY");
 
     //cleanup
-    ZeppelinServer.notebook.removeNote(note1.getId(), anonymous);
+    SmartsuitesServer.notebook.removeNote(note1.getId(), anonymous);
 
   }
 
   @Test
   public void testRunParagraphJob() throws IOException {
-    Note note1 = ZeppelinServer.notebook.createNote(anonymous);
+    Note note1 = SmartsuitesServer.notebook.createNote(anonymous);
     note1.addNewParagraph(AuthenticationInfo.ANONYMOUS);
 
     Paragraph p = note1.addNewParagraph(AuthenticationInfo.ANONYMOUS);
@@ -104,12 +104,12 @@ public class NotebookRestApiTest extends AbstractTestRestApi {
     assertNotEquals(p.getStatus(), Job.Status.READY);
 
     //cleanup
-    ZeppelinServer.notebook.removeNote(note1.getId(), anonymous);
+    SmartsuitesServer.notebook.removeNote(note1.getId(), anonymous);
   }
 
   @Test
   public void testRunAllParagraph_AllSuccess() throws IOException {
-    Note note1 = ZeppelinServer.notebook.createNote(anonymous);
+    Note note1 = SmartsuitesServer.notebook.createNote(anonymous);
     // 2 paragraphs
     // P1:
     //    %python
@@ -140,7 +140,7 @@ public class NotebookRestApiTest extends AbstractTestRestApi {
 
   @Test
   public void testRunAllParagraph_FirstFailed() throws IOException {
-    Note note1 = ZeppelinServer.notebook.createNote(anonymous);
+    Note note1 = SmartsuitesServer.notebook.createNote(anonymous);
     // 2 paragraphs
     // P1:
     //    %python
@@ -171,7 +171,7 @@ public class NotebookRestApiTest extends AbstractTestRestApi {
 
   @Test
   public void testCloneNote() throws IOException {
-    Note note1 = ZeppelinServer.notebook.createNote(anonymous);
+    Note note1 = SmartsuitesServer.notebook.createNote(anonymous);
     PostMethod post = httpPost("/notebook/" + note1.getId(), "");
     LOG.info("testCloneNote response\n" + post.getResponseBodyAsString());
     assertThat(post, isAllowed());
@@ -190,13 +190,13 @@ public class NotebookRestApiTest extends AbstractTestRestApi {
     get.releaseConnection();
 
     //cleanup
-    ZeppelinServer.notebook.removeNote(note1.getId(), anonymous);
-    ZeppelinServer.notebook.removeNote(clonedNoteId, anonymous);
+    SmartsuitesServer.notebook.removeNote(note1.getId(), anonymous);
+    SmartsuitesServer.notebook.removeNote(clonedNoteId, anonymous);
   }
 
   @Test
   public void testUpdateParagraphConfig() throws IOException {
-    Note note = ZeppelinServer.notebook.createNote(anonymous);
+    Note note = SmartsuitesServer.notebook.createNote(anonymous);
     String noteId = note.getId();
     Paragraph p = note.addNewParagraph(AuthenticationInfo.ANONYMOUS);
     assertNull(p.getConfig().get("colWidth"));
@@ -213,17 +213,17 @@ public class NotebookRestApiTest extends AbstractTestRestApi {
     put.releaseConnection();
 
     assertEquals(config.get("colWidth"), 6.0);
-    note = ZeppelinServer.notebook.getNote(noteId);
+    note = SmartsuitesServer.notebook.getNote(noteId);
     assertEquals(note.getParagraph(paragraphId).getConfig().get("colWidth"), 6.0);
 
     //cleanup
-    ZeppelinServer.notebook.removeNote(noteId, anonymous);
+    SmartsuitesServer.notebook.removeNote(noteId, anonymous);
   }
 
   @Test
   public void testClearAllParagraphOutput() throws IOException {
     // Create note and set result explicitly
-    Note note = ZeppelinServer.notebook.createNote(anonymous);
+    Note note = SmartsuitesServer.notebook.createNote(anonymous);
     Paragraph p1 = note.addNewParagraph(AuthenticationInfo.ANONYMOUS);
     InterpreterResult result = new InterpreterResult(InterpreterResult.Code.SUCCESS, InterpreterResult.Type.TEXT, "result");
     p1.setResult(result);
@@ -254,6 +254,6 @@ public class NotebookRestApiTest extends AbstractTestRestApi {
     get.releaseConnection();
 
     //cleanup
-    ZeppelinServer.notebook.removeNote(note.getId(), anonymous);
+    SmartsuitesServer.notebook.removeNote(note.getId(), anonymous);
   }
 }

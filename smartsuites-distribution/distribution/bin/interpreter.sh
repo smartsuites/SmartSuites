@@ -43,14 +43,14 @@ while getopts "hc:p:d:l:v:u:g:" o; do
             ;;
         v)
             . "${bin}/common.sh"
-            getZeppelinVersion
+            getSmartsuitesVersion
             ;;
         u)
-            ZEPPELIN_IMPERSONATE_USER="${OPTARG}"
-            if [[ -z "$ZEPPELIN_IMPERSONATE_CMD" ]]; then
-              ZEPPELIN_IMPERSONATE_RUN_CMD=`echo "ssh ${ZEPPELIN_IMPERSONATE_USER}@localhost" `
+            SMARTSUITES_IMPERSONATE_USER="${OPTARG}"
+            if [[ -z "$SMARTSUITES_IMPERSONATE_CMD" ]]; then
+              SMARTSUITES_IMPERSONATE_RUN_CMD=`echo "ssh ${SMARTSUITES_IMPERSONATE_USER}@localhost" `
             else
-              ZEPPELIN_IMPERSONATE_RUN_CMD=$(eval "echo ${ZEPPELIN_IMPERSONATE_CMD} ")
+              SMARTSUITES_IMPERSONATE_RUN_CMD=$(eval "echo ${SMARTSUITES_IMPERSONATE_CMD} ")
             fi
             ;;
         g)
@@ -66,56 +66,42 @@ fi
 
 . "${bin}/common.sh"
 
-ZEPPELIN_INTP_CLASSPATH="${CLASSPATH}"
+# 解析器JVM类路径
+SMARTSUITES_INTP_CLASSPATH="${CLASSPATH}"
 
-# construct classpath
-if [[ -d "${ZEPPELIN_DEV_HOME}/smartsuites-interpreter/target/classes" ]]; then
-  ZEPPELIN_INTP_CLASSPATH+=":${ZEPPELIN_DEV_HOME}/smartsuites-interpreter/target/classes"
-fi
-
-# add test classes for unittest
-if [[ -d "${ZEPPELIN_DEV_HOME}/smartsuites-interpreter/target/test-classes" ]]; then
-  ZEPPELIN_INTP_CLASSPATH+=":${ZEPPELIN_DEV_HOME}/smartsuites-interpreter/target/test-classes"
-fi
-if [[ -d "${ZEPPELIN_DEV_HOME}/smartsuites-zengine/target/test-classes" ]]; then
-  ZEPPELIN_INTP_CLASSPATH+=":${ZEPPELIN_DEV_HOME}/smartsuites-zengine/target/test-classes"
-fi
-
-addJarInDirForIntp "${ZEPPELIN_DEV_HOME}/smartsuites-interpreter/target/lib"
-
-addJarInDirForIntp "${ZEPPELIN_HOME}/lib/interpreter"
+addJarInDirForIntp "${SMARTSUITES_HOME}/lib/interpreter"
 addJarInDirForIntp "${INTERPRETER_DIR}"
 
 HOSTNAME=$(hostname)
-ZEPPELIN_SERVER=com.smartsuites.interpreter.remote.RemoteInterpreterServer
+SMARTSUITES_SERVER=com.smartsuites.interpreter.remote.RemoteInterpreterServer
 
 INTERPRETER_ID=$(basename "${INTERPRETER_DIR}")
-ZEPPELIN_PID="${ZEPPELIN_PID_DIR}/smartsuites-interpreter-${INTERPRETER_ID}-${ZEPPELIN_IDENT_STRING}-${HOSTNAME}.pid"
-ZEPPELIN_LOGFILE="${ZEPPELIN_LOG_DIR}/smartsuites-interpreter-"
+SMARTSUITES_PID="${SMARTSUITES_PID_DIR}/smartsuites-interpreter-${INTERPRETER_ID}-${SMARTSUITES_IDENT_STRING}-${HOSTNAME}.pid"
+SMARTSUITES_LOGFILE="${SMARTSUITES_LOG_DIR}/smartsuites-interpreter-"
 if [[ ! -z "$INTERPRETER_GROUP_NAME" ]]; then
-    ZEPPELIN_LOGFILE+="${INTERPRETER_GROUP_NAME}-"
+    SMARTSUITES_LOGFILE+="${INTERPRETER_GROUP_NAME}-"
 fi
-if [[ ! -z "$ZEPPELIN_IMPERSONATE_USER" ]]; then
-    ZEPPELIN_LOGFILE+="${ZEPPELIN_IMPERSONATE_USER}-"
+if [[ ! -z "$SMARTSUITES_IMPERSONATE_USER" ]]; then
+    SMARTSUITES_LOGFILE+="${SMARTSUITES_IMPERSONATE_USER}-"
 fi
-ZEPPELIN_LOGFILE+="${INTERPRETER_ID}-${ZEPPELIN_IDENT_STRING}-${HOSTNAME}.log"
+SMARTSUITES_LOGFILE+="${INTERPRETER_ID}-${SMARTSUITES_IDENT_STRING}-${HOSTNAME}.log"
 
-#JAVA_INTP_OPTS+=" -Dzeppelin.log.file=${ZEPPELIN_LOGFILE}"
+# 设置LOG
+JAVA_INTP_OPTS+=" -Dzeppelin.log.file=${SMARTSUITES_LOGFILE}"
 
-JAVA_INTP_OPTS+=" -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=`expr ${PORT} + 1`  -Dzeppelin.log.file=${ZEPPELIN_LOGFILE}"
-
-if [[ ! -d "${ZEPPELIN_LOG_DIR}" ]]; then
-  echo "Log dir doesn't exist, create ${ZEPPELIN_LOG_DIR}"
-  $(mkdir -p "${ZEPPELIN_LOG_DIR}")
+# 创建LOG目录
+if [[ ! -d "${SMARTSUITES_LOG_DIR}" ]]; then
+  echo "Log dir doesn't exist, create ${SMARTSUITES_LOG_DIR}"
+  $(mkdir -p "${SMARTSUITES_LOG_DIR}")
 fi
 
 # set spark related env variables
 if [[ "${INTERPRETER_ID}" == "spark" ]]; then
   if [[ -n "${SPARK_HOME}" ]]; then
     export SPARK_SUBMIT="${SPARK_HOME}/bin/spark-submit"
-    SPARK_APP_JAR="$(ls ${ZEPPELIN_HOME}/interpreter/spark/zeppelin-spark*.jar)"
+    SPARK_APP_JAR="$(ls ${SMARTSUITES_HOME}/interpreter/spark/zeppelin-spark*.jar)"
     # This will evantually passes SPARK_APP_JAR to classpath of SparkIMain
-    ZEPPELIN_INTP_CLASSPATH+=":${SPARK_APP_JAR}"
+    SMARTSUITES_INTP_CLASSPATH+=":${SPARK_APP_JAR}"
 
     pattern="$SPARK_HOME/python/lib/py4j-*-src.zip"
     py4j=($pattern)
@@ -135,10 +121,10 @@ if [[ "${INTERPRETER_ID}" == "spark" ]]; then
 
     addJarInDirForIntp "${INTERPRETER_DIR}/dep"
 
-    pattern="${ZEPPELIN_HOME}/interpreter/spark/pyspark/py4j-*-src.zip"
+    pattern="${SMARTSUITES_HOME}/interpreter/spark/pyspark/py4j-*-src.zip"
     py4j=($pattern)
     # pick the first match py4j zip - there should only be one
-    PYSPARKPATH="${ZEPPELIN_HOME}/interpreter/spark/pyspark/pyspark.zip:${py4j[0]}"
+    PYSPARKPATH="${SMARTSUITES_HOME}/interpreter/spark/pyspark/pyspark.zip:${py4j[0]}"
 
     if [[ -z "${PYTHONPATH}" ]]; then
       export PYTHONPATH="${PYSPARKPATH}"
@@ -146,11 +132,11 @@ if [[ "${INTERPRETER_ID}" == "spark" ]]; then
       export PYTHONPATH="${PYTHONPATH}:${PYSPARKPATH}"
     fi
     unset PYSPARKPATH
-    export SPARK_CLASSPATH+=":${ZEPPELIN_INTP_CLASSPATH}"
+    export SPARK_CLASSPATH+=":${SMARTSUITES_INTP_CLASSPATH}"
   fi
 
   if [[ -n "${HADOOP_CONF_DIR}" ]] && [[ -d "${HADOOP_CONF_DIR}" ]]; then
-    ZEPPELIN_INTP_CLASSPATH+=":${HADOOP_CONF_DIR}"
+    SMARTSUITES_INTP_CLASSPATH+=":${HADOOP_CONF_DIR}"
     export HADOOP_CONF_DIR=${HADOOP_CONF_DIR}
   else
     # autodetect HADOOP_CONF_HOME by heuristic
@@ -165,9 +151,9 @@ if [[ "${INTERPRETER_ID}" == "spark" ]]; then
 
 elif [[ "${INTERPRETER_ID}" == "hbase" ]]; then
   if [[ -n "${HBASE_CONF_DIR}" ]]; then
-    ZEPPELIN_INTP_CLASSPATH+=":${HBASE_CONF_DIR}"
+    SMARTSUITES_INTP_CLASSPATH+=":${HBASE_CONF_DIR}"
   elif [[ -n "${HBASE_HOME}" ]]; then
-    ZEPPELIN_INTP_CLASSPATH+=":${HBASE_HOME}/conf"
+    SMARTSUITES_INTP_CLASSPATH+=":${HBASE_HOME}/conf"
   else
     echo "HBASE_HOME and HBASE_CONF_DIR are not set, configuration might not be loaded"
   fi
@@ -182,14 +168,14 @@ elif [[ "${INTERPRETER_ID}" == "pig" ]]; then
   fi
 
   if [[ -n "${HADOOP_CONF_DIR}" ]] && [[ -d "${HADOOP_CONF_DIR}" ]]; then
-    ZEPPELIN_INTP_CLASSPATH+=":${HADOOP_CONF_DIR}"
+    SMARTSUITES_INTP_CLASSPATH+=":${HADOOP_CONF_DIR}"
   fi
 
   # autodetect TEZ_CONF_DIR
   if [[ -n "${TEZ_CONF_DIR}" ]]; then
-    ZEPPELIN_INTP_CLASSPATH+=":${TEZ_CONF_DIR}"
+    SMARTSUITES_INTP_CLASSPATH+=":${TEZ_CONF_DIR}"
   elif [[ -d "/etc/tez/conf" ]]; then
-    ZEPPELIN_INTP_CLASSPATH+=":/etc/tez/conf"
+    SMARTSUITES_INTP_CLASSPATH+=":/etc/tez/conf"
   else
     echo "TEZ_CONF_DIR is not set, configuration might not be loaded"
   fi
@@ -197,29 +183,29 @@ fi
 
 addJarInDirForIntp "${LOCAL_INTERPRETER_REPO}"
 
-if [[ ! -z "$ZEPPELIN_IMPERSONATE_USER" ]]; then
-    suid="$(id -u ${ZEPPELIN_IMPERSONATE_USER})"
+if [[ ! -z "$SMARTSUITES_IMPERSONATE_USER" ]]; then
+    suid="$(id -u ${SMARTSUITES_IMPERSONATE_USER})"
     if [[ -n  "${suid}" || -z "${SPARK_SUBMIT}" ]]; then
-       INTERPRETER_RUN_COMMAND=${ZEPPELIN_IMPERSONATE_RUN_CMD}" '"
-       if [[ -f "${ZEPPELIN_CONF_DIR}/zeppelin-env.sh" ]]; then
-           INTERPRETER_RUN_COMMAND+=" source "${ZEPPELIN_CONF_DIR}'/zeppelin-env.sh;'
+       INTERPRETER_RUN_COMMAND=${SMARTSUITES_IMPERSONATE_RUN_CMD}" '"
+       if [[ -f "${SMARTSUITES_CONF_DIR}/smartsuites-env.sh" ]]; then
+           INTERPRETER_RUN_COMMAND+=" source "${SMARTSUITES_CONF_DIR}'/smartsuites-env.sh;'
        fi
     fi
 fi
 
 if [[ -n "${SPARK_SUBMIT}" ]]; then
-    if [[ -n "$ZEPPELIN_IMPERSONATE_USER" ]] && [[ "$ZEPPELIN_IMPERSONATE_SPARK_PROXY_USER" != "false" ]];  then
-       INTERPRETER_RUN_COMMAND+=' '` echo ${SPARK_SUBMIT} --class ${ZEPPELIN_SERVER} --driver-class-path \"${ZEPPELIN_INTP_CLASSPATH_OVERRIDES}:${ZEPPELIN_INTP_CLASSPATH}\" --driver-java-options \"${JAVA_INTP_OPTS}\" ${SPARK_SUBMIT_OPTIONS} ${ZEPPELIN_SPARK_CONF} --proxy-user ${ZEPPELIN_IMPERSONATE_USER} ${SPARK_APP_JAR} ${CALLBACK_HOST} ${PORT}`
+    if [[ -n "$SMARTSUITES_IMPERSONATE_USER" ]] && [[ "$SMARTSUITES_IMPERSONATE_SPARK_PROXY_USER" != "false" ]];  then
+       INTERPRETER_RUN_COMMAND+=' '` echo ${SPARK_SUBMIT} --class ${SMARTSUITES_SERVER} --driver-class-path \"${SMARTSUITES_INTP_CLASSPATH_OVERRIDES}:${SMARTSUITES_INTP_CLASSPATH}\" --driver-java-options \"${JAVA_INTP_OPTS}\" ${SPARK_SUBMIT_OPTIONS} ${SMARTSUITES_SPARK_CONF} --proxy-user ${SMARTSUITES_IMPERSONATE_USER} ${SPARK_APP_JAR} ${CALLBACK_HOST} ${PORT}`
     else
-       INTERPRETER_RUN_COMMAND+=' '` echo ${SPARK_SUBMIT} --class ${ZEPPELIN_SERVER} --driver-class-path \"${ZEPPELIN_INTP_CLASSPATH_OVERRIDES}:${ZEPPELIN_INTP_CLASSPATH}\" --driver-java-options \"${JAVA_INTP_OPTS}\" ${SPARK_SUBMIT_OPTIONS} ${ZEPPELIN_SPARK_CONF} ${SPARK_APP_JAR} ${CALLBACK_HOST} ${PORT}`
+       INTERPRETER_RUN_COMMAND+=' '` echo ${SPARK_SUBMIT} --class ${SMARTSUITES_SERVER} --driver-class-path \"${SMARTSUITES_INTP_CLASSPATH_OVERRIDES}:${SMARTSUITES_INTP_CLASSPATH}\" --driver-java-options \"${JAVA_INTP_OPTS}\" ${SPARK_SUBMIT_OPTIONS} ${SMARTSUITES_SPARK_CONF} ${SPARK_APP_JAR} ${CALLBACK_HOST} ${PORT}`
     fi
 else
-    INTERPRETER_RUN_COMMAND+=' '` echo ${ZEPPELIN_RUNNER} ${JAVA_INTP_OPTS} ${ZEPPELIN_INTP_MEM} -cp ${ZEPPELIN_INTP_CLASSPATH_OVERRIDES}:${ZEPPELIN_INTP_CLASSPATH} ${ZEPPELIN_SERVER} ${CALLBACK_HOST} ${PORT} `
+    INTERPRETER_RUN_COMMAND+=' '` echo ${SMARTSUITES_RUNNER} ${JAVA_INTP_OPTS} ${SMARTSUITES_INTP_MEM} -cp ${SMARTSUITES_INTP_CLASSPATH_OVERRIDES}:${SMARTSUITES_INTP_CLASSPATH} ${SMARTSUITES_SERVER} ${CALLBACK_HOST} ${PORT} `
 fi
 
 echo $INTERPRETER_RUN_COMMAND
 
-if [[ ! -z "$ZEPPELIN_IMPERSONATE_USER" ]] && [[ -n "${suid}" || -z "${SPARK_SUBMIT}" ]]; then
+if [[ ! -z "$SMARTSUITES_IMPERSONATE_USER" ]] && [[ -n "${suid}" || -z "${SPARK_SUBMIT}" ]]; then
     INTERPRETER_RUN_COMMAND+="'"
 fi
 
@@ -229,7 +215,7 @@ pid=$!
 if [[ -z "${pid}" ]]; then
   exit 1;
 else
-  echo ${pid} > ${ZEPPELIN_PID}
+  echo ${pid} > ${SMARTSUITES_PID}
 fi
 
 
@@ -243,12 +229,12 @@ function shutdown_hook() {
       sleep 3
       let "count+=1"
     else
-      rm -f "${ZEPPELIN_PID}"
+      rm -f "${SMARTSUITES_PID}"
       break
     fi
   if [[ "${count}" == "5" ]]; then
     $(kill -9 ${pid} > /dev/null 2> /dev/null)
-    rm -f "${ZEPPELIN_PID}"
+    rm -f "${SMARTSUITES_PID}"
   fi
   done
 }

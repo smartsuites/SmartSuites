@@ -528,7 +528,7 @@ public class Notebook implements NoteEventListener {
           // so does not make sense add it to the remote.
           //
           // therefore instead of addAndNotifyRemoteProcess(), need to use add()
-          // that results add angularObject only in ZeppelinServer side not remoteProcessSide
+          // that results add angularObject only in SmartsuitesServer side not remoteProcessSide
           registry.add(name, snapshot.getAngularObject().get(), noteId, paragraphId);
         }
       }

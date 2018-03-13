@@ -22,135 +22,144 @@ else
   FWDIR=$(dirname "${BASH_SOURCE-$0}")
 fi
 
-if [[ -z "${ZEPPELIN_HOME}" ]]; then
-  # Make ZEPPELIN_HOME look cleaner in logs by getting rid of the
+# 设置HOME地址
+if [[ -z "${SMARTSUITES_HOME}" ]]; then
+  # Make SMARTSUITES_HOME look cleaner in logs by getting rid of the
   # extra ../
-  export ZEPPELIN_HOME="$(cd "${FWDIR}/.."; pwd)"
+  export SMARTSUITES_HOME="$(cd "${FWDIR}/.."; pwd)"
 fi
 
-# For Develop
-
-if [[ -z "${ZEPPELIN_DEV_HOME}" ]]; then
-  # Make ZEPPELIN_HOME look cleaner in logs by getting rid of the
-  # extra ../
-  export ZEPPELIN_DEV_HOME="$(cd "${FWDIR}/../../.."; pwd)"
+# 设置conf目录
+if [[ -z "${SMARTSUITES_CONF_DIR}" ]]; then
+  export SMARTSUITES_CONF_DIR="${SMARTSUITES_HOME}/conf"
 fi
 
-# End Develop
-
-if [[ -z "${ZEPPELIN_CONF_DIR}" ]]; then
-  export ZEPPELIN_CONF_DIR="${ZEPPELIN_HOME}/conf"
+# 设置logs目录
+if [[ -z "${SMARTSUITES_LOG_DIR}" ]]; then
+  export SMARTSUITES_LOG_DIR="${SMARTSUITES_HOME}/logs"
 fi
 
-if [[ -z "${ZEPPELIN_LOG_DIR}" ]]; then
-  export ZEPPELIN_LOG_DIR="${ZEPPELIN_HOME}/logs"
+# 设置pid存放目录
+if [[ -z "$SMARTSUITES_PID_DIR" ]]; then
+  export SMARTSUITES_PID_DIR="${SMARTSUITES_HOME}/run"
 fi
 
-if [[ -z "$ZEPPELIN_PID_DIR" ]]; then
-  export ZEPPELIN_PID_DIR="${ZEPPELIN_HOME}/run"
-fi
-
-if [[ -z "${ZEPPELIN_WAR}" ]]; then
-  if [[ -d "${ZEPPELIN_HOME}/zeppelin-web/dist" ]]; then
-    export ZEPPELIN_WAR="${ZEPPELIN_HOME}/zeppelin-web/dist"
+# 查找war包路径
+if [[ -z "${SMARTSUITES_WAR}" ]]; then
+  if [[ -d "${SMARTSUITES_HOME}/smartsuites-web/dist" ]]; then
+    export SMARTSUITES_WAR="${SMARTSUITES_HOME}/smartsuites-web/dist"
   else
-    export ZEPPELIN_WAR=$(find -L "${ZEPPELIN_HOME}" -name "zeppelin-web*.war")
+    export SMARTSUITES_WAR=$(find -L "${SMARTSUITES_HOME}" -name "smartsuites-web*.war")
   fi
 fi
 
-if [[ -f "${ZEPPELIN_CONF_DIR}/zeppelin-env.sh" ]]; then
-  . "${ZEPPELIN_CONF_DIR}/zeppelin-env.sh"
+# 查找 smartsuites-env.sh 并加载
+if [[ -f "${SMARTSUITES_CONF_DIR}/smartsuites-env.sh" ]]; then
+  . "${SMARTSUITES_CONF_DIR}/smartsuites-env.sh"
 fi
 
-ZEPPELIN_CLASSPATH+=":${ZEPPELIN_CONF_DIR}"
+# 将conf目录加入到类路径
+SMARTSUITES_CLASSPATH+=":${SMARTSUITES_CONF_DIR}"
 
+# 将文件夹下的所有jar包加入类路径
 function addEachJarInDir(){
   if [[ -d "${1}" ]]; then
     for jar in $(find -L "${1}" -maxdepth 1 -name '*jar'); do
-      ZEPPELIN_CLASSPATH="$jar:$ZEPPELIN_CLASSPATH"
+      SMARTSUITES_CLASSPATH="$jar:$SMARTSUITES_CLASSPATH"
     done
   fi
 }
 
+# 递归将文件夹下的所有jar包加入类路径
 function addEachJarInDirRecursive(){
   if [[ -d "${1}" ]]; then
     for jar in $(find -L "${1}" -type f -name '*jar'); do
-      ZEPPELIN_CLASSPATH="$jar:$ZEPPELIN_CLASSPATH"
+      SMARTSUITES_CLASSPATH="$jar:$SMARTSUITES_CLASSPATH"
     done
   fi
 }
 
+# 递归将文件夹下的所有jar包加入解析器的类路径
 function addEachJarInDirRecursiveForIntp(){
   if [[ -d "${1}" ]]; then
     for jar in $(find -L "${1}" -type f -name '*jar'); do
-      ZEPPELIN_INTP_CLASSPATH="$jar:$ZEPPELIN_INTP_CLASSPATH"
+      SMARTSUITES_INTP_CLASSPATH="$jar:$SMARTSUITES_INTP_CLASSPATH"
     done
   fi
 }
 
+# 将单个jar包加入类路径
 function addJarInDir(){
   if [[ -d "${1}" ]]; then
-    ZEPPELIN_CLASSPATH="${1}/*:${ZEPPELIN_CLASSPATH}"
+    SMARTSUITES_CLASSPATH="${1}/*:${SMARTSUITES_CLASSPATH}"
   fi
 }
 
+# 将单个jar包加入解析器的类路径
 function addJarInDirForIntp() {
   if [[ -d "${1}" ]]; then
-    ZEPPELIN_INTP_CLASSPATH="${1}/*:${ZEPPELIN_INTP_CLASSPATH}"
+    SMARTSUITES_INTP_CLASSPATH="${1}/*:${SMARTSUITES_INTP_CLASSPATH}"
   fi
 }
 
-ZEPPELIN_COMMANDLINE_MAIN=org.apache.zeppelin.utils.CommandLineUtils
+# 平台命令行主类
+SMARTSUITES_COMMANDLINE_MAIN=com.smartsuites.utils.CommandLineUtils
 
-function getZeppelinVersion(){
-    if [[ -d "${ZEPPELIN_HOME}/zeppelin-server/target/classes" ]]; then
-      ZEPPELIN_CLASSPATH+=":${ZEPPELIN_HOME}/zeppelin-server/target/classes"
+# 获取平台的版本信息
+function getSmartsuitesVersion(){
+    if [[ -d "${SMARTSUITES_HOME}/smartsuites-server/target/classes" ]]; then
+      SMARTSUITES_CLASSPATH+=":${SMARTSUITES_HOME}/smartsuites-server/target/classes"
     fi
-    addJarInDir "${ZEPPELIN_HOME}/zeppelin-server/target/lib"
-    CLASSPATH+=":${ZEPPELIN_CLASSPATH}"
-    $ZEPPELIN_RUNNER -cp $CLASSPATH $ZEPPELIN_COMMANDLINE_MAIN -v
+    addJarInDir "${SMARTSUITES_HOME}/smartsuites-server/target/lib"
+    CLASSPATH+=":${SMARTSUITES_CLASSPATH}"
+    $SMARTSUITES_RUNNER -cp $CLASSPATH $SMARTSUITES_COMMANDLINE_MAIN -v
     exit 0
 }
 
 # Text encoding for 
 # read/write job into files,
 # receiving/displaying query/result.
-if [[ -z "${ZEPPELIN_ENCODING}" ]]; then
-  export ZEPPELIN_ENCODING="UTF-8"
+if [[ -z "${SMARTSUITES_ENCODING}" ]]; then
+  export SMARTSUITES_ENCODING="UTF-8"
 fi
 
-if [[ -z "${ZEPPELIN_MEM}" ]]; then
-  export ZEPPELIN_MEM="-Xms1024m -Xmx1024m -XX:MaxPermSize=512m"
+# 平台JVM的内存大小
+if [[ -z "${SMARTSUITES_MEM}" ]]; then
+  export SMARTSUITES_MEM="-Xms1024m -Xmx1024m -XX:MaxPermSize=512m"
 fi
 
-if [[ -z "${ZEPPELIN_INTP_MEM}" ]]; then
-  export ZEPPELIN_INTP_MEM="-Xms1024m -Xmx1024m -XX:MaxPermSize=512m"
+# 每个解析器JVM的内存大小
+if [[ -z "${SMARTSUITES_INTP_MEM}" ]]; then
+  export SMARTSUITES_INTP_MEM="-Xms1024m -Xmx1024m -XX:MaxPermSize=512m"
 fi
 
-JAVA_OPTS+=" ${ZEPPELIN_JAVA_OPTS} -Dfile.encoding=${ZEPPELIN_ENCODING} ${ZEPPELIN_MEM}"
-JAVA_OPTS+=" -Dlog4j.configuration=file://${ZEPPELIN_CONF_DIR}/log4j.properties"
+# 设置JVM OPS
+JAVA_OPTS+=" ${SMARTSUITES_JAVA_OPTS} -Dfile.encoding=${SMARTSUITES_ENCODING} ${SMARTSUITES_MEM}"
+JAVA_OPTS+=" -Dlog4j.configuration=file://${SMARTSUITES_CONF_DIR}/log4j.properties"
 export JAVA_OPTS
 
-JAVA_INTP_OPTS="${ZEPPELIN_INTP_JAVA_OPTS} -Dfile.encoding=${ZEPPELIN_ENCODING}"
-if [[ -z "${ZEPPELIN_SPARK_YARN_CLUSTER}" ]]; then
-    JAVA_INTP_OPTS+=" -Dlog4j.configuration=file://${ZEPPELIN_CONF_DIR}/log4j.properties"
+# 设置解析器JVM的OPS
+JAVA_INTP_OPTS="${SMARTSUITES_INTP_JAVA_OPTS} -Dfile.encoding=${SMARTSUITES_ENCODING}"
+if [[ -z "${SMARTSUITES_SPARK_YARN_CLUSTER}" ]]; then
+    JAVA_INTP_OPTS+=" -Dlog4j.configuration=file://${SMARTSUITES_CONF_DIR}/log4j.properties"
 else
     JAVA_INTP_OPTS+=" -Dlog4j.configuration=log4j_yarn_cluster.properties"
 fi
 export JAVA_INTP_OPTS
 
-
+# 设置java地址
 if [[ -n "${JAVA_HOME}" ]]; then
-  ZEPPELIN_RUNNER="${JAVA_HOME}/bin/java"
+  SMARTSUITES_RUNNER="${JAVA_HOME}/bin/java"
 else
-  ZEPPELIN_RUNNER=java
+  SMARTSUITES_RUNNER=java
 fi
-export ZEPPELIN_RUNNER
+export SMARTSUITES_RUNNER
 
-if [[ -z "$ZEPPELIN_IDENT_STRING" ]]; then
-  export ZEPPELIN_IDENT_STRING="${USER}"
+if [[ -z "$SMARTSUITES_IDENT_STRING" ]]; then
+  export SMARTSUITES_IDENT_STRING="${USER}"
 fi
 
-if [[ -z "$ZEPPELIN_INTERPRETER_REMOTE_RUNNER" ]]; then
-  export ZEPPELIN_INTERPRETER_REMOTE_RUNNER="bin/interpreter.sh"
+# 启动解析器JVM的脚本
+if [[ -z "$SMARTSUITES_INTERPRETER_REMOTE_RUNNER" ]]; then
+  export SMARTSUITES_INTERPRETER_REMOTE_RUNNER="bin/interpreter.sh"
 fi

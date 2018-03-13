@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.smartsuites.server.SmartsuitesServer;
 import org.apache.commons.io.FileUtils;
 import com.smartsuites.interpreter.InterpreterException;
 import com.smartsuites.interpreter.InterpreterResult;
@@ -20,7 +21,6 @@ import com.smartsuites.interpreter.InterpreterSetting;
 import com.smartsuites.notebook.Note;
 import com.smartsuites.notebook.Paragraph;
 import com.smartsuites.scheduler.Job.Status;
-import com.smartsuites.server.ZeppelinServer;
 import com.smartsuites.user.AuthenticationInfo;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -64,7 +64,7 @@ public class ZeppelinSparkClusterTest extends AbstractTestRestApi {
     @Test
     public void scalaOutputTest() throws IOException {
         // create new note
-        Note note = ZeppelinServer.notebook.createNote(anonymous);
+        Note note = SmartsuitesServer.notebook.createNote(anonymous);
         Paragraph p = note.addNewParagraph(AuthenticationInfo.ANONYMOUS);
         Map config = p.getConfig();
         config.put("enabled", true);
@@ -80,7 +80,7 @@ public class ZeppelinSparkClusterTest extends AbstractTestRestApi {
         assertEquals("import java.util.Date\n" +
             "import java.net.URL\n" +
             "hello\n", p.getResult().message().get(0).getData());
-        ZeppelinServer.notebook.removeNote(note.getId(), anonymous);
+        SmartsuitesServer.notebook.removeNote(note.getId(), anonymous);
     }
 
 
@@ -88,7 +88,7 @@ public class ZeppelinSparkClusterTest extends AbstractTestRestApi {
     @Test
     public void basicRDDTransformationAndActionTest() throws IOException {
         // create new note
-        Note note = ZeppelinServer.notebook.createNote(anonymous);
+        Note note = SmartsuitesServer.notebook.createNote(anonymous);
 
         // run markdown paragraph, again
         Paragraph p = note.addNewParagraph(AuthenticationInfo.ANONYMOUS);
@@ -101,13 +101,13 @@ public class ZeppelinSparkClusterTest extends AbstractTestRestApi {
         waitForFinish(p);
         assertEquals(Status.FINISHED, p.getStatus());
         assertEquals("55", p.getResult().message().get(0).getData());
-        ZeppelinServer.notebook.removeNote(note.getId(), anonymous);
+        SmartsuitesServer.notebook.removeNote(note.getId(), anonymous);
     }
 
     @Test
     public void sparkSQLTest() throws IOException {
         // create new note
-        Note note = ZeppelinServer.notebook.createNote(anonymous);
+        Note note = SmartsuitesServer.notebook.createNote(anonymous);
         int sparkVersion = getSparkVersionNumber(note);
         // DataFrame API is available from spark 1.3
         if (sparkVersion >= 13) {
@@ -154,24 +154,24 @@ public class ZeppelinSparkClusterTest extends AbstractTestRestApi {
                 assertEquals(InterpreterResult.Type.TABLE, p.getResult().message().get(1).getType());
                 assertEquals("_1\t_2\nhello\t20\n", p.getResult().message().get(1).getData());
             }
-            ZeppelinServer.notebook.removeNote(note.getId(), anonymous);
+            SmartsuitesServer.notebook.removeNote(note.getId(), anonymous);
         }
     }
 
     @Test
     public void sparkRTest() throws IOException, InterpreterException {
       // create new note
-      Note note = ZeppelinServer.notebook.createNote(anonymous);
+      Note note = SmartsuitesServer.notebook.createNote(anonymous);
       int sparkVersion = getSparkVersionNumber(note);
 
       if (isSparkR() && sparkVersion >= 14) {   // sparkr supported from 1.4.0
         // restart spark interpreter
         List<InterpreterSetting> settings =
-          ZeppelinServer.notebook.getBindedInterpreterSettings(note.getId());
+          SmartsuitesServer.notebook.getBindedInterpreterSettings(note.getId());
 
         for (InterpreterSetting setting : settings) {
           if (setting.getName().equals("spark")) {
-            ZeppelinServer.notebook.getInterpreterSettingManager().restart(setting.getId());
+            SmartsuitesServer.notebook.getInterpreterSettingManager().restart(setting.getId());
             break;
           }
         }
@@ -195,13 +195,13 @@ public class ZeppelinSparkClusterTest extends AbstractTestRestApi {
         assertEquals(Status.FINISHED, p.getStatus());
         assertEquals("[1] 3", p.getResult().message().get(0).getData().trim());
       }
-      ZeppelinServer.notebook.removeNote(note.getId(), anonymous);
+      SmartsuitesServer.notebook.removeNote(note.getId(), anonymous);
     }
 
     @Test
     public void pySparkTest() throws IOException {
         // create new note
-        Note note = ZeppelinServer.notebook.createNote(anonymous);
+        Note note = SmartsuitesServer.notebook.createNote(anonymous);
         note.setName("note");
         int sparkVersion = getSparkVersionNumber(note);
 
@@ -314,13 +314,13 @@ public class ZeppelinSparkClusterTest extends AbstractTestRestApi {
                     "[Row(len='3')]\n".equals(p.getResult().message().get(0).getData()));
             }
         }
-        ZeppelinServer.notebook.removeNote(note.getId(), anonymous);
+        SmartsuitesServer.notebook.removeNote(note.getId(), anonymous);
     }
 
     @Test
     public void pySparkAutoConvertOptionTest() throws IOException {
         // create new note
-        Note note = ZeppelinServer.notebook.createNote(anonymous);
+        Note note = SmartsuitesServer.notebook.createNote(anonymous);
         note.setName("note");
 
         int sparkVersionNumber = getSparkVersionNumber(note);
@@ -345,13 +345,13 @@ public class ZeppelinSparkClusterTest extends AbstractTestRestApi {
             assertEquals(Status.FINISHED, p.getStatus());
             assertEquals("10\n", p.getResult().message().get(0).getData());
         }
-        ZeppelinServer.notebook.removeNote(note.getId(), anonymous);
+        SmartsuitesServer.notebook.removeNote(note.getId(), anonymous);
     }
 
     @Test
     public void zRunTest() throws IOException {
         // create new note
-        Note note = ZeppelinServer.notebook.createNote(anonymous);
+        Note note = SmartsuitesServer.notebook.createNote(anonymous);
         Paragraph p0 = note.addNewParagraph(AuthenticationInfo.ANONYMOUS);
         Map config0 = p0.getConfig();
         config0.put("enabled", true);
@@ -410,23 +410,23 @@ public class ZeppelinSparkClusterTest extends AbstractTestRestApi {
 
         assertNotEquals(p3result, p3.getResult().message());
 
-        ZeppelinServer.notebook.removeNote(note.getId(), anonymous);
+        SmartsuitesServer.notebook.removeNote(note.getId(), anonymous);
     }
 
     @Test
     public void pySparkDepLoaderTest() throws IOException, InterpreterException {
         // create new note
-        Note note = ZeppelinServer.notebook.createNote(anonymous);
+        Note note = SmartsuitesServer.notebook.createNote(anonymous);
         int sparkVersionNumber = getSparkVersionNumber(note);
 
         if (isPyspark() && sparkVersionNumber >= 14) {
             // restart spark interpreter
             List<InterpreterSetting> settings =
-                    ZeppelinServer.notebook.getBindedInterpreterSettings(note.getId());
+                    SmartsuitesServer.notebook.getBindedInterpreterSettings(note.getId());
 
             for (InterpreterSetting setting : settings) {
                 if (setting.getName().equals("spark")) {
-                    ZeppelinServer.notebook.getInterpreterSettingManager().restart(setting.getId());
+                    SmartsuitesServer.notebook.getInterpreterSettingManager().restart(setting.getId());
                     break;
                 }
             }
@@ -465,7 +465,7 @@ public class ZeppelinSparkClusterTest extends AbstractTestRestApi {
             assertEquals(Status.FINISHED, p1.getStatus());
             assertEquals("2\n", p1.getResult().message().get(0).getData());
         }
-        ZeppelinServer.notebook.removeNote(note.getId(), anonymous);
+        SmartsuitesServer.notebook.removeNote(note.getId(), anonymous);
     }
 
     /**
@@ -492,7 +492,7 @@ public class ZeppelinSparkClusterTest extends AbstractTestRestApi {
 
     @Test
     public void testSparkZeppelinContextDynamicForms() throws IOException {
-        Note note = ZeppelinServer.notebook.createNote(anonymous);
+        Note note = SmartsuitesServer.notebook.createNote(anonymous);
         Paragraph p = note.addNewParagraph(AuthenticationInfo.ANONYMOUS);
         note.setName("note");
         Map config = p.getConfig();
@@ -526,7 +526,7 @@ public class ZeppelinSparkClusterTest extends AbstractTestRestApi {
 
     @Test
     public void testPySparkZeppelinContextDynamicForms() throws IOException {
-        Note note = ZeppelinServer.notebook.createNote(anonymous);
+        Note note = SmartsuitesServer.notebook.createNote(anonymous);
         Paragraph p = note.addNewParagraph(AuthenticationInfo.ANONYMOUS);
         note.setName("note");
         Map config = p.getConfig();

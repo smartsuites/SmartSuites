@@ -10,6 +10,7 @@ import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.smartsuites.server.SmartsuitesServer;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.PutMethod;
@@ -27,7 +28,6 @@ import org.apache.shiro.subject.PrincipalCollection;
 import com.smartsuites.common.JsonSerializable;
 import com.smartsuites.notebook.repo.zeppelinhub.model.UserSessionContainer;
 import com.smartsuites.notebook.repo.zeppelinhub.websocket.utils.ZeppelinhubUtils;
-import com.smartsuites.server.ZeppelinServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -209,7 +209,7 @@ public class ZeppelinHubRealm extends AuthorizingRealm {
     /* TODO(xxx): add proper roles */
     HashSet<String> userAndRoles = new HashSet<String>();
     userAndRoles.add(username);
-    ZeppelinServer.notebookWsServer.broadcastReloadedNoteList(
+    SmartsuitesServer.notebookWsServer.broadcastReloadedNoteList(
         new com.smartsuites.user.AuthenticationInfo(username), userAndRoles);
 
     ZeppelinhubUtils.userLoginRoutine(username);

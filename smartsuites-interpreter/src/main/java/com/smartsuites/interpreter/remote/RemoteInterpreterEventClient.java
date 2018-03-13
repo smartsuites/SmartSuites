@@ -25,13 +25,13 @@ import java.util.Map;
 
 /**
  * 将数据从独立JVM发送回Master节点
- * Thread connection ZeppelinServer -> RemoteInterpreterServer does not provide
- * remote method invocation from RemoteInterpreterServer -> ZeppelinServer
+ * Thread connection SmartsuitesServer -> RemoteInterpreterServer does not provide
+ * remote method invocation from RemoteInterpreterServer -> SmartsuitesServer
  *
  * This class provides event send and get response from RemoteInterpreterServer to
- * ZeppelinServer.
+ * SmartsuitesServer.
  *
- * RemoteInterpreterEventPoller is counter part in ZeppelinServer
+ * RemoteInterpreterEventPoller is counter part in SmartsuitesServer
  */
 public class RemoteInterpreterEventClient implements ResourcePoolConnector {
   private final Logger logger = LoggerFactory.getLogger(RemoteInterpreterEventClient.class);
@@ -124,7 +124,7 @@ public class RemoteInterpreterEventClient implements ResourcePoolConnector {
 
   @Override
   public Object readResource(ResourceId resourceId) {
-    logger.debug("Request Read Resource {} from ZeppelinServer", resourceId.getName());
+    logger.debug("Request Read Resource {} from SmartsuitesServer", resourceId.getName());
     synchronized (getResourceResponse) {
       // wait for previous response consumed
       while (getResourceResponse.containsKey(resourceId)) {
@@ -260,7 +260,7 @@ public class RemoteInterpreterEventClient implements ResourcePoolConnector {
    * Supposed to call from RemoteInterpreterEventPoller
    */
   public void putResponseGetAllResources(List<String> resources) {
-    logger.debug("ResourceSet from ZeppelinServer");
+    logger.debug("ResourceSet from SmartsuitesServer");
     ResourceSet resourceSet = new ResourceSet();
 
     for (String res : resources) {

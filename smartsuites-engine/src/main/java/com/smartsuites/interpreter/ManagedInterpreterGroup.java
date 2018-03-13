@@ -27,7 +27,7 @@ public class ManagedInterpreterGroup extends InterpreterGroup {
   private RemoteInterpreterProcess remoteInterpreterProcess; // attached remote interpreter process
 
   /**
-   * Create InterpreterGroup with given id and interpreterSetting, used in ZeppelinServer
+   * Create InterpreterGroup with given id and interpreterSetting, used in SmartsuitesServer
    * @param id
    * @param interpreterSetting
    */

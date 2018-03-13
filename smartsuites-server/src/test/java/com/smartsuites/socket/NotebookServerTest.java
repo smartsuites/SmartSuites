@@ -18,7 +18,7 @@ import com.smartsuites.notebook.Paragraph;
 import com.smartsuites.notebook.socket.Message;
 import com.smartsuites.notebook.socket.Message.OP;
 import com.smartsuites.scheduler.Job;
-import com.smartsuites.server.ZeppelinServer;
+import com.smartsuites.server.SmartsuitesServer;
 import com.smartsuites.user.AuthenticationInfo;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -52,8 +52,8 @@ public class NotebookServerTest extends AbstractTestRestApi {
   public static void init() throws Exception {
     AbstractTestRestApi.startUp(NotebookServerTest.class.getSimpleName());
     gson = new Gson();
-    notebook = ZeppelinServer.notebook;
-    notebookServer = ZeppelinServer.notebookWsServer;
+    notebook = SmartsuitesServer.notebook;
+    notebookServer = SmartsuitesServer.notebookWsServer;
   }
 
   @AfterClass

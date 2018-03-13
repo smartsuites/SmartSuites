@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.Sets;
+import com.smartsuites.server.SmartsuitesServer;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
@@ -18,7 +19,6 @@ import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.lang3.StringUtils;
 import com.smartsuites.notebook.Note;
 import com.smartsuites.notebook.Paragraph;
-import com.smartsuites.server.ZeppelinServer;
 import com.smartsuites.user.AuthenticationInfo;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -72,7 +72,7 @@ public class ZeppelinRestApiTest extends AbstractTestRestApi {
   public void testGetNoteInfo() throws IOException {
     LOG.info("testGetNoteInfo");
     // Create note to get info
-    Note note = ZeppelinServer.notebook.createNote(anonymous);
+    Note note = SmartsuitesServer.notebook.createNote(anonymous);
     assertNotNull("can't create new note", note);
     note.setName("note");
     Paragraph paragraph = note.addNewParagraph(AuthenticationInfo.ANONYMOUS);
@@ -100,7 +100,7 @@ public class ZeppelinRestApiTest extends AbstractTestRestApi {
     assertTrue(paragraphs.size() > 0);
     assertEquals(paragraphText, paragraphs.get(0).get("text"));
     //
-    ZeppelinServer.notebook.removeNote(sourceNoteId, anonymous);
+    SmartsuitesServer.notebook.removeNote(sourceNoteId, anonymous);
   }
 
   @Test
@@ -134,7 +134,7 @@ public class ZeppelinRestApiTest extends AbstractTestRestApi {
 
     String newNoteId =  (String) resp.get("body");
     LOG.info("newNoteId:=" + newNoteId);
-    Note newNote = ZeppelinServer.notebook.getNote(newNoteId);
+    Note newNote = SmartsuitesServer.notebook.getNote(newNoteId);
     assertNotNull("Can not find new note by id", newNote);
     // This is partial test as newNote is in memory but is not persistent
     String newNoteName = newNote.getName();
@@ -160,7 +160,7 @@ public class ZeppelinRestApiTest extends AbstractTestRestApi {
       }
     }
     // cleanup
-    ZeppelinServer.notebook.removeNote(newNoteId, anonymous);
+    SmartsuitesServer.notebook.removeNote(newNoteId, anonymous);
     post.releaseConnection();
   }
 
@@ -176,7 +176,7 @@ public class ZeppelinRestApiTest extends AbstractTestRestApi {
 
     String newNoteId =  (String) resp.get("body");
     LOG.info("newNoteId:=" + newNoteId);
-    Note newNote = ZeppelinServer.notebook.getNote(newNoteId);
+    Note newNote = SmartsuitesServer.notebook.getNote(newNoteId);
     assertNotNull("Can not find new note by id", newNote);
     // This is partial test as newNote is in memory but is not persistent
     String newNoteName = newNote.getName();
@@ -187,7 +187,7 @@ public class ZeppelinRestApiTest extends AbstractTestRestApi {
     }
     assertEquals("compare note name", expectedNoteName, newNoteName);
     // cleanup
-    ZeppelinServer.notebook.removeNote(newNoteId, anonymous);
+    SmartsuitesServer.notebook.removeNote(newNoteId, anonymous);
     post.releaseConnection();
 
   }
@@ -196,7 +196,7 @@ public class ZeppelinRestApiTest extends AbstractTestRestApi {
   public void testDeleteNote() throws IOException {
     LOG.info("testDeleteNote");
     //Create note and get ID
-    Note note = ZeppelinServer.notebook.createNote(anonymous);
+    Note note = SmartsuitesServer.notebook.createNote(anonymous);
     String noteId = note.getId();
     testDeleteNote(noteId);
   }
@@ -212,7 +212,7 @@ public class ZeppelinRestApiTest extends AbstractTestRestApi {
   @Test
   public void testExportNote() throws IOException {
     LOG.info("testExportNote");
-    Note note = ZeppelinServer.notebook.createNote(anonymous);
+    Note note = SmartsuitesServer.notebook.createNote(anonymous);
     assertNotNull("can't create new note", note);
     note.setName("source note for export");
     Paragraph paragraph = note.addNewParagraph(AuthenticationInfo.ANONYMOUS);
@@ -234,7 +234,7 @@ public class ZeppelinRestApiTest extends AbstractTestRestApi {
     String exportJSON = (String) resp.get("body");
     assertNotNull("Can not find new notejson", exportJSON);
     LOG.info("export JSON:=" + exportJSON);
-    ZeppelinServer.notebook.removeNote(sourceNoteId, anonymous);
+    SmartsuitesServer.notebook.removeNote(sourceNoteId, anonymous);
     get.releaseConnection();
 
   }
@@ -245,7 +245,7 @@ public class ZeppelinRestApiTest extends AbstractTestRestApi {
     String noteName = "source note for import";
     LOG.info("testImportNote");
     // create test note
-    Note note = ZeppelinServer.notebook.createNote(anonymous);
+    Note note = SmartsuitesServer.notebook.createNote(anonymous);
     assertNotNull("can't create new note", note);
     note.setName(noteName);
     Paragraph paragraph = note.addNewParagraph(AuthenticationInfo.ANONYMOUS);
@@ -266,13 +266,13 @@ public class ZeppelinRestApiTest extends AbstractTestRestApi {
     String importId = (String) resp.get("body");
 
     assertNotNull("Did not get back a note id in body", importId);
-    Note newNote = ZeppelinServer.notebook.getNote(importId);
+    Note newNote = SmartsuitesServer.notebook.getNote(importId);
     assertEquals("Compare note names", noteName, newNote.getName());
     assertEquals("Compare paragraphs count", note.getParagraphs().size(), newNote.getParagraphs()
         .size());
     // cleanup
-    ZeppelinServer.notebook.removeNote(note.getId(), anonymous);
-    ZeppelinServer.notebook.removeNote(newNote.getId(), anonymous);
+    SmartsuitesServer.notebook.removeNote(note.getId(), anonymous);
+    SmartsuitesServer.notebook.removeNote(newNote.getId(), anonymous);
     importPost.releaseConnection();
   }
 
@@ -298,7 +298,7 @@ public class ZeppelinRestApiTest extends AbstractTestRestApi {
     delete.releaseConnection();
     // make sure note is deleted
     if (!noteId.isEmpty()) {
-      Note deletedNote = ZeppelinServer.notebook.getNote(noteId);
+      Note deletedNote = SmartsuitesServer.notebook.getNote(noteId);
       assertNull("Deleted note should be null", deletedNote);
     }
   }
@@ -307,7 +307,7 @@ public class ZeppelinRestApiTest extends AbstractTestRestApi {
   public void testCloneNote() throws IOException, CloneNotSupportedException, IllegalArgumentException {
     LOG.info("testCloneNote");
     // Create note to clone
-    Note note = ZeppelinServer.notebook.createNote(anonymous);
+    Note note = SmartsuitesServer.notebook.createNote(anonymous);
     assertNotNull("can't create new note", note);
     note.setName("source note for clone");
     Paragraph paragraph = note.addNewParagraph(AuthenticationInfo.ANONYMOUS);
@@ -330,13 +330,13 @@ public class ZeppelinRestApiTest extends AbstractTestRestApi {
 
     String newNoteId =  (String) resp.get("body");
     LOG.info("newNoteId:=" + newNoteId);
-    Note newNote = ZeppelinServer.notebook.getNote(newNoteId);
+    Note newNote = SmartsuitesServer.notebook.getNote(newNoteId);
     assertNotNull("Can not find new note by id", newNote);
     assertEquals("Compare note names", noteName, newNote.getName());
     assertEquals("Compare paragraphs count", note.getParagraphs().size(), newNote.getParagraphs().size());
     //cleanup
-    ZeppelinServer.notebook.removeNote(note.getId(), anonymous);
-    ZeppelinServer.notebook.removeNote(newNote.getId(), anonymous);
+    SmartsuitesServer.notebook.removeNote(note.getId(), anonymous);
+    SmartsuitesServer.notebook.removeNote(newNote.getId(), anonymous);
     post.releaseConnection();
   }
 
@@ -350,7 +350,7 @@ public class ZeppelinRestApiTest extends AbstractTestRestApi {
     List<Map<String, String>> body = (List<Map<String, String>>) resp.get("body");
     //TODO(khalid): anonymous or specific user notes?
     HashSet<String> anonymous = Sets.newHashSet("anonymous");
-    assertEquals("List notes are equal", ZeppelinServer.notebook.getAllNotes(anonymous).size(), body.size());
+    assertEquals("List notes are equal", SmartsuitesServer.notebook.getAllNotes(anonymous).size(), body.size());
     get.releaseConnection();
   }
 
@@ -358,7 +358,7 @@ public class ZeppelinRestApiTest extends AbstractTestRestApi {
   public void testNoteJobs() throws IOException, InterruptedException {
     LOG.info("testNoteJobs");
     // Create note to run test.
-    Note note = ZeppelinServer.notebook.createNote(anonymous);
+    Note note = SmartsuitesServer.notebook.createNote(anonymous);
     assertNotNull("can't create new note", note);
     note.setName("note for run test");
     Paragraph paragraph = note.addNewParagraph(AuthenticationInfo.ANONYMOUS);
@@ -406,14 +406,14 @@ public class ZeppelinRestApiTest extends AbstractTestRestApi {
     Thread.sleep(1000);
     
     //cleanup
-    ZeppelinServer.notebook.removeNote(note.getId(), anonymous);
+    SmartsuitesServer.notebook.removeNote(note.getId(), anonymous);
   }
 
   @Test
   public void testGetNoteJob() throws IOException, InterruptedException {
     LOG.info("testGetNoteJob");
     // Create note to run test.
-    Note note = ZeppelinServer.notebook.createNote(anonymous);
+    Note note = SmartsuitesServer.notebook.createNote(anonymous);
     assertNotNull("can't create new note", note);
     note.setName("note for run test");
     Paragraph paragraph = note.addNewParagraph(AuthenticationInfo.ANONYMOUS);
@@ -454,14 +454,14 @@ public class ZeppelinRestApiTest extends AbstractTestRestApi {
       }
     }
 
-    ZeppelinServer.notebook.removeNote(note.getId(), anonymous);
+    SmartsuitesServer.notebook.removeNote(note.getId(), anonymous);
   }
 
   @Test
   public void testRunParagraphWithParams() throws IOException, InterruptedException {
     LOG.info("testRunParagraphWithParams");
     // Create note to run test.
-    Note note = ZeppelinServer.notebook.createNote(anonymous);
+    Note note = SmartsuitesServer.notebook.createNote(anonymous);
     assertNotNull("can't create new note", note);
     note.setName("note for run test");
     Paragraph paragraph = note.addNewParagraph(AuthenticationInfo.ANONYMOUS);
@@ -483,20 +483,20 @@ public class ZeppelinRestApiTest extends AbstractTestRestApi {
     postParagraph.releaseConnection();
     Thread.sleep(1000);
 
-    Note retrNote = ZeppelinServer.notebook.getNote(noteId);
+    Note retrNote = SmartsuitesServer.notebook.getNote(noteId);
     Paragraph retrParagraph = retrNote.getParagraph(paragraph.getId());
     Map<String, Object> params = retrParagraph.settings.getParams();
     assertEquals("hello", params.get("param"));
     assertEquals("world", params.get("param2"));
 
     //cleanup
-    ZeppelinServer.notebook.removeNote(note.getId(), anonymous);
+    SmartsuitesServer.notebook.removeNote(note.getId(), anonymous);
   }
 
   @Test
   public void testJobs() throws InterruptedException, IOException{
     // create a note and a paragraph
-    Note note = ZeppelinServer.notebook.createNote(anonymous);
+    Note note = SmartsuitesServer.notebook.createNote(anonymous);
 
     note.setName("note for run test");
     Paragraph paragraph = note.addNewParagraph(AuthenticationInfo.ANONYMOUS);
@@ -531,12 +531,12 @@ public class ZeppelinRestApiTest extends AbstractTestRestApi {
     DeleteMethod deleteCron = httpDelete("/notebook/cron/" + note.getId());
     assertThat("", deleteCron, isAllowed());
     deleteCron.releaseConnection();
-    ZeppelinServer.notebook.removeNote(note.getId(), anonymous);
+    SmartsuitesServer.notebook.removeNote(note.getId(), anonymous);
   }
 
   @Test
   public void testRegressionZEPPELIN_527() throws IOException {
-    Note note = ZeppelinServer.notebook.createNote(anonymous);
+    Note note = SmartsuitesServer.notebook.createNote(anonymous);
 
     note.setName("note for run test");
     Paragraph paragraph = note.addNewParagraph(AuthenticationInfo.ANONYMOUS);
@@ -553,12 +553,12 @@ public class ZeppelinRestApiTest extends AbstractTestRestApi {
     assertFalse(body.get(0).containsKey("finished"));
     getNoteJobs.releaseConnection();
 
-    ZeppelinServer.notebook.removeNote(note.getId(), anonymous);
+    SmartsuitesServer.notebook.removeNote(note.getId(), anonymous);
   }
 
   @Test
   public void testInsertParagraph() throws IOException {
-    Note note = ZeppelinServer.notebook.createNote(anonymous);
+    Note note = SmartsuitesServer.notebook.createNote(anonymous);
 
     String jsonRequest = "{\"title\": \"title1\", \"text\": \"text1\"}";
     PostMethod post = httpPost("/notebook/" + note.getId() + "/paragraph", jsonRequest);
@@ -572,7 +572,7 @@ public class ZeppelinRestApiTest extends AbstractTestRestApi {
     String newParagraphId = (String) resp.get("body");
     LOG.info("newParagraphId:=" + newParagraphId);
 
-    Note retrNote = ZeppelinServer.notebook.getNote(note.getId());
+    Note retrNote = SmartsuitesServer.notebook.getNote(note.getId());
     Paragraph newParagraph = retrNote.getParagraph(newParagraphId);
     assertNotNull("Can not find new paragraph by id", newParagraph);
 
@@ -612,12 +612,12 @@ public class ZeppelinRestApiTest extends AbstractTestRestApi {
     assertTrue(((boolean) p.getConfig().get("title")));
 
 
-    ZeppelinServer.notebook.removeNote(note.getId(), anonymous);
+    SmartsuitesServer.notebook.removeNote(note.getId(), anonymous);
   }
 
   @Test
   public void testUpdateParagraph() throws IOException {
-    Note note = ZeppelinServer.notebook.createNote(anonymous);
+    Note note = SmartsuitesServer.notebook.createNote(anonymous);
 
     String jsonRequest = "{\"title\": \"title1\", \"text\": \"text1\"}";
     PostMethod post = httpPost("/notebook/" + note.getId() + "/paragraph", jsonRequest);
@@ -625,7 +625,7 @@ public class ZeppelinRestApiTest extends AbstractTestRestApi {
     post.releaseConnection();
 
     String newParagraphId = (String) resp.get("body");
-    Paragraph newParagraph = ZeppelinServer.notebook.getNote(note.getId()).getParagraph(newParagraphId);
+    Paragraph newParagraph = SmartsuitesServer.notebook.getNote(note.getId()).getParagraph(newParagraphId);
 
     assertEquals("title1", newParagraph.getTitle());
     assertEquals("text1", newParagraph.getText());
@@ -635,7 +635,7 @@ public class ZeppelinRestApiTest extends AbstractTestRestApi {
     assertThat("Test update method:", put, isAllowed());
     put.releaseConnection();
 
-    Paragraph updatedParagraph = ZeppelinServer.notebook.getNote(note.getId()).getParagraph(newParagraphId);
+    Paragraph updatedParagraph = SmartsuitesServer.notebook.getNote(note.getId()).getParagraph(newParagraphId);
 
     assertEquals("title1", updatedParagraph.getTitle());
     assertEquals("updated text", updatedParagraph.getText());
@@ -644,17 +644,17 @@ public class ZeppelinRestApiTest extends AbstractTestRestApi {
     PutMethod updatePut = httpPut("/notebook/" + note.getId() + "/paragraph/" + newParagraphId, updateBothRequest);
     updatePut.releaseConnection();
 
-    Paragraph updatedBothParagraph = ZeppelinServer.notebook.getNote(note.getId()).getParagraph(newParagraphId);
+    Paragraph updatedBothParagraph = SmartsuitesServer.notebook.getNote(note.getId()).getParagraph(newParagraphId);
 
     assertEquals("updated title", updatedBothParagraph.getTitle());
     assertEquals("updated text 2", updatedBothParagraph.getText());
 
-    ZeppelinServer.notebook.removeNote(note.getId(), anonymous);
+    SmartsuitesServer.notebook.removeNote(note.getId(), anonymous);
   }
 
   @Test
   public void testGetParagraph() throws IOException {
-    Note note = ZeppelinServer.notebook.createNote(anonymous);
+    Note note = SmartsuitesServer.notebook.createNote(anonymous);
 
     Paragraph p = note.addNewParagraph(AuthenticationInfo.ANONYMOUS);
     p.setTitle("hello");
@@ -678,12 +678,12 @@ public class ZeppelinRestApiTest extends AbstractTestRestApi {
     assertEquals("hello", body.get("title"));
     assertEquals("world", body.get("text"));
 
-    ZeppelinServer.notebook.removeNote(note.getId(), anonymous);
+    SmartsuitesServer.notebook.removeNote(note.getId(), anonymous);
   }
 
   @Test
   public void testMoveParagraph() throws IOException {
-    Note note = ZeppelinServer.notebook.createNote(anonymous);
+    Note note = SmartsuitesServer.notebook.createNote(anonymous);
 
     Paragraph p = note.addNewParagraph(AuthenticationInfo.ANONYMOUS);
     p.setTitle("title1");
@@ -699,7 +699,7 @@ public class ZeppelinRestApiTest extends AbstractTestRestApi {
     assertThat("Test post method: ", post, isAllowed());
     post.releaseConnection();
 
-    Note retrNote = ZeppelinServer.notebook.getNote(note.getId());
+    Note retrNote = SmartsuitesServer.notebook.getNote(note.getId());
     Paragraph paragraphAtIdx0 = retrNote.getParagraphs().get(0);
 
     assertEquals(p2.getId(), paragraphAtIdx0.getId());
@@ -710,12 +710,12 @@ public class ZeppelinRestApiTest extends AbstractTestRestApi {
     assertThat("Test post method: ", post2, isBadRequest());
     post.releaseConnection();
 
-    ZeppelinServer.notebook.removeNote(note.getId(), anonymous);
+    SmartsuitesServer.notebook.removeNote(note.getId(), anonymous);
   }
 
   @Test
   public void testDeleteParagraph() throws IOException {
-    Note note = ZeppelinServer.notebook.createNote(anonymous);
+    Note note = SmartsuitesServer.notebook.createNote(anonymous);
 
     Paragraph p = note.addNewParagraph(AuthenticationInfo.ANONYMOUS);
     p.setTitle("title1");
@@ -727,16 +727,16 @@ public class ZeppelinRestApiTest extends AbstractTestRestApi {
     assertThat("Test delete method: ", delete, isAllowed());
     delete.releaseConnection();
 
-    Note retrNote = ZeppelinServer.notebook.getNote(note.getId());
+    Note retrNote = SmartsuitesServer.notebook.getNote(note.getId());
     Paragraph retrParagrah = retrNote.getParagraph(p.getId());
     assertNull("paragraph should be deleted", retrParagrah);
 
-    ZeppelinServer.notebook.removeNote(note.getId(), anonymous);
+    SmartsuitesServer.notebook.removeNote(note.getId(), anonymous);
   }
 
   @Test
   public void testTitleSearch() throws IOException {
-    Note note = ZeppelinServer.notebook.createNote(anonymous);
+    Note note = SmartsuitesServer.notebook.createNote(anonymous);
     String jsonRequest = "{\"title\": \"testTitleSearchOfParagraph\", \"text\": \"ThisIsToTestSearchMethodWithTitle \"}";
     PostMethod postNoteText = httpPost("/notebook/" + note.getId() + "/paragraph", jsonRequest);
     postNoteText.releaseConnection();
@@ -757,7 +757,7 @@ public class ZeppelinRestApiTest extends AbstractTestRestApi {
     }
     assertEquals("Paragraph title hits must be at-least one", true, numberOfTitleHits >= 1);
     searchNote.releaseConnection();
-    ZeppelinServer.notebook.removeNote(note.getId(), anonymous);
+    SmartsuitesServer.notebook.removeNote(note.getId(), anonymous);
   }
 
 }

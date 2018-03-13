@@ -417,7 +417,7 @@ public class RemoteInterpreter extends Interpreter {
     if (angularObjectRegistry != null && angularObjectRegistry.getRegistry() != null) {
       final Map<String, Map<String, AngularObject>> registry = angularObjectRegistry
           .getRegistry();
-      LOGGER.info("Push local angular object registry from ZeppelinServer to" +
+      LOGGER.info("Push local angular object registry from SmartsuitesServer to" +
           " remote interpreter group {}", this.getInterpreterGroup().getId());
       final java.lang.reflect.Type registryType = new TypeToken<Map<String,
           Map<String, AngularObject>>>() {

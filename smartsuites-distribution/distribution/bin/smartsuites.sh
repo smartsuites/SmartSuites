@@ -29,7 +29,7 @@ if [[ "$1" == "--config" ]]; then
     echo ${USAGE}
     exit 1
   else
-    export ZEPPELIN_CONF_DIR="${conf_dir}"
+    export SMARTSUITES_CONF_DIR="${conf_dir}"
   fi
   shift
 fi
@@ -40,51 +40,51 @@ bin=$(cd "${bin}">/dev/null; pwd)
 . "${bin}/common.sh"
 
 if [ "$1" == "--version" ] || [ "$1" == "-v" ]; then
-    getZeppelinVersion
+    getSmartsuitesVersion
 fi
 
 HOSTNAME=$(hostname)
-ZEPPELIN_LOGFILE="${ZEPPELIN_LOG_DIR}/zeppelin-${ZEPPELIN_IDENT_STRING}-${HOSTNAME}.log"
-LOG="${ZEPPELIN_LOG_DIR}/zeppelin-cli-${ZEPPELIN_IDENT_STRING}-${HOSTNAME}.out"
+SMARTSUITES_LOGFILE="${SMARTSUITES_LOG_DIR}/zeppelin-${SMARTSUITES_IDENT_STRING}-${HOSTNAME}.log"
+LOG="${SMARTSUITES_LOG_DIR}/smartsuites-cli-${SMARTSUITES_IDENT_STRING}-${HOSTNAME}.out"
   
-ZEPPELIN_SERVER=org.apache.zeppelin.server.ZeppelinServer
-JAVA_OPTS+=" -Dzeppelin.log.file=${ZEPPELIN_LOGFILE}"
+SMARTSUITES_SERVER=com.smartsuites.server.SmartsuitesServer
+JAVA_OPTS+=" -Dzeppelin.log.file=${SMARTSUITES_LOGFILE}"
 
 # construct classpath
-if [[ -d "${ZEPPELIN_HOME}/zeppelin-interpreter/target/classes" ]]; then
-  ZEPPELIN_CLASSPATH+=":${ZEPPELIN_HOME}/zeppelin-interpreter/target/classes"
+if [[ -d "${SMARTSUITES_HOME}/smartsuites-interpreter/target/classes" ]]; then
+  ZEPPELIN_CLASSPATH+=":${ZEPPELIN_HOME}/smartsuites-interpreter/target/classes"
 fi
 
-if [[ -d "${ZEPPELIN_HOME}/zeppelin-zengine/target/classes" ]]; then
-  ZEPPELIN_CLASSPATH+=":${ZEPPELIN_HOME}/zeppelin-zengine/target/classes"
+if [[ -d "${SMARTSUITES_HOME}/smartsuites-engine/target/classes" ]]; then
+  SMARTSUITES_CLASSPATH+=":${SMARTSUITES_HOME}/smartsuites-engine/target/classes"
 fi
 
-if [[ -d "${ZEPPELIN_HOME}/zeppelin-server/target/classes" ]]; then
-  ZEPPELIN_CLASSPATH+=":${ZEPPELIN_HOME}/zeppelin-server/target/classes"
+if [[ -d "${SMARTSUITES_HOME}/smartsuites-server/target/classes" ]]; then
+  SMARTSUITES_CLASSPATH+=":${SMARTSUITES_HOME}/smartsuites-server/target/classes"
 fi
 
-addJarInDir "${ZEPPELIN_HOME}"
-addJarInDir "${ZEPPELIN_HOME}/lib"
-addJarInDir "${ZEPPELIN_HOME}/lib/interpreter"
-addJarInDir "${ZEPPELIN_HOME}/zeppelin-interpreter/target/lib"
-addJarInDir "${ZEPPELIN_HOME}/zeppelin-zengine/target/lib"
-addJarInDir "${ZEPPELIN_HOME}/zeppelin-server/target/lib"
-addJarInDir "${ZEPPELIN_HOME}/zeppelin-web/target/lib"
+addJarInDir "${SMARTSUITES_HOME}"
+addJarInDir "${SMARTSUITES_HOME}/lib"
+addJarInDir "${SMARTSUITES_HOME}/lib/interpreter"
+addJarInDir "${SMARTSUITES_HOME}/smartsuites-interpreter/target/lib"
+addJarInDir "${SMARTSUITES_HOME}/smartsuites-engine/target/lib"
+addJarInDir "${SMARTSUITES_HOME}/smartsuites-server/target/lib"
+addJarInDir "${SMARTSUITES_HOME}/smartsuites-web/target/lib"
 
-ZEPPELIN_CLASSPATH="$CLASSPATH:$ZEPPELIN_CLASSPATH"
+SMARTSUITES_CLASSPATH="$CLASSPATH:$SMARTSUITES_CLASSPATH"
 
 if [[ -n "${HADOOP_CONF_DIR}" ]] && [[ -d "${HADOOP_CONF_DIR}" ]]; then
-  ZEPPELIN_CLASSPATH+=":${HADOOP_CONF_DIR}"
+  SMARTSUITES_CLASSPATH+=":${HADOOP_CONF_DIR}"
 fi
 
-if [[ ! -d "${ZEPPELIN_LOG_DIR}" ]]; then
-  echo "Log dir doesn't exist, create ${ZEPPELIN_LOG_DIR}"
-  $(mkdir -p "${ZEPPELIN_LOG_DIR}")
+if [[ ! -d "${SMARTSUITES_LOG_DIR}" ]]; then
+  echo "Log dir doesn't exist, create ${SMARTSUITES_LOG_DIR}"
+  $(mkdir -p "${SMARTSUITES_LOG_DIR}")
 fi
 
-if [[ ! -d "${ZEPPELIN_PID_DIR}" ]]; then
-  echo "Pid dir doesn't exist, create ${ZEPPELIN_PID_DIR}"
-  $(mkdir -p "${ZEPPELIN_PID_DIR}")
+if [[ ! -d "${SMARTSUITES_PID_DIR}" ]]; then
+  echo "Pid dir doesn't exist, create ${SMARTSUITES_PID_DIR}"
+  $(mkdir -p "${SMARTSUITES_PID_DIR}")
 fi
 
-exec $ZEPPELIN_RUNNER $JAVA_OPTS -cp $ZEPPELIN_CLASSPATH_OVERRIDES:${ZEPPELIN_CLASSPATH} $ZEPPELIN_SERVER "$@"
+exec $SMARTSUITES_RUNNER $JAVA_OPTS -cp $SMARTSUITES_CLASSPATH_OVERRIDES:${SMARTSUITES_CLASSPATH} $SMARTSUITES_SERVER "$@"

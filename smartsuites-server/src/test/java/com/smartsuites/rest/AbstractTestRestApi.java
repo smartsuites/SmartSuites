@@ -15,6 +15,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
 
+import com.smartsuites.server.SmartsuitesServer;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.PumpStreamHandler;
@@ -34,7 +35,6 @@ import com.smartsuites.conf.SmartsuitesConfiguration;
 import com.smartsuites.interpreter.InterpreterProperty;
 import com.smartsuites.interpreter.InterpreterPropertyType;
 import com.smartsuites.interpreter.InterpreterSetting;
-import com.smartsuites.server.ZeppelinServer;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
@@ -106,7 +106,7 @@ public abstract class AbstractTestRestApi {
     @Override
     public void run() {
       try {
-        ZeppelinServer.main(new String[] {""});
+        SmartsuitesServer.main(new String[] {""});
       } catch (Exception e) {
         LOG.error("Exception in WebDriverManager while getWebDriver ", e);
         throw new RuntimeException(e);
@@ -187,7 +187,7 @@ public abstract class AbstractTestRestApi {
       // assume first one is spark
       InterpreterSetting sparkIntpSetting = null;
       for(InterpreterSetting intpSetting :
-          ZeppelinServer.notebook.getInterpreterSettingManager().get()) {
+          SmartsuitesServer.notebook.getInterpreterSettingManager().get()) {
         if (intpSetting.getName().equals("spark")) {
           sparkIntpSetting = intpSetting;
         }
@@ -213,7 +213,7 @@ public abstract class AbstractTestRestApi {
         sparkIntpSetting.setProperties(sparkProperties);
         pySpark = true;
         sparkR = true;
-        ZeppelinServer.notebook.getInterpreterSettingManager().restart(sparkIntpSetting.getId());
+        SmartsuitesServer.notebook.getInterpreterSettingManager().restart(sparkIntpSetting.getId());
       } else {
         String sparkHome = getSparkHome();
         if (sparkHome != null) {
@@ -237,7 +237,7 @@ public abstract class AbstractTestRestApi {
           sparkR = true;
         }
 
-        ZeppelinServer.notebook.getInterpreterSettingManager().restart(sparkIntpSetting.getId());
+        SmartsuitesServer.notebook.getInterpreterSettingManager().restart(sparkIntpSetting.getId());
       }
     }
   }
@@ -304,15 +304,15 @@ public abstract class AbstractTestRestApi {
   protected static void shutDown() throws Exception {
     if (!wasRunning) {
       // restart interpreter to stop all interpreter processes
-      List<InterpreterSetting> settingList = ZeppelinServer.notebook.getInterpreterSettingManager().get();
+      List<InterpreterSetting> settingList = SmartsuitesServer.notebook.getInterpreterSettingManager().get();
       for (InterpreterSetting setting : settingList) {
-        ZeppelinServer.notebook.getInterpreterSettingManager().restart(setting.getId());
+        SmartsuitesServer.notebook.getInterpreterSettingManager().restart(setting.getId());
       }
       if (shiroIni != null) {
         FileUtils.deleteQuietly(shiroIni);
       }
       LOG.info("Terminating test Zeppelin...");
-      ZeppelinServer.jettyWebServer.stop();
+      SmartsuitesServer.jettyWebServer.stop();
       executor.shutdown();
 
       long s = System.currentTimeMillis();
@@ -348,7 +348,7 @@ public abstract class AbstractTestRestApi {
       request = httpGet("/version");
       isRunning = request.getStatusCode() == 200;
     } catch (IOException e) {
-      LOG.error("AbstractTestRestApi.checkIfServerIsRunning() fails .. ZeppelinServer is not running");
+      LOG.error("AbstractTestRestApi.checkIfServerIsRunning() fails .. SmartsuitesServer is not running");
       isRunning = false;
     } finally {
       if (request != null) {

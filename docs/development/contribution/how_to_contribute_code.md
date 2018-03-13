@@ -91,7 +91,7 @@ For the further
 
 ```
 cd zeppelin-server
-HADOOP_HOME=YOUR_HADOOP_HOME JAVA_HOME=YOUR_JAVA_HOME mvn exec:java -Dexec.mainClass="org.apache.zeppelin.server.ZeppelinServer" -Dexec.args=""
+HADOOP_HOME=YOUR_HADOOP_HOME JAVA_HOME=YOUR_JAVA_HOME mvn exec:java -Dexec.mainClass="org.apache.zeppelin.server.SmartsuitesServer" -Dexec.args=""
 ```
 
 > **Note:** Make sure you first run ```mvn clean install -DskipTests``` on your zeppelin root directory, otherwise your server build will fail to find the required dependencies in the local repro.

@@ -17,7 +17,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import com.smartsuites.notebook.Note;
-import com.smartsuites.server.ZeppelinServer;
+import com.smartsuites.server.SmartsuitesServer;
 import org.hamcrest.Matcher;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -93,7 +93,7 @@ public class NotebookSecurityRestApiTest extends AbstractTestRestApi {
     userTryRemoveNote(noteId, "user2", "password3", isForbidden());
     userTryRemoveNote(noteId, "user1", "password2", isAllowed());
     
-    Note deletedNote = ZeppelinServer.notebook.getNote(noteId);
+    Note deletedNote = SmartsuitesServer.notebook.getNote(noteId);
     assertNull("Deleted note should be null", deletedNote);
   }
 
@@ -144,7 +144,7 @@ public class NotebookSecurityRestApiTest extends AbstractTestRestApi {
     }.getType());
     post.releaseConnection();
     String newNoteId =  (String) resp.get("body");
-    Note newNote = ZeppelinServer.notebook.getNote(newNoteId);
+    Note newNote = SmartsuitesServer.notebook.getNote(newNoteId);
     assertNotNull("Can not find new note by id", newNote);
     return newNoteId;
   }
@@ -155,7 +155,7 @@ public class NotebookSecurityRestApiTest extends AbstractTestRestApi {
     delete.releaseConnection();
     // make sure note is deleted
     if (!noteId.isEmpty()) {
-      Note deletedNote = ZeppelinServer.notebook.getNote(noteId);
+      Note deletedNote = SmartsuitesServer.notebook.getNote(noteId);
       assertNull("Deleted note should be null", deletedNote);
     }
   }
