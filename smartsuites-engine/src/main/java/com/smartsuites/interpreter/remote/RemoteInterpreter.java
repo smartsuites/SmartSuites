@@ -8,7 +8,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.smartsuites.scheduler.RemoteScheduler;
 import org.apache.thrift.TException;
-import com.smartsuites.conf.ZeppelinConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration;
 import com.smartsuites.display.AngularObject;
 import com.smartsuites.display.AngularObjectRegistry;
 import com.smartsuites.display.GUI;
@@ -377,7 +377,7 @@ public class RemoteInterpreter extends Interpreter {
   public Scheduler getScheduler() {
     int maxConcurrency = Integer.parseInt(
         getProperty("zeppelin.interpreter.max.poolsize",
-            ZeppelinConfiguration.ConfVars.ZEPPELIN_INTERPRETER_MAX_POOL_SIZE.getIntValue() + ""));
+            SmartsuitesConfiguration.ConfVars.ZEPPELIN_INTERPRETER_MAX_POOL_SIZE.getIntValue() + ""));
 
     Scheduler s = new RemoteScheduler(
         RemoteInterpreter.class.getName() + "-" + sessionId,

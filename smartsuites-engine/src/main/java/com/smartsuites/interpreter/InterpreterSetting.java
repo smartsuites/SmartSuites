@@ -20,7 +20,7 @@ import com.smartsuites.interpreter.remote.RemoteInterpreter;
 import com.smartsuites.interpreter.remote.RemoteInterpreterProcess;
 import com.smartsuites.interpreter.remote.RemoteInterpreterProcessListener;
 import org.apache.commons.io.FileUtils;
-import com.smartsuites.conf.ZeppelinConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration;
 import com.smartsuites.dep.Dependency;
 import com.smartsuites.dep.DependencyResolver;
 import com.smartsuites.display.AngularObjectRegistry;
@@ -47,8 +47,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import static com.smartsuites.conf.ZeppelinConfiguration.ConfVars.ZEPPELIN_INTERPRETER_MAX_POOL_SIZE;
-import static com.smartsuites.conf.ZeppelinConfiguration.ConfVars.ZEPPELIN_INTERPRETER_OUTPUT_LIMIT;
+import static com.smartsuites.conf.SmartsuitesConfiguration.ConfVars.ZEPPELIN_INTERPRETER_MAX_POOL_SIZE;
+import static com.smartsuites.conf.SmartsuitesConfiguration.ConfVars.ZEPPELIN_INTERPRETER_OUTPUT_LIMIT;
 import static com.smartsuites.util.IdHashes.generateId;
 
 /**
@@ -97,6 +97,8 @@ public class InterpreterSetting {
   ///////////////////////////////////////////////////////////////////////////////////////////
   private transient InterpreterSettingManager interpreterSettingManager;
   private transient String interpreterDir;
+
+  // 代表多个实例
   private final transient Map<String, ManagedInterpreterGroup> interpreterGroups =
       new ConcurrentHashMap<>();
 
@@ -114,7 +116,7 @@ public class InterpreterSetting {
   // This map is used to clear the infos in paragraph when the interpretersetting is restarted
   private transient Map<String, Set<String>> runtimeInfosToBeCleared;
 
-  private transient ZeppelinConfiguration conf = new ZeppelinConfiguration();
+  private transient SmartsuitesConfiguration conf = new SmartsuitesConfiguration();
 
   // TODO(zjffdu) ShellScriptLauncher is the only launcher implemention for now. It could be other
   // launcher in future when we have other launcher implementation. e.g. third party launcher
@@ -179,7 +181,7 @@ public class InterpreterSetting {
       return this;
     }
 
-    public Builder setConf(ZeppelinConfiguration conf) {
+    public Builder setConf(SmartsuitesConfiguration conf) {
       interpreterSetting.conf = conf;
       return this;
     }
@@ -501,11 +503,11 @@ public class InterpreterSetting {
     return jProperties;
   }
 
-  public ZeppelinConfiguration getConf() {
+  public SmartsuitesConfiguration getConf() {
     return conf;
   }
 
-  public void setConf(ZeppelinConfiguration conf) {
+  public void setConf(SmartsuitesConfiguration conf) {
     this.conf = conf;
   }
 
@@ -735,7 +737,7 @@ public class InterpreterSetting {
           if (deps != null) {
             for (Dependency d : deps) {
               File destDir = new File(
-                  conf.getRelativeDir(ZeppelinConfiguration.ConfVars.ZEPPELIN_DEP_LOCALREPO));
+                  conf.getRelativeDir(SmartsuitesConfiguration.ConfVars.ZEPPELIN_DEP_LOCALREPO));
 
               if (d.getExclusions() != null) {
                 dependencyResolver.load(d.getGroupArtifactVersion(), d.getExclusions(),

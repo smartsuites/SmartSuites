@@ -6,7 +6,7 @@ package com.smartsuites.interpreter.install;
 
 import com.smartsuites.interpreter.install.InstallInterpreter;
 import org.apache.commons.io.FileUtils;
-import com.smartsuites.conf.ZeppelinConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,7 +35,7 @@ public class InstallInterpreterTest {
 
 
     // create interpreter list file
-    System.setProperty(ZeppelinConfiguration.ConfVars.ZEPPELIN_HOME.getVarName(), tmpDir.getAbsolutePath());
+    System.setProperty(SmartsuitesConfiguration.ConfVars.ZEPPELIN_HOME.getVarName(), tmpDir.getAbsolutePath());
 
     String interpreterList = "";
     interpreterList += "intp1   org.apache.commons:commons-csv:1.1   test interpreter 1\n";

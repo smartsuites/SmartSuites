@@ -21,7 +21,7 @@ import com.smartsuites.notebook.repo.zeppelinhub.websocket.protocol.ZeppelinhubM
 import com.smartsuites.notebook.socket.Message;
 import com.smartsuites.util.WatcherSecurityKey;
 import org.apache.commons.lang3.StringUtils;
-import com.smartsuites.conf.ZeppelinConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration;
 import com.smartsuites.notebook.NotebookAuthorization;
 import com.smartsuites.notebook.repo.zeppelinhub.model.UserTokenContainer;
 import com.smartsuites.notebook.repo.zeppelinhub.websocket.listener.WatcherWebsocket;
@@ -68,7 +68,7 @@ public class ZeppelinClient {
       "CANCEL_PARAGRAPH"));
 
   public static ZeppelinClient initialize(String zeppelinUrl, String token, 
-      ZeppelinConfiguration conf) {
+      SmartsuitesConfiguration conf) {
     if (instance == null) {
       instance = new ZeppelinClient(zeppelinUrl, token, conf);
     }
@@ -79,7 +79,7 @@ public class ZeppelinClient {
     return instance;
   }
 
-  private ZeppelinClient(String zeppelinUrl, String token, ZeppelinConfiguration conf) {
+  private ZeppelinClient(String zeppelinUrl, String token, SmartsuitesConfiguration conf) {
     zeppelinWebsocketUrl = URI.create(zeppelinUrl);
     wsClient = createNewWebsocketClient();
     notesConnection = new ConcurrentHashMap<>();

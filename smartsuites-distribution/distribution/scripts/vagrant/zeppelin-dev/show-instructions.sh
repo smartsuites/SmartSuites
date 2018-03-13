@@ -35,7 +35,7 @@ echo
 echo '# or for a specific Spark/Hadoop build with additional options such as python and R support'
 echo
 echo 'mvn clean package -Pspark-1.6 -Phadoop-2.4 -DskipTests'
-echo './bin/zeppelin-daemon.sh start'
+echo './bin/smartsuites-daemon.sh start'
 echo
 echo 'On your host machine browse to http://localhost:8080/'
 

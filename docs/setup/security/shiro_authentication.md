@@ -47,7 +47,7 @@ Set to property **zeppelin.anonymous.allowed** to **false** in `conf/zeppelin-si
 ### 3. Start Zeppelin
 
 ```
-bin/zeppelin-daemon.sh start (or restart)
+bin/smartsuites-daemon.sh start (or restart)
 ```
 
 Then you can browse Zeppelin at [http://localhost:8080](http://localhost:8080).

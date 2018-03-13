@@ -25,7 +25,7 @@ bin=$(cd "${bin}">/dev/null; pwd)
 . "${bin}/common.sh"
 
 
-ZEPPELIN_INSTALL_INTERPRETER_MAIN=org.apache.zeppelin.interpreter.install.InstallInterpreter
+ZEPPELIN_INSTALL_INTERPRETER_MAIN=com.smartsuites.interpreter.install.InstallInterpreter
 ZEPPELIN_LOGFILE="${ZEPPELIN_LOG_DIR}/install-interpreter.log"
 JAVA_OPTS+=" -Dzeppelin.log.file=${ZEPPELIN_LOGFILE}"
 

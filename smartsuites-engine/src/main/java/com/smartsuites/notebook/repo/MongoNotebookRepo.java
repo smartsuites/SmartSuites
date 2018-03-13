@@ -18,7 +18,7 @@ import static com.mongodb.client.model.Filters.in;
 import com.mongodb.client.model.InsertManyOptions;
 import com.mongodb.client.model.UpdateOptions;
 import com.smartsuites.notebook.ApplicationState;
-import com.smartsuites.conf.ZeppelinConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration;
 import com.smartsuites.notebook.Note;
 import com.smartsuites.notebook.NoteInfo;
 import com.smartsuites.notebook.Paragraph;
@@ -41,12 +41,12 @@ import java.util.regex.Pattern;
 public class MongoNotebookRepo implements NotebookRepo {
   private static final Logger LOG = LoggerFactory.getLogger(MongoNotebookRepo.class);
 
-  private final ZeppelinConfiguration conf;
+  private final SmartsuitesConfiguration conf;
   private final MongoClient mongo;
   private final MongoDatabase db;
   private final MongoCollection<Document> coll;
 
-  public MongoNotebookRepo(ZeppelinConfiguration conf) throws IOException {
+  public MongoNotebookRepo(SmartsuitesConfiguration conf) throws IOException {
     this.conf = conf;
 
     mongo = new MongoClient(new MongoClientURI(conf.getMongoUri()));

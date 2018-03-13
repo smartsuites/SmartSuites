@@ -5,7 +5,7 @@
 
 package com.smartsuites.interpreter;
 
-import com.smartsuites.conf.ZeppelinConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration;
 import com.smartsuites.dep.Dependency;
 import com.smartsuites.display.AngularObjectRegistryListener;
 import com.smartsuites.helium.ApplicationEventListener;
@@ -173,7 +173,7 @@ public class InterpreterSettingManagerTest extends AbstractInterpreterTest {
     assertEquals(5, interpreterSettingManager.get().size());
 
     // load it again
-    InterpreterSettingManager interpreterSettingManager3 = new InterpreterSettingManager(new ZeppelinConfiguration(),
+    InterpreterSettingManager interpreterSettingManager3 = new InterpreterSettingManager(new SmartsuitesConfiguration(),
         mock(AngularObjectRegistryListener.class), mock(RemoteInterpreterProcessListener.class), mock(ApplicationEventListener.class));
     assertEquals(5, interpreterSettingManager3.get().size());
 

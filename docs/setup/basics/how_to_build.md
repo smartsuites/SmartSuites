@@ -77,7 +77,7 @@ mvn clean package -DskipTests -Pspark-2.0 -Phadoop-2.4 -Pr -Pscala-2.11
 You can directly start Zeppelin by running after successful build:
 
 ```bash
-./bin/zeppelin-daemon.sh start
+./bin/smartsuites-daemon.sh start
 ```
 
 Check [build-profiles](#build-profiles) section for further build options.

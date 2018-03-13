@@ -146,7 +146,7 @@ As long as you didn't edit any code, it is unlikely the build is failing because
 Start the Zeppelin daemon.
 
 ```
-bin/zeppelin-daemon.sh start
+bin/smartsuites-daemon.sh start
 ```
 
 Use `ifconfig` to determine the host machine's IP address. If you are not familiar with how to do this, a fairly comprehensive post can be found [here](http://www.cyberciti.biz/faq/how-to-find-out-the-ip-address-assigned-to-eth0-and-display-ip-only/).
@@ -239,7 +239,7 @@ Run the code to make sure the built-in Zeppelin Flink interpreter is working pro
 Finally, stop the Zeppelin daemon.  From the command prompt run:
 
 ```
-bin/zeppelin-daemon.sh stop
+bin/smartsuites-daemon.sh stop
 ```
 
 ### Installing Clusters
@@ -384,7 +384,7 @@ Return to the root directory and start the Zeppelin daemon.
 ```
 cd $HOME
 
-zeppelin/bin/zeppelin-daemon.sh start
+zeppelin/bin/smartsuites-daemon.sh start
 ```
 
 ##### Configure Interpreters

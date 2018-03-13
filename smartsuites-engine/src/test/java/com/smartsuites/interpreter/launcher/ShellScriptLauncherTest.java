@@ -5,7 +5,7 @@
 package com.smartsuites.interpreter.launcher;
 
 import com.smartsuites.interpreter.launcher.ShellScriptLauncher;
-import com.smartsuites.conf.ZeppelinConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration;
 import com.smartsuites.interpreter.InterpreterContext;
 import com.smartsuites.interpreter.InterpreterOption;
 import com.smartsuites.interpreter.remote.RemoteInterpreterManagedProcess;
@@ -20,7 +20,7 @@ public class ShellScriptLauncherTest {
 
   @Test
   public void testLauncher() {
-    ZeppelinConfiguration zConf = new ZeppelinConfiguration();
+    SmartsuitesConfiguration zConf = new SmartsuitesConfiguration();
     ShellScriptLauncher launcher = new ShellScriptLauncher(zConf);
     Properties properties = new Properties();
     properties.setProperty("ENV_1", "VALUE_1");

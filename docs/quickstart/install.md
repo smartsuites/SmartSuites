@@ -62,13 +62,13 @@ follow the instructions [How to Build](../setup/basics/how_to_build.html), If yo
 On all unix like platforms:
 
 ```
-bin/zeppelin-daemon.sh start
+bin/smartsuites-daemon.sh start
 ```
 
 If you are on Windows:
 
 ```
-bin\zeppelin.cmd
+bin\smartsuites.cmd
 ```
 
 After Zeppelin has started successfully, go to [http://localhost:8080](http://localhost:8080) with your web browser.
@@ -76,7 +76,7 @@ After Zeppelin has started successfully, go to [http://localhost:8080](http://lo
 #### Stopping Zeppelin
 
 ```
-bin/zeppelin-daemon.sh stop
+bin/smartsuites-daemon.sh stop
 ```
 
 ## Start Apache Zeppelin with a service manager
@@ -94,10 +94,10 @@ sudo service zeppelin stop
 sudo service zeppelin restart
 ```
 
-Other service managers could use a similar approach with the `upstart` argument passed to the `zeppelin-daemon.sh` script.
+Other service managers could use a similar approach with the `upstart` argument passed to the `smartsuites-daemon.sh` script.
 
 ```
-bin/zeppelin-daemon.sh upstart
+bin/smartsuites-daemon.sh upstart
 ```
 
 **zeppelin.conf**
@@ -117,7 +117,7 @@ respawn limit 7 5
 
 # zeppelin was installed in /usr/share/zeppelin in this example
 chdir /usr/share/zeppelin
-exec bin/zeppelin-daemon.sh upstart
+exec bin/smartsuites-daemon.sh upstart
 ```
 
 

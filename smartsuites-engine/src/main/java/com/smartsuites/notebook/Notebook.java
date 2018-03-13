@@ -40,8 +40,8 @@ import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.smartsuites.conf.ZeppelinConfiguration;
-import com.smartsuites.conf.ZeppelinConfiguration.ConfVars;
+import com.smartsuites.conf.SmartsuitesConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration.ConfVars;
 import com.smartsuites.display.AngularObject;
 import com.smartsuites.display.AngularObjectRegistry;
 import com.smartsuites.notebook.repo.NotebookRepo;
@@ -69,7 +69,7 @@ public class Notebook implements NoteEventListener {
   // 保存所有的Notes
   private final Map<String, Note> notes = new LinkedHashMap<>();
   private final FolderView folders = new FolderView();
-  private ZeppelinConfiguration conf;
+  private SmartsuitesConfiguration conf;
   private StdSchedulerFactory quertzSchedFact;
 
   // 用于周期性运行Note
@@ -89,7 +89,7 @@ public class Notebook implements NoteEventListener {
    * @throws IOException
    * @throws SchedulerException
    */
-  public Notebook(ZeppelinConfiguration conf, NotebookRepo notebookRepo,
+  public Notebook(SmartsuitesConfiguration conf, NotebookRepo notebookRepo,
       SchedulerFactory schedulerFactory, InterpreterFactory replFactory,
       InterpreterSettingManager interpreterSettingManager, JobListenerFactory jobListenerFactory,
       SearchService noteSearchService, NotebookAuthorization notebookAuthorization,
@@ -972,7 +972,7 @@ public class Notebook implements NoteEventListener {
     return notebookAuthorization;
   }
 
-  public ZeppelinConfiguration getConf() {
+  public SmartsuitesConfiguration getConf() {
     return conf;
   }
 

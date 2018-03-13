@@ -1,18 +1,5 @@
 <!--
-  ~ Licensed to the Apache Software Foundation (ASF) under one or more
-  ~ contributor license agreements.  See the NOTICE file distributed with
-  ~ this work for additional information regarding copyright ownership.
-  ~ The ASF licenses this file to You under the Apache License, Version 2.0
-  ~ (the "License"); you may not use this file except in compliance with
-  ~ the License.  You may obtain a copy of the License at
-  ~
-  ~    http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
+  ~ Copyright (c) 2018. 联思智云（北京）科技有限公司. All rights reserved.
   -->
 
 <assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/2.0.0"
@@ -22,29 +9,28 @@
     <formats>
         <format>dir</format>
         <format>tar.gz</format>
-        <!-- format>zip</format -->
     </formats>
     <includeBaseDirectory>true</includeBaseDirectory>
     <baseDirectory>smartsuites-${project.version}</baseDirectory>
 
     <dependencySets>
+        <!-- 打包war包 -->
         <dependencySet>
-            <!-- Enable access to all projects in the current multimodule build!
-            <useAllReactorProjects>true</useAllReactorProjects> -->
-            <!-- Now, select which projects to include in this module-set. -->
             <includes>
                 <include>${project.groupId}:smartsuites-web</include>
             </includes>
             <useProjectArtifact>false</useProjectArtifact>
             <useTransitiveDependencies>false</useTransitiveDependencies>
-            <outputDirectory>./web/</outputDirectory>
+            <outputDirectory>/lib</outputDirectory>
         </dependencySet>
+        <!-- 打包解析器主程序 -->
         <dependencySet>
             <outputDirectory>/lib/interpreter</outputDirectory>
             <includes>
                 <include>${project.groupId}:smartsuites-interpreter</include>
             </includes>
         </dependencySet>
+        <!-- 打包主程序【包含传递性依赖】 -->
         <dependencySet>
             <outputDirectory>/lib</outputDirectory>
             <excludes>
@@ -57,24 +43,22 @@
     </dependencySets>
 
     <fileSets>
+        <!-- 打包License文件 -->
         <fileSet>
-            <directory>../</directory>
+            <directory>./distribution/</directory>
             <includes>
-                <include>README.md</include>
-                <include>LICENSE*</include>
-                <include>NOTICE</include>
+                <include>./LICENSE</include>
             </includes>
+            <outputDirectory>./</outputDirectory>
         </fileSet>
+        <!-- 打包脚本文件 -->
         <fileSet>
             <directory>./distribution/bin</directory>
             <directoryMode>0755</directoryMode>
             <fileMode>0755</fileMode>
             <outputDirectory>./bin/</outputDirectory>
         </fileSet>
-        <fileSet>
-            <directory>./distribution/licenses</directory>
-            <outputDirectory>./licenses/</outputDirectory>
-        </fileSet>
+        <!-- 打包配置文件 -->
         <fileSet>
             <directory>./distribution/conf</directory>
             <excludes>
@@ -82,24 +66,28 @@
                 <exclude>interpreter.json</exclude>
                 <exclude>notebook-authorization.json</exclude>
                 <exclude>shiro.ini</exclude>
-                <exclude>zeppelin-env.cmd</exclude>
-                <exclude>zeppelin-env.sh</exclude>
-                <exclude>zeppelin-site.xml</exclude>
+                <exclude>smartsuites-env.cmd</exclude>
+                <exclude>smartsuites-env.sh</exclude>
+                <exclude>smartsuites-site.xml</exclude>
             </excludes>
             <outputDirectory>./conf/</outputDirectory>
         </fileSet>
+        <!-- 打包解析器依赖 -->
         <fileSet>
             <directory>./distribution/interpreter</directory>
             <outputDirectory>./interpreter/</outputDirectory>
         </fileSet>
+        <!-- 打包notebook -->
         <fileSet>
             <directory>./distribution/notebook</directory>
             <outputDirectory>./notebook/</outputDirectory>
         </fileSet>
+        <!-- 打包smart-interpreter的依赖 -->
         <fileSet>
             <directory>../smartsuites-interpreter/target/lib</directory>
             <outputDirectory>/lib/interpreter</outputDirectory>
         </fileSet>
+
         <!--<fileSet>
             <outputDirectory>/lib/node_modules/zeppelin-vis</outputDirectory>
             <directory>../smartsuites-web/src/app/components/visualization</directory>

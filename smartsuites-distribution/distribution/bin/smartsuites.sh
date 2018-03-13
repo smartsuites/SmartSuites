@@ -19,7 +19,7 @@
 # Run Zeppelin 
 #
 
-USAGE="Usage: bin/zeppelin.sh [--config <conf-dir>]"
+USAGE="Usage: bin/smartsuites.sh [--config <conf-dir>]"
 
 if [[ "$1" == "--config" ]]; then
   shift

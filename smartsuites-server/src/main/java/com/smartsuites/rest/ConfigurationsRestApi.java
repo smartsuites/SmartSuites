@@ -5,7 +5,7 @@
 package com.smartsuites.rest;
 
 import com.smartsuites.annotation.ZeppelinApi;
-import com.smartsuites.conf.ZeppelinConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration;
 import com.smartsuites.notebook.Notebook;
 import com.smartsuites.server.JsonResponse;
 
@@ -36,14 +36,14 @@ public class ConfigurationsRestApi {
   @Path("all")
   @ZeppelinApi
   public Response getAll() {
-    ZeppelinConfiguration conf = notebook.getConf();
+    SmartsuitesConfiguration conf = notebook.getConf();
 
     Map<String, String> configurations = conf.dumpConfigurations(conf,
-        new ZeppelinConfiguration.ConfigurationKeyPredicate() {
+        new SmartsuitesConfiguration.ConfigurationKeyPredicate() {
         @Override
         public boolean apply(String key) {
           return !key.contains("password") &&
-              !key.equals(ZeppelinConfiguration
+              !key.equals(SmartsuitesConfiguration
                   .ConfVars
                   .ZEPPELIN_NOTEBOOK_AZURE_CONNECTION_STRING
                   .getVarName());
@@ -58,14 +58,14 @@ public class ConfigurationsRestApi {
   @Path("prefix/{prefix}")
   @ZeppelinApi
   public Response getByPrefix(@PathParam("prefix") final String prefix) {
-    ZeppelinConfiguration conf = notebook.getConf();
+    SmartsuitesConfiguration conf = notebook.getConf();
 
     Map<String, String> configurations = conf.dumpConfigurations(conf,
-        new ZeppelinConfiguration.ConfigurationKeyPredicate() {
+        new SmartsuitesConfiguration.ConfigurationKeyPredicate() {
         @Override
         public boolean apply(String key) {
           return !key.contains("password") &&
-              !key.equals(ZeppelinConfiguration
+              !key.equals(SmartsuitesConfiguration
                   .ConfVars
                   .ZEPPELIN_NOTEBOOK_AZURE_CONNECTION_STRING
                   .getVarName()) &&

@@ -12,6 +12,7 @@
         <version>1.8</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
+    <packaging>pom</packaging>
 
     <artifactId>smartsuites-distribution</artifactId>
 
@@ -28,9 +29,7 @@
         <deb.assembly.base.dir>target/zeppelin-${project.version}/zeppelin-${project.version}</deb.assembly.base.dir>
     </properties>
 
-    <!-- NOTE: These dependency declarations are only required to sort this project to the
-         end of the line in the multimodule build.
-      -->
+    <!-- 解决版本号冲突 -->
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -56,11 +55,6 @@
                 <artifactId>scalap</artifactId>
                 <version>${scala.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.scala-lang.modules</groupId>
-                <artifactId>scala-xml_${scala.binary.version}</artifactId>
-                <version>1.0.4</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -68,6 +62,11 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>smartsuites-server</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>smartsuites-interpreter</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -101,262 +100,7 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <plugin>
-                <!--assembly does all the job here-->
-                <artifactId>maven-dependency-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
-
-    <profiles>
-
-        <!--<profile>
-            <id>publish-distr</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <build>
-                &lt;!&ndash; skip tests in surefire plugin &ndash;&gt;
-                &lt;!&ndash; assembly:single &ndash;&gt;
-                &lt;!&ndash; publish distribution to S3
-
-                to settings.xml add:
-                <profiles><profile>
-                   <id>inject-s3-credentials</id>
-                   <properties>
-                    <s3-upload.accessKey>your-key</s3-upload.accessKey>
-                    <s3-upload.secretKey>your-secret-key</s3-upload.secretKey>
-                   </properties>
-                 </profile></profiles>
-                <activeProfiles>
-                  <activeProfile>inject-s3-credentials</activeProfile>
-                </activeProfiles>
-                &ndash;&gt;
-
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <skipTests>true</skipTests>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-assembly-plugin</artifactId>
-                        <configuration>
-                            <finalName>${project.parent.artifactId}-${project.version}</finalName>
-                            <descriptors>
-                                <descriptor>assemble/distribution.xml</descriptor>
-                            </descriptors>
-                            <tarLongFileMode>posix</tarLongFileMode>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>make-assembly</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>single</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    &lt;!&ndash;<plugin>
-                        <groupId>com.bazaarvoice.maven.plugins</groupId>
-                        <artifactId>s3-upload-maven-plugin</artifactId>
-                        <version>1.2</version>
-                        <configuration>
-                            <bucketName>zeppel.in</bucketName>
-                            <endpoint>s3-ap-northeast-1.amazonaws.com</endpoint>
-                            <makePublic>true</makePublic>
-                            <sourceFile>zeppelin-distribution/target/zeppelin-${project.version}.tar.gz</sourceFile>
-                            <destinationFile>zeppelin-${project.version}.tar.gz</destinationFile>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>publish-distr-to-s3</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>s3-upload</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>&ndash;&gt;
-                </plugins>
-            </build>
-        </profile>-->
-
-        <!-- 打包成DEB -->
-        <!--<profile>
-            <id>deb</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-assembly-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>make-assembly</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>single</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <formats>
-                                <format>dir</format>
-                            </formats>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>buildnumber-maven-plugin</artifactId>
-                        <version>1.2</version>
-                        <executions>
-                            <execution>
-                                <phase>validate</phase>
-                                <goals>
-                                    <goal>create</goal>
-                                </goals>
-                                <configuration>
-                                    <shortRevisionLength>8</shortRevisionLength>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.vafer</groupId>
-                        <artifactId>jdeb</artifactId>
-                        <version>1.4</version>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>jdeb</goal>
-                                </goals>
-                                <configuration>
-                                    <deb>${project.build.directory}/zeppelin-${project.version}-${buildNumber}_all.deb</deb>
-                                    <attach>false</attach>
-                                    <skipPOMs>false</skipPOMs>
-                                    <dataSet>
-                                        <data>
-                                            <type>files</type>
-                                            <paths>
-                                                <path>${project.parent.basedir}/LICENSE</path>
-                                                <path>${project.parent.basedir}/README.md</path>
-                                            </paths>
-                                            <dst>${deb.install.path}</dst>
-                                        </data>
-                                        <data>
-                                            <type>directory</type>
-                                            <src>${project.basedir}/src/deb/init.d</src>
-                                            <mapper>
-                                                <type>perm</type>
-                                                <prefix>/etc/init.d</prefix>
-                                                <filemode>755</filemode>
-                                            </mapper>
-                                        </data>
-                                        <data>
-                                            <type>link</type>
-                                            <linkName>/usr/bin/zeppelin-daemon.sh</linkName>
-                                            <linkTarget>${deb.install.path}/bin/zeppelin-daemon.sh</linkTarget>
-                                            <symlink>true</symlink>
-                                        </data>
-                                        <data>
-                                            <type>link</type>
-                                            <linkName>${deb.install.path}/conf</linkName>
-                                            <linkTarget>${deb.conf.path}</linkTarget>
-                                            <symlink>true</symlink>
-                                        </data>
-                                        <data>
-                                            <type>link</type>
-                                            <linkName>${deb.install.path}/logs</linkName>
-                                            <linkTarget>${deb.log.path}</linkTarget>
-                                            <symlink>true</symlink>
-                                        </data>
-                                        <data>
-                                            <type>link</type>
-                                            <linkName>${deb.install.path}/notebook</linkName>
-                                            <linkTarget>${deb.notebook.path}</linkTarget>
-                                            <symlink>true</symlink>
-                                        </data>
-                                        <data>
-                                            <type>link</type>
-                                            <linkName>${deb.install.path}/run</linkName>
-                                            <linkTarget>${deb.pid.path}</linkTarget>
-                                            <symlink>true</symlink>
-                                        </data>
-                                        <data>
-                                            <type>directory</type>
-                                            <src>${deb.assembly.base.dir}/bin</src>
-                                            <mapper>
-                                                <type>perm</type>
-                                                <prefix>${deb.install.path}/bin</prefix>
-                                                <filemode>755</filemode>
-                                            </mapper>
-                                        </data>
-                                        <data>
-                                            <type>directory</type>
-                                            <src>${deb.assembly.base.dir}/conf</src>
-                                            <conffile>true</conffile>
-                                            <mapper>
-                                                <type>perm</type>
-                                                <prefix>${deb.conf.path}</prefix>
-                                            </mapper>
-                                        </data>
-                                        <data>
-                                            <type>directory</type>
-                                            <src>${deb.assembly.base.dir}/lib</src>
-                                            <mapper>
-                                                <type>perm</type>
-                                                <prefix>${deb.install.path}/lib</prefix>
-                                            </mapper>
-                                        </data>
-                                        <data>
-                                            <type>directory</type>
-                                            <src>${deb.assembly.base.dir}</src>
-                                            <includes>*.jar,*.war</includes>
-                                            <mapper>
-                                                <type>perm</type>
-                                                <prefix>${deb.install.path}</prefix>
-                                            </mapper>
-                                        </data>
-                                        <data>
-                                            <type>directory</type>
-                                            <src>${deb.assembly.base.dir}/interpreter</src>
-                                            <mapper>
-                                                <type>perm</type>
-                                                <prefix>${deb.install.path}/interpreter</prefix>
-                                            </mapper>
-                                        </data>
-                                        <data>
-                                            <type>directory</type>
-                                            <src>${deb.assembly.base.dir}/notebook</src>
-                                            <includes>2A94M5J1Z/note.json</includes>
-                                            <mapper>
-                                                <type>perm</type>
-                                                <prefix>${deb.notebook.path}</prefix>
-                                            </mapper>
-                                        </data>
-                                        <data>
-                                            <type>template</type>
-                                            <paths>
-                                                <path>${deb.conf.path}</path>
-                                                <path>${deb.log.path}</path>
-                                                <path>${deb.pid.path}</path>
-                                                <paht>${deb.notebook.path}</paht>
-                                            </paths>
-                                        </data>
-                                    </dataSet>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>-->
-    </profiles>
 
 </project>

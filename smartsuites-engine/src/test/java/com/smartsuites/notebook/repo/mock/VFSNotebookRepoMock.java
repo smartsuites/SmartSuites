@@ -5,20 +5,20 @@ package com.smartsuites.notebook.repo.mock;
 
 import java.io.IOException;
 
-import com.smartsuites.conf.ZeppelinConfiguration;
-import com.smartsuites.conf.ZeppelinConfiguration.ConfVars;
+import com.smartsuites.conf.SmartsuitesConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration.ConfVars;
 import com.smartsuites.notebook.repo.VFSNotebookRepo;
 
 public class VFSNotebookRepoMock extends VFSNotebookRepo {
 
-  private static ZeppelinConfiguration modifyNotebookDir(ZeppelinConfiguration conf) {
+  private static SmartsuitesConfiguration modifyNotebookDir(SmartsuitesConfiguration conf) {
     String secNotebookDir = conf.getNotebookDir() + "_secondary";
     System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_DIR.getVarName(), secNotebookDir);
-    ZeppelinConfiguration secConf = ZeppelinConfiguration.create();
+    SmartsuitesConfiguration secConf = SmartsuitesConfiguration.create();
     return secConf;
   }
 
-  public VFSNotebookRepoMock(ZeppelinConfiguration conf) throws IOException {
+  public VFSNotebookRepoMock(SmartsuitesConfiguration conf) throws IOException {
     super(modifyNotebookDir(conf));
   }
 

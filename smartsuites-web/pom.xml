@@ -35,9 +35,40 @@
     <finalName>smartsuites-web</finalName>
 
     <plugins>
-
-      <!--
+      <!-- 执行AngularJS ng build命令 -->
       <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>ng-build</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+            <configuration>
+              <executable>ng</executable>
+              <arguments>
+                <argument>build</argument>
+              </arguments>
+              <workingDirectory>${basedir}/</workingDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- 将Build完成的程序达成War包 -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>3.2.0</version>
+        <configuration>
+          <warSourceDirectory>dist</warSourceDirectory>
+          <webXml>descriptor/WEB-INF/web.xml</webXml>
+        </configuration>
+      </plugin>
+
+      <!--<plugin>
         <groupId>com.github.eirslett</groupId>
         <artifactId>frontend-maven-plugin</artifactId>
         <version>${plugin.frontend.version}</version>
@@ -109,140 +140,10 @@
           </execution>
 
         </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>start-zeppelin</id>
-            <phase>pre-integration-test</phase>
-            <configuration>
-              <skip>${web.e2e.disabled}</skip>
-              <target unless="skipTests">
-                <exec executable="./zeppelin-daemon.sh" dir="${zeppelin.daemon.package.base}" spawn="true">
-                  <arg value="start" />
-                </exec>
-              </target>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-
-          <execution>
-            <id>stop-zeppelin</id>
-            <phase>post-integration-test</phase>
-            <configuration>
-              <skip>${web.e2e.disabled}</skip>
-              <target unless="skipTests">
-                <exec executable="./zeppelin-daemon.sh" dir="${zeppelin.daemon.package.base}" spawn="false">
-                  <arg value="stop" />
-                </exec>
-              </target>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      &lt;!&ndash;
-          Disabling test report generation as it forks the lifecycle
-          and results in https://issues.apache.org/jira/browse/ZEPPELIN-69
-
-          There is no better way to do it, as per
-          http://jira.codehaus.org/browse/MCOBERTURA-154
-      &ndash;&gt;
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>cobertura-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>cobertura</id>
-            <phase>none</phase>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-deploy-plugin</artifactId>
-      </plugin>
-
-      <plugin>
-        &lt;!&ndash; clean task will be executed by front-end-maven plugin &ndash;&gt;
-        <artifactId>maven-clean-plugin</artifactId>
-        <configuration>
-          <filesets>
-            <fileset>
-              <directory>bower_components</directory>
-            </fileset>
-            <fileset>
-              <directory>node</directory>
-            </fileset>
-            <fileset>
-              <directory>node_modules</directory>
-            </fileset>
-          </filesets>
-        </configuration>
       </plugin>-->
-
     </plugins>
 
   </build>
 
-  <profiles>
-    <profile>
-      <id>develop</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <!-- 执行AngularJS ng serve命令来进行开发 -->
-    </profile>
-
-    <profile>
-      <id>release</id>
-      <build>
-        <plugins>
-          <!-- 执行AngularJS ng build命令 -->
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>ng-build</id>
-                <phase>prepare-package</phase>
-                <goals>
-                  <goal>exec</goal>
-                </goals>
-                <configuration>
-                  <executable>ng</executable>
-                  <arguments>
-                    <argument>build</argument>
-                  </arguments>
-                  <workingDirectory>${basedir}/</workingDirectory>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-
-          <!-- 将Build完成的程序达成War包 -->
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-war-plugin</artifactId>
-            <version>3.2.0</version>
-            <configuration>
-              <warSourceDirectory>dist</warSourceDirectory>
-              <webXml>descriptor/WEB-INF/web.xml</webXml>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-  </profiles>
 
 </project>

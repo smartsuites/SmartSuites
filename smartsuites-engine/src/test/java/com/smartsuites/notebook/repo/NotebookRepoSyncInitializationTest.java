@@ -10,8 +10,8 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.IOException;
 
-import com.smartsuites.conf.ZeppelinConfiguration;
-import com.smartsuites.conf.ZeppelinConfiguration.ConfVars;
+import com.smartsuites.conf.SmartsuitesConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration.ConfVars;
 import com.smartsuites.notebook.repo.mock.VFSNotebookRepoMock;
 import org.junit.After;
 import org.junit.Before;
@@ -45,7 +45,7 @@ public class NotebookRepoSyncInitializationTest {
     // no need to initialize folder due to one storage
     // set confs
     System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_STORAGE.getVarName(), validOneStorageConf);
-    ZeppelinConfiguration conf = ZeppelinConfiguration.create();
+    SmartsuitesConfiguration conf = SmartsuitesConfiguration.create();
     // create repo
     NotebookRepoSync notebookRepoSync = new NotebookRepoSync(conf);
     // check proper initialization of one storage
@@ -71,7 +71,7 @@ public class NotebookRepoSyncInitializationTest {
     System.setProperty(ConfVars.ZEPPELIN_HOME.getVarName(), mainZepDir.getAbsolutePath());
     System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_DIR.getVarName(), mainNotebookDir.getAbsolutePath());
     System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_STORAGE.getVarName(), validTwoStorageConf);
-    ZeppelinConfiguration conf = ZeppelinConfiguration.create();
+    SmartsuitesConfiguration conf = SmartsuitesConfiguration.create();
     // create repo
     NotebookRepoSync notebookRepoSync = new NotebookRepoSync(conf);
     // check that both initialized
@@ -84,7 +84,7 @@ public class NotebookRepoSyncInitializationTest {
   public void invalidInitTwoStorageTest() throws IOException {
     // set confs
     System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_STORAGE.getVarName(), invalidTwoStorageConf);
-    ZeppelinConfiguration conf = ZeppelinConfiguration.create();
+    SmartsuitesConfiguration conf = SmartsuitesConfiguration.create();
     // create repo
     NotebookRepoSync notebookRepoSync = new NotebookRepoSync(conf);
     // check that second didn't initialize
@@ -111,7 +111,7 @@ public class NotebookRepoSyncInitializationTest {
     System.setProperty(ConfVars.ZEPPELIN_HOME.getVarName(), mainZepDir.getAbsolutePath());
     System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_DIR.getVarName(), mainNotebookDir.getAbsolutePath());
     System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_STORAGE.getVarName(), unsupportedStorageConf);
-    ZeppelinConfiguration conf = ZeppelinConfiguration.create();
+    SmartsuitesConfiguration conf = SmartsuitesConfiguration.create();
     // create repo
     NotebookRepoSync notebookRepoSync = new NotebookRepoSync(conf);
     // check that first two storages initialized instead of three 
@@ -124,7 +124,7 @@ public class NotebookRepoSyncInitializationTest {
   public void initEmptyStorageTest() throws IOException {
     // set confs
     System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_STORAGE.getVarName(), emptyStorageConf);
-    ZeppelinConfiguration conf = ZeppelinConfiguration.create();
+    SmartsuitesConfiguration conf = SmartsuitesConfiguration.create();
     // create repo
     NotebookRepoSync notebookRepoSync = new NotebookRepoSync(conf);
     // check initialization of one default storage
@@ -136,7 +136,7 @@ public class NotebookRepoSyncInitializationTest {
   public void initOneDummyStorageTest() throws IOException {
  // set confs
     System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_STORAGE.getVarName(), invalidStorageClass);
-    ZeppelinConfiguration conf = ZeppelinConfiguration.create();
+    SmartsuitesConfiguration conf = SmartsuitesConfiguration.create();
     // create repo
     NotebookRepoSync notebookRepoSync = new NotebookRepoSync(conf);
     // check initialization of one default storage instead of invalid one

@@ -208,14 +208,14 @@ To configure your interpreter you need to follow these steps:
   </property>
   ```
 
-2. Add your interpreter to the [default configuration](https://github.com/apache/zeppelin/blob/master/zeppelin-zengine/src/main/java/org/apache/zeppelin/conf/ZeppelinConfiguration.java#L397) which is used when there is no `zeppelin-site.xml`.
+2. Add your interpreter to the [default configuration](https://github.com/apache/zeppelin/blob/master/zeppelin-zengine/src/main/java/org/apache/zeppelin/conf/SmartsuitesConfiguration.java#L397) which is used when there is no `zeppelin-site.xml`.
 
-3. Start Zeppelin by running `./bin/zeppelin-daemon.sh start`.
+3. Start Zeppelin by running `./bin/smartsuites-daemon.sh start`.
 
 4. In the interpreter page, click the `+Create` button and configure your interpreter properties.
 Now you are done and ready to use your interpreter.
 
-> **Note :** Interpreters released with zeppelin have a [default configuration](https://github.com/apache/zeppelin/blob/master/zeppelin-zengine/src/main/java/org/apache/zeppelin/conf/ZeppelinConfiguration.java#L397) which is used when there is no `conf/zeppelin-site.xml`.
+> **Note :** Interpreters released with zeppelin have a [default configuration](https://github.com/apache/zeppelin/blob/master/zeppelin-zengine/src/main/java/org/apache/zeppelin/conf/SmartsuitesConfiguration.java#L397) which is used when there is no `conf/zeppelin-site.xml`.
 
 ## Use your interpreter
 

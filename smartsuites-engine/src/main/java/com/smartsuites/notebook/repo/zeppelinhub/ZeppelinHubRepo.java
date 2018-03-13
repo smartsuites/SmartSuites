@@ -20,7 +20,7 @@ import com.smartsuites.notebook.repo.zeppelinhub.rest.ZeppelinhubRestApiHandler;
 import com.smartsuites.notebook.repo.zeppelinhub.websocket.Client;
 import com.smartsuites.notebook.repo.zeppelinhub.websocket.utils.ZeppelinhubUtils;
 import org.apache.commons.lang.StringUtils;
-import com.smartsuites.conf.ZeppelinConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration;
 import com.smartsuites.notebook.repo.NotebookRepo;
 import com.smartsuites.user.AuthenticationInfo;
 import org.slf4j.Logger;
@@ -49,9 +49,9 @@ public class ZeppelinHubRepo implements NotebookRepo {
   private String token;
   private ZeppelinhubRestApiHandler restApiClient;
   
-  private final ZeppelinConfiguration conf;
+  private final SmartsuitesConfiguration conf;
   
-  public ZeppelinHubRepo(ZeppelinConfiguration conf) {
+  public ZeppelinHubRepo(SmartsuitesConfiguration conf) {
     this.conf = conf;
     String zeppelinHubUrl = getZeppelinHubUrl(conf);
     LOG.info("Initializing ZeppelinHub integration module");
@@ -88,7 +88,7 @@ public class ZeppelinHubRepo implements NotebookRepo {
     return ws + apiRoot.getHost() + ":" + port + "/async";
   }
 
-  String getZeppelinhubWebsocketUri(ZeppelinConfiguration conf) {
+  String getZeppelinhubWebsocketUri(SmartsuitesConfiguration conf) {
     String zeppelinHubUri = StringUtils.EMPTY;
     try {
       zeppelinHubUri = getZeppelinHubWsUri(new URI(conf.getString("ZEPPELINHUB_API_ADDRESS",
@@ -99,7 +99,7 @@ public class ZeppelinHubRepo implements NotebookRepo {
     return zeppelinHubUri;
   }
 
-  private String getZeppelinWebsocketUri(ZeppelinConfiguration conf) {
+  private String getZeppelinWebsocketUri(SmartsuitesConfiguration conf) {
     int port = conf.getServerPort();
     if (port <= 0) {
       port = 80;
@@ -113,7 +113,7 @@ public class ZeppelinHubRepo implements NotebookRepo {
     restApiClient = zeppelinhub;
   }
 
-  String getZeppelinHubUrl(ZeppelinConfiguration conf) {
+  String getZeppelinHubUrl(SmartsuitesConfiguration conf) {
     if (conf == null) {
       LOG.error("Invalid configuration, cannot be null. Using default address {}", DEFAULT_SERVER);
       return DEFAULT_SERVER;

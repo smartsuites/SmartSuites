@@ -4,7 +4,7 @@
 package com.smartsuites.helium;
 
 import com.smartsuites.interpreter.AbstractInterpreterTest;
-import com.smartsuites.conf.ZeppelinConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration;
 import com.smartsuites.interpreter.Interpreter;
 import com.smartsuites.interpreter.InterpreterException;
 import com.smartsuites.interpreter.InterpreterResultMessage;
@@ -43,7 +43,7 @@ public class HeliumApplicationFactoryTest extends AbstractInterpreterTest implem
 
   @Before
   public void setUp() throws Exception {
-    System.setProperty(ZeppelinConfiguration.ConfVars.ZEPPELIN_INTERPRETER_GROUP_ORDER.getVarName(), "mock1,mock2");
+    System.setProperty(SmartsuitesConfiguration.ConfVars.ZEPPELIN_INTERPRETER_GROUP_ORDER.getVarName(), "mock1,mock2");
     super.setUp();
 
     this.schedulerFactory = SchedulerFactory.singleton();

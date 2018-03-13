@@ -5,7 +5,7 @@
 package com.smartsuites.interpreter.launcher;
 
 import org.apache.commons.lang3.StringUtils;
-import com.smartsuites.conf.ZeppelinConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration;
 import com.smartsuites.interpreter.remote.RemoteInterpreterUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +22,7 @@ public class SparkInterpreterLauncher extends ShellScriptLauncher {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SparkInterpreterLauncher.class);
 
-  public SparkInterpreterLauncher(ZeppelinConfiguration zConf) {
+  public SparkInterpreterLauncher(SmartsuitesConfiguration zConf) {
     super(zConf);
   }
 
@@ -120,7 +120,7 @@ public class SparkInterpreterLauncher extends ShellScriptLauncher {
             " for non-local mode, if you specify it in zeppelin-env.sh, please move that into " +
             " interpreter setting");
       }
-      String zeppelinHome = zConf.getString(ZeppelinConfiguration.ConfVars.ZEPPELIN_HOME);
+      String zeppelinHome = zConf.getString(SmartsuitesConfiguration.ConfVars.ZEPPELIN_HOME);
       sparkRBasePath = new File(zeppelinHome,
           "interpreter" + File.separator + "spark" + File.separator + "R");
     } else {

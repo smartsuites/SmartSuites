@@ -46,7 +46,7 @@ public class InterpreterFactory {
       LOGGER.error("No interpreter is binded to this note: " + noteId);
       return null;
     }
-
+    // 如果没有提供，则使用默认的
     if (StringUtils.isBlank(replName)) {
       // Get the default interpreter of the first interpreter binding
       InterpreterSetting defaultSetting = settings.get(0);

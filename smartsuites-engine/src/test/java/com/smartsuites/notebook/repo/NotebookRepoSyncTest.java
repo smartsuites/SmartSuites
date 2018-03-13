@@ -18,8 +18,8 @@ import java.util.Set;
 
 import com.smartsuites.notebook.*;
 import org.apache.commons.io.FileUtils;
-import com.smartsuites.conf.ZeppelinConfiguration;
-import com.smartsuites.conf.ZeppelinConfiguration.ConfVars;
+import com.smartsuites.conf.SmartsuitesConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration.ConfVars;
 import com.smartsuites.dep.DependencyResolver;
 import com.smartsuites.display.AngularObjectRegistryListener;
 import com.smartsuites.helium.ApplicationEventListener;
@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
 public class NotebookRepoSyncTest implements JobListenerFactory {
 
   private File mainZepDir;
-  private ZeppelinConfiguration conf;
+  private SmartsuitesConfiguration conf;
   private SchedulerFactory schedulerFactory;
   private File mainNotebookDir;
   private File secNotebookDir;
@@ -78,7 +78,7 @@ public class NotebookRepoSyncTest implements JobListenerFactory {
     System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_ONE_WAY_SYNC.getVarName(), "false");
     LOG.info("main Note dir : " + mainNotePath);
     LOG.info("secondary note dir : " + secNotePath);
-    conf = ZeppelinConfiguration.create();
+    conf = SmartsuitesConfiguration.create();
 
     this.schedulerFactory = SchedulerFactory.singleton();
 
@@ -218,7 +218,7 @@ public class NotebookRepoSyncTest implements JobListenerFactory {
   public void testOneWaySyncOnReloadedList() throws IOException, SchedulerException {
     System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_DIR.getVarName(), mainNotebookDir.getAbsolutePath());
     System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_ONE_WAY_SYNC.getVarName(), "true");
-    conf = ZeppelinConfiguration.create();
+    conf = SmartsuitesConfiguration.create();
     notebookRepoSync = new NotebookRepoSync(conf);
     notebookSync = new Notebook(conf, notebookRepoSync, schedulerFactory, factory, interpreterSettingManager, this, search,
             notebookAuthorization, credentials);
@@ -265,7 +265,7 @@ public class NotebookRepoSyncTest implements JobListenerFactory {
   @Test
   public void testCheckpointOneStorage() throws IOException, SchedulerException {
     System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_STORAGE.getVarName(), "GitNotebookRepo");
-    ZeppelinConfiguration vConf = ZeppelinConfiguration.create();
+    SmartsuitesConfiguration vConf = SmartsuitesConfiguration.create();
 
     NotebookRepoSync vRepoSync = new NotebookRepoSync(vConf);
     Notebook vNotebookSync = new Notebook(vConf, vRepoSync, schedulerFactory, factory, interpreterSettingManager, this, search,

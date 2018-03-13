@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.List;
 
 import com.smartsuites.notebook.Note;
-import com.smartsuites.conf.ZeppelinConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration;
 import com.smartsuites.user.AuthenticationInfo;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -44,7 +44,7 @@ public class GitNotebookRepo extends VFSNotebookRepo {
   private String localPath;
   private Git git;
 
-  public GitNotebookRepo(ZeppelinConfiguration conf) throws IOException {
+  public GitNotebookRepo(SmartsuitesConfiguration conf) throws IOException {
     super(conf);
     localPath = getRootDir().getName().getPath();
     LOG.info("Opening a git repo at '{}'", localPath);

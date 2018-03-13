@@ -19,13 +19,13 @@ import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.smartsuites.conf.ZeppelinConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration;
 
 import static org.junit.Assert.*;
 
 public class HeliumBundleFactoryTest {
   private File tmpDir;
-  private ZeppelinConfiguration conf;
+  private SmartsuitesConfiguration conf;
   private HeliumBundleFactory hbf;
   private static File nodeInstallationDir = new File(
       System.getProperty("java.io.tmpdir") + "/ZeppelinLTest_nodeCache");
@@ -45,7 +45,7 @@ public class HeliumBundleFactoryTest {
     String resDir = new File(res.getFile()).getParent();
     File moduleDir = new File(resDir + "/../../../../zeppelin-web/src/app/");
 
-    conf = new ZeppelinConfiguration();
+    conf = new SmartsuitesConfiguration();
 
     hbf = new HeliumBundleFactory(conf,
         nodeInstallationDir,

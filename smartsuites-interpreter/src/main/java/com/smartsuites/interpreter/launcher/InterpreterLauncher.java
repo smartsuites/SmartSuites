@@ -4,7 +4,7 @@
 
 package com.smartsuites.interpreter.launcher;
 
-import com.smartsuites.conf.ZeppelinConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -15,10 +15,10 @@ import java.util.Properties;
  */
 public abstract class InterpreterLauncher {
 
-  protected ZeppelinConfiguration zConf;
+  protected SmartsuitesConfiguration zConf;
   protected Properties properties;
 
-  public InterpreterLauncher(ZeppelinConfiguration zConf) {
+  public InterpreterLauncher(SmartsuitesConfiguration zConf) {
     this.zConf = zConf;
   }
 

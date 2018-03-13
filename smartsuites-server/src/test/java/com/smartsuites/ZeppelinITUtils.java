@@ -30,7 +30,7 @@ public class ZeppelinITUtils {
   }
 
   public static void restartZeppelin() {
-    CommandExecutor.executeCommandLocalHost("../bin/zeppelin-daemon.sh restart",
+    CommandExecutor.executeCommandLocalHost("../bin/smartsuites-daemon.sh restart",
         false, ProcessData.Types_Of_Data.OUTPUT);
     //wait for server to start.
     sleep(5000, false);

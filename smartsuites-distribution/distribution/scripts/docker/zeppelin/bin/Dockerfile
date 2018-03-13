@@ -100,4 +100,4 @@ EXPOSE 8080
 
 ENTRYPOINT [ "/usr/bin/tini", "--" ]
 WORKDIR ${Z_HOME}
-CMD ["bin/zeppelin.sh"]
+CMD ["bin/smartsuites.sh"]

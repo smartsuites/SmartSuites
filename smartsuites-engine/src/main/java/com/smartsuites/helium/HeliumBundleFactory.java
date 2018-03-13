@@ -29,7 +29,7 @@ import java.io.*;
 import java.net.URI;
 import java.util.*;
 
-import com.smartsuites.conf.ZeppelinConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration;
 
 /**
  * Load helium visualization & spell
@@ -72,7 +72,7 @@ public class HeliumBundleFactory {
   private ByteArrayOutputStream out  = new ByteArrayOutputStream();
 
   public HeliumBundleFactory(
-      ZeppelinConfiguration conf,
+      SmartsuitesConfiguration conf,
       File nodeInstallationDir,
       File moduleDownloadPath,
       File tabledataModulePath,
@@ -85,7 +85,7 @@ public class HeliumBundleFactory {
   }
 
   private HeliumBundleFactory(
-      ZeppelinConfiguration conf,
+      SmartsuitesConfiguration conf,
       File nodeInstallationDir,
       File moduleDownloadPath) throws TaskRunnerException {
     this.heliumLocalRepoDirectory = new File(moduleDownloadPath, HELIUM_LOCAL_REPO);

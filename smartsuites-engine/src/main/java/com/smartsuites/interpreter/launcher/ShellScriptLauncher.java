@@ -5,7 +5,7 @@
 
 package com.smartsuites.interpreter.launcher;
 
-import com.smartsuites.conf.ZeppelinConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration;
 import com.smartsuites.interpreter.InterpreterOption;
 import com.smartsuites.interpreter.InterpreterRunner;
 import com.smartsuites.interpreter.remote.RemoteInterpreterManagedProcess;
@@ -25,7 +25,7 @@ public class ShellScriptLauncher extends InterpreterLauncher {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ShellScriptLauncher.class);
 
-  public ShellScriptLauncher(ZeppelinConfiguration zConf) {
+  public ShellScriptLauncher(SmartsuitesConfiguration zConf) {
     super(zConf);
   }
 
@@ -38,7 +38,7 @@ public class ShellScriptLauncher extends InterpreterLauncher {
     String groupName = context.getInterpreterGroupName();
 
     int connectTimeout =
-        zConf.getInt(ZeppelinConfiguration.ConfVars.ZEPPELIN_INTERPRETER_CONNECT_TIMEOUT);
+        zConf.getInt(SmartsuitesConfiguration.ConfVars.ZEPPELIN_INTERPRETER_CONNECT_TIMEOUT);
     if (option.isExistingProcess()) {
       return new RemoteInterpreterRunningProcess(
           connectTimeout,

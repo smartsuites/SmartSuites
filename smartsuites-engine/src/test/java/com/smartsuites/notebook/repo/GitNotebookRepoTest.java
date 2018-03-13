@@ -13,8 +13,8 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import com.smartsuites.conf.ZeppelinConfiguration;
-import com.smartsuites.conf.ZeppelinConfiguration.ConfVars;
+import com.smartsuites.conf.SmartsuitesConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration.ConfVars;
 import com.smartsuites.notebook.Note;
 import com.smartsuites.notebook.NoteInfo;
 import com.smartsuites.notebook.Paragraph;
@@ -39,7 +39,7 @@ public class GitNotebookRepoTest {
 
   private File zeppelinDir;
   private String notebooksDir;
-  private ZeppelinConfiguration conf;
+  private SmartsuitesConfiguration conf;
   private GitNotebookRepo notebookRepo;
 
   @Before
@@ -65,7 +65,7 @@ public class GitNotebookRepoTest {
     System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_DIR.getVarName(), notebookDir.getAbsolutePath());
     System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_STORAGE.getVarName(), "GitNotebookRepo");
 
-    conf = ZeppelinConfiguration.create();
+    conf = SmartsuitesConfiguration.create();
   }
 
   @After

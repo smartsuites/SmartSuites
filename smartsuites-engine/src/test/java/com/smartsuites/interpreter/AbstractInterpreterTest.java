@@ -5,7 +5,7 @@
 package com.smartsuites.interpreter;
 
 import org.apache.commons.io.FileUtils;
-import com.smartsuites.conf.ZeppelinConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration;
 import com.smartsuites.display.AngularObjectRegistryListener;
 import com.smartsuites.helium.ApplicationEventListener;
 import com.smartsuites.interpreter.remote.RemoteInterpreterProcessListener;
@@ -36,7 +36,7 @@ public abstract class AbstractInterpreterTest {
   protected File interpreterDir;
   protected File confDir;
   protected File notebookDir;
-  protected ZeppelinConfiguration conf = new ZeppelinConfiguration();
+  protected SmartsuitesConfiguration conf = new SmartsuitesConfiguration();
 
   @Before
   public void setUp() throws Exception {
@@ -54,13 +54,13 @@ public abstract class AbstractInterpreterTest {
     FileUtils.copyDirectory(new File("src/test/resources/interpreter"), interpreterDir);
     FileUtils.copyDirectory(new File("src/test/resources/conf"), confDir);
 
-    System.setProperty(ZeppelinConfiguration.ConfVars.ZEPPELIN_HOME.getVarName(), zeppelinHome.getAbsolutePath());
-    System.setProperty(ZeppelinConfiguration.ConfVars.ZEPPELIN_CONF_DIR.getVarName(), confDir.getAbsolutePath());
-    System.setProperty(ZeppelinConfiguration.ConfVars.ZEPPELIN_INTERPRETER_DIR.getVarName(), interpreterDir.getAbsolutePath());
-    System.setProperty(ZeppelinConfiguration.ConfVars.ZEPPELIN_NOTEBOOK_DIR.getVarName(), notebookDir.getAbsolutePath());
-    System.setProperty(ZeppelinConfiguration.ConfVars.ZEPPELIN_INTERPRETER_GROUP_ORDER.getVarName(), "test,mock1,mock2,mock_resource_pool");
+    System.setProperty(SmartsuitesConfiguration.ConfVars.ZEPPELIN_HOME.getVarName(), zeppelinHome.getAbsolutePath());
+    System.setProperty(SmartsuitesConfiguration.ConfVars.ZEPPELIN_CONF_DIR.getVarName(), confDir.getAbsolutePath());
+    System.setProperty(SmartsuitesConfiguration.ConfVars.ZEPPELIN_INTERPRETER_DIR.getVarName(), interpreterDir.getAbsolutePath());
+    System.setProperty(SmartsuitesConfiguration.ConfVars.ZEPPELIN_NOTEBOOK_DIR.getVarName(), notebookDir.getAbsolutePath());
+    System.setProperty(SmartsuitesConfiguration.ConfVars.ZEPPELIN_INTERPRETER_GROUP_ORDER.getVarName(), "test,mock1,mock2,mock_resource_pool");
 
-    conf = new ZeppelinConfiguration();
+    conf = new SmartsuitesConfiguration();
     interpreterSettingManager = new InterpreterSettingManager(conf,
         mock(AngularObjectRegistryListener.class), mock(RemoteInterpreterProcessListener.class), mock(ApplicationEventListener.class));
     interpreterFactory = new InterpreterFactory(interpreterSettingManager);

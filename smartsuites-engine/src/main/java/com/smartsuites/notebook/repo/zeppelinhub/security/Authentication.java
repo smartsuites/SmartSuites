@@ -25,7 +25,7 @@ import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.lang3.StringUtils;
-import com.smartsuites.conf.ZeppelinConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +60,7 @@ public class Authentication implements Runnable {
   private Gson gson = new Gson();
   private static Authentication instance = null;
 
-  public static Authentication initialize(String token, ZeppelinConfiguration conf) {
+  public static Authentication initialize(String token, SmartsuitesConfiguration conf) {
     if (instance == null && conf != null) {
       instance = new Authentication(token, conf);
     }
@@ -71,7 +71,7 @@ public class Authentication implements Runnable {
     return instance;
   }
 
-  private Authentication(String token, ZeppelinConfiguration conf) {
+  private Authentication(String token, SmartsuitesConfiguration conf) {
     MultiThreadedHttpConnectionManager connectionManager = new MultiThreadedHttpConnectionManager();
     client = new HttpClient(connectionManager);
     this.token = token;
@@ -100,7 +100,7 @@ public class Authentication implements Runnable {
   public boolean isAuthenticated() {
     return authenticated;
   }
-  private String getLoginEndpoint(ZeppelinConfiguration conf) {
+  private String getLoginEndpoint(SmartsuitesConfiguration conf) {
     int port = conf.getInt("ZEPPELIN_PORT", "zeppelin.server.port" , 8080);
     if (port <= 0) {
       port = 8080;

@@ -5,7 +5,7 @@
 package com.smartsuites.server;
 
 import com.smartsuites.utils.SecurityUtils;
-import com.smartsuites.conf.ZeppelinConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +39,7 @@ public class CorsFilter implements Filter {
     String origin = "";
 
     try {
-      if (SecurityUtils.isValidOrigin(sourceHost, ZeppelinConfiguration.create())) {
+      if (SecurityUtils.isValidOrigin(sourceHost, SmartsuitesConfiguration.create())) {
         origin = sourceHost;
       }
     } catch (URISyntaxException e) {
@@ -67,12 +67,12 @@ public class CorsFilter implements Filter {
     DateFormat fullDateFormatEN =
         DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL, new Locale("EN", "en"));
     response.setHeader("Date", fullDateFormatEN.format(new Date()));
-    ZeppelinConfiguration zeppelinConfiguration = ZeppelinConfiguration.create();
-    response.setHeader("X-FRAME-OPTIONS", zeppelinConfiguration.getXFrameOptions());
-    if (zeppelinConfiguration.useSsl()) {
-      response.setHeader("Strict-Transport-Security", zeppelinConfiguration.getStrictTransport());
+    SmartsuitesConfiguration smartsuitesConfiguration = SmartsuitesConfiguration.create();
+    response.setHeader("X-FRAME-OPTIONS", smartsuitesConfiguration.getXFrameOptions());
+    if (smartsuitesConfiguration.useSsl()) {
+      response.setHeader("Strict-Transport-Security", smartsuitesConfiguration.getStrictTransport());
     }
-    response.setHeader("X-XSS-Protection", zeppelinConfiguration.getXxssProtection());
+    response.setHeader("X-XSS-Protection", smartsuitesConfiguration.getXxssProtection());
   }
 
   @Override

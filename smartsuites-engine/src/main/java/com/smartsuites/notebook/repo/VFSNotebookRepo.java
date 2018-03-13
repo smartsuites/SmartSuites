@@ -25,8 +25,8 @@ import org.apache.commons.vfs2.FileType;
 import org.apache.commons.vfs2.NameScope;
 import org.apache.commons.vfs2.Selectors;
 import org.apache.commons.vfs2.VFS;
-import com.smartsuites.conf.ZeppelinConfiguration;
-import com.smartsuites.conf.ZeppelinConfiguration.ConfVars;
+import com.smartsuites.conf.SmartsuitesConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration.ConfVars;
 import com.smartsuites.notebook.Note;
 import com.smartsuites.notebook.NoteInfo;
 import com.smartsuites.notebook.Paragraph;
@@ -45,9 +45,9 @@ public class VFSNotebookRepo implements NotebookRepo {
 
   private FileSystemManager fsManager;
   private URI filesystemRoot;
-  private ZeppelinConfiguration conf;
+  private SmartsuitesConfiguration conf;
 
-  public VFSNotebookRepo(ZeppelinConfiguration conf) throws IOException {
+  public VFSNotebookRepo(SmartsuitesConfiguration conf) throws IOException {
     this.conf = conf;
     setNotebookDirectory(conf.getNotebookDir());
   }

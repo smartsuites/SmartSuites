@@ -14,7 +14,7 @@ import java.util.Map;
 
 import com.smartsuites.interpreter.AbstractInterpreterTest;
 import org.apache.commons.io.FileUtils;
-import com.smartsuites.conf.ZeppelinConfiguration.ConfVars;
+import com.smartsuites.conf.SmartsuitesConfiguration.ConfVars;
 
 import com.smartsuites.notebook.JobListenerFactory;
 import com.smartsuites.notebook.Note;

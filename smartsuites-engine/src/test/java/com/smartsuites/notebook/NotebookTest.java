@@ -7,8 +7,8 @@ package com.smartsuites.notebook;
 import com.google.common.collect.Sets;
 import com.smartsuites.interpreter.AbstractInterpreterTest;
 import org.apache.commons.io.FileUtils;
-import com.smartsuites.conf.ZeppelinConfiguration;
-import com.smartsuites.conf.ZeppelinConfiguration.ConfVars;
+import com.smartsuites.conf.SmartsuitesConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration.ConfVars;
 import com.smartsuites.display.AngularObjectRegistry;
 import com.smartsuites.interpreter.InterpreterException;
 import com.smartsuites.interpreter.InterpreterFactory;
@@ -1144,7 +1144,7 @@ public class NotebookTest extends AbstractInterpreterTest implements JobListener
 
     // case of private note
     System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_PUBLIC.getVarName(), "false");
-    ZeppelinConfiguration conf2 = ZeppelinConfiguration.create();
+    SmartsuitesConfiguration conf2 = SmartsuitesConfiguration.create();
     assertFalse(conf2.isNotebokPublic());
     // notebook authorization reads from conf, so no need to re-initilize
     assertFalse(notebookAuthorization.isPublic());
@@ -1173,7 +1173,7 @@ public class NotebookTest extends AbstractInterpreterTest implements JobListener
     
     //set back public to true
     System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_PUBLIC.getVarName(), "true");
-    ZeppelinConfiguration.create();
+    SmartsuitesConfiguration.create();
   }
   
   private void delete(File file){

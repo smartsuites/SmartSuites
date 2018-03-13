@@ -21,7 +21,7 @@ import com.smartsuites.interpreter.remote.RemoteAngularObjectRegistry;
 import com.smartsuites.notebook.utility.IdHashes;
 import org.apache.commons.lang.StringUtils;
 import com.smartsuites.common.JsonSerializable;
-import com.smartsuites.conf.ZeppelinConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration;
 import com.smartsuites.display.AngularObject;
 import com.smartsuites.display.AngularObjectRegistry;
 import com.smartsuites.display.Input;
@@ -64,7 +64,7 @@ public class Note implements ParagraphJobListener, JsonSerializable {
   private String name = "";
   private String id;
 
-  private transient ZeppelinConfiguration conf = ZeppelinConfiguration.create();
+  private transient SmartsuitesConfiguration conf = SmartsuitesConfiguration.create();
 
   private Map<String, List<AngularObject>> angularObjects = new HashMap<>();
 

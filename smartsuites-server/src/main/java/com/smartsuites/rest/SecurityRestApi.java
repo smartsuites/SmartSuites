@@ -15,7 +15,7 @@ import org.apache.shiro.realm.jdbc.JdbcRealm;
 import org.apache.shiro.realm.ldap.JndiLdapRealm;
 import org.apache.shiro.realm.text.IniRealm;
 import com.smartsuites.annotation.ZeppelinApi;
-import com.smartsuites.conf.ZeppelinConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration;
 import com.smartsuites.ticket.TicketContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +54,7 @@ public class SecurityRestApi {
   @Path("ticket")
   @ZeppelinApi
   public Response ticket() {
-    ZeppelinConfiguration conf = ZeppelinConfiguration.create();
+    SmartsuitesConfiguration conf = SmartsuitesConfiguration.create();
     String principal = SecurityUtils.getPrincipal();
     HashSet<String> roles = SecurityUtils.getRoles();
     JsonResponse response;

@@ -8,7 +8,7 @@ import com.smartsuites.rest.AbstractTestRestApi;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
-import com.smartsuites.conf.ZeppelinConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration;
 import org.junit.Test;
 
 public class DirAccessTest extends AbstractTestRestApi {
@@ -16,7 +16,7 @@ public class DirAccessTest extends AbstractTestRestApi {
   @Test
   public void testDirAccessForbidden() throws Exception {
     synchronized (this) {
-      System.setProperty(ZeppelinConfiguration.ConfVars.ZEPPELIN_SERVER_DEFAULT_DIR_ALLOWED.getVarName(), "false");
+      System.setProperty(SmartsuitesConfiguration.ConfVars.ZEPPELIN_SERVER_DEFAULT_DIR_ALLOWED.getVarName(), "false");
       AbstractTestRestApi.startUp(DirAccessTest.class.getSimpleName());
       HttpClient httpClient = new HttpClient();
       GetMethod getMethod = new GetMethod(getUrlToTest() + "/app/");
@@ -29,7 +29,7 @@ public class DirAccessTest extends AbstractTestRestApi {
   @Test
   public void testDirAccessOk() throws Exception {
     synchronized (this) {
-      System.setProperty(ZeppelinConfiguration.ConfVars.ZEPPELIN_SERVER_DEFAULT_DIR_ALLOWED.getVarName(), "true");
+      System.setProperty(SmartsuitesConfiguration.ConfVars.ZEPPELIN_SERVER_DEFAULT_DIR_ALLOWED.getVarName(), "true");
       AbstractTestRestApi.startUp(DirAccessTest.class.getSimpleName());
       HttpClient httpClient = new HttpClient();
       GetMethod getMethod = new GetMethod(getUrlToTest() + "/app/");

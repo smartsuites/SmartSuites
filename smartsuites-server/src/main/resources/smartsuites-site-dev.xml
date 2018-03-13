@@ -41,7 +41,7 @@
 
     <property>
         <name>zeppelin.home</name>
-        <value>${zeppelin.home}</value>
+        <value>/Users/wuyufei/GitHub/SmartSuites/smartsuites-distribution/distribution</value>
         <description>zeppelin.home</description>
     </property>
 
@@ -67,7 +67,7 @@
 
     <property>
         <name>zeppelin.server.port</name>
-        <value>8080</value>
+        <value>8081</value>
         <description>Server port.</description>
     </property>
 

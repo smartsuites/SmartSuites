@@ -18,8 +18,8 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import com.smartsuites.conf.ZeppelinConfiguration;
-import com.smartsuites.conf.ZeppelinConfiguration.ConfVars;
+import com.smartsuites.conf.SmartsuitesConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration.ConfVars;
 import com.smartsuites.notebook.Note;
 import com.smartsuites.notebook.NoteInfo;
 import com.smartsuites.notebook.Paragraph;
@@ -73,9 +73,9 @@ public class S3NotebookRepo implements NotebookRepo {
   private final String bucketName;
   private final String user;
   private final boolean useServerSideEncryption;
-  private final ZeppelinConfiguration conf;
+  private final SmartsuitesConfiguration conf;
 
-  public S3NotebookRepo(ZeppelinConfiguration conf) throws IOException {
+  public S3NotebookRepo(SmartsuitesConfiguration conf) throws IOException {
     this.conf = conf;
     bucketName = conf.getBucketName();
     user = conf.getUser();
@@ -117,7 +117,7 @@ public class S3NotebookRepo implements NotebookRepo {
    * Create an instance of a custom encryption materials provider class
    * which supplies encryption keys to use when reading/writing data in S3.
    */
-  private EncryptionMaterialsProvider createCustomProvider(ZeppelinConfiguration conf)
+  private EncryptionMaterialsProvider createCustomProvider(SmartsuitesConfiguration conf)
       throws IOException {
     // use a custom encryption materials provider class
     String empClassname = conf.getS3EncryptionMaterialsProviderClass();

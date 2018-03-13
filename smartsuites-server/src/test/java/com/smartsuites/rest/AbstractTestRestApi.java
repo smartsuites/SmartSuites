@@ -30,7 +30,7 @@ import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import com.smartsuites.conf.ZeppelinConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration;
 import com.smartsuites.interpreter.InterpreterProperty;
 import com.smartsuites.interpreter.InterpreterPropertyType;
 import com.smartsuites.interpreter.InterpreterSetting;
@@ -122,21 +122,21 @@ public abstract class AbstractTestRestApi {
       confDir = new File(zeppelinHome, "conf_" + testClassName);
       confDir.mkdirs();
 
-      System.setProperty(ZeppelinConfiguration.ConfVars.ZEPPELIN_HOME.getVarName(), zeppelinHome.getAbsolutePath());
-      System.setProperty(ZeppelinConfiguration.ConfVars.ZEPPELIN_WAR.getVarName(), new File("../zeppelin-web/dist").getAbsolutePath());
-      System.setProperty(ZeppelinConfiguration.ConfVars.ZEPPELIN_CONF_DIR.getVarName(), confDir.getAbsolutePath());
+      System.setProperty(SmartsuitesConfiguration.ConfVars.ZEPPELIN_HOME.getVarName(), zeppelinHome.getAbsolutePath());
+      System.setProperty(SmartsuitesConfiguration.ConfVars.ZEPPELIN_WAR.getVarName(), new File("../zeppelin-web/dist").getAbsolutePath());
+      System.setProperty(SmartsuitesConfiguration.ConfVars.ZEPPELIN_CONF_DIR.getVarName(), confDir.getAbsolutePath());
 
       // some test profile does not build zeppelin-web.
       // to prevent zeppelin starting up fail, create zeppelin-web/dist directory
       new File("../zeppelin-web/dist").mkdirs();
 
       LOG.info("Staring test Zeppelin up...");
-      ZeppelinConfiguration conf = ZeppelinConfiguration.create();
+      SmartsuitesConfiguration conf = SmartsuitesConfiguration.create();
 
       if (withAuth) {
         isRunningWithAuth = true;
         // Set Anonymous session to false.
-        System.setProperty(ZeppelinConfiguration.ConfVars.ZEPPELIN_ANONYMOUS_ALLOWED.getVarName(), "false");
+        System.setProperty(SmartsuitesConfiguration.ConfVars.ZEPPELIN_ANONYMOUS_ALLOWED.getVarName(), "false");
         
         // Create a shiro env test.
         shiroIni = new File(confDir, "shiro.ini");
@@ -147,7 +147,7 @@ public abstract class AbstractTestRestApi {
       }
 
       // exclude com.smartsuites.rinterpreter.* for scala 2.11 test
-      String interpreters = conf.getString(ZeppelinConfiguration.ConfVars.ZEPPELIN_INTERPRETERS);
+      String interpreters = conf.getString(SmartsuitesConfiguration.ConfVars.ZEPPELIN_INTERPRETERS);
       String interpretersCompatibleWithScala211Test = null;
 
       for (String intp : interpreters.split(",")) {
@@ -163,7 +163,7 @@ public abstract class AbstractTestRestApi {
       }
 
       System.setProperty(
-          ZeppelinConfiguration.ConfVars.ZEPPELIN_INTERPRETERS.getVarName(),
+          SmartsuitesConfiguration.ConfVars.ZEPPELIN_INTERPRETERS.getVarName(),
           interpretersCompatibleWithScala211Test);
 
 
@@ -264,7 +264,7 @@ public abstract class AbstractTestRestApi {
     if (sparkHome != null) {
       return sparkHome;
     }
-    sparkHome = getSparkHomeRecursively(new File(System.getProperty(ZeppelinConfiguration.ConfVars.ZEPPELIN_HOME.getVarName())));
+    sparkHome = getSparkHomeRecursively(new File(System.getProperty(SmartsuitesConfiguration.ConfVars.ZEPPELIN_HOME.getVarName())));
     System.out.println("SPARK HOME detected " + sparkHome);
     return sparkHome;
   }
@@ -330,11 +330,11 @@ public abstract class AbstractTestRestApi {
 
       LOG.info("Test Zeppelin terminated.");
 
-      System.clearProperty(ZeppelinConfiguration.ConfVars.ZEPPELIN_INTERPRETERS.getVarName());
+      System.clearProperty(SmartsuitesConfiguration.ConfVars.ZEPPELIN_INTERPRETERS.getVarName());
       if (isRunningWithAuth) {
         isRunningWithAuth = false;
         System
-            .clearProperty(ZeppelinConfiguration.ConfVars.ZEPPELIN_ANONYMOUS_ALLOWED.getVarName());
+            .clearProperty(SmartsuitesConfiguration.ConfVars.ZEPPELIN_ANONYMOUS_ALLOWED.getVarName());
       }
 
       FileUtils.deleteDirectory(confDir);

@@ -5,7 +5,7 @@
 package com.smartsuites.interpreter;
 
 import org.apache.commons.io.FileUtils;
-import com.smartsuites.conf.ZeppelinConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration;
 import com.smartsuites.display.AngularObjectRegistryListener;
 import com.smartsuites.helium.ApplicationEventListener;
 import com.smartsuites.interpreter.remote.RemoteInterpreterProcessListener;
@@ -26,11 +26,11 @@ public class MiniZeppelin {
   protected File zeppelinHome;
   private File confDir;
   private File notebookDir;
-  protected ZeppelinConfiguration conf;
+  protected SmartsuitesConfiguration conf;
 
   public void start() throws IOException {
     zeppelinHome = new File("..");
-    System.setProperty(ZeppelinConfiguration.ConfVars.ZEPPELIN_HOME.getVarName(),
+    System.setProperty(SmartsuitesConfiguration.ConfVars.ZEPPELIN_HOME.getVarName(),
         zeppelinHome.getAbsolutePath());
     confDir = new File(zeppelinHome, "conf_" + getClass().getSimpleName());
     notebookDir = new File(zeppelinHome, "notebook_" + getClass().getSimpleName());
@@ -39,9 +39,9 @@ public class MiniZeppelin {
     LOGGER.info("ZEPPELIN_HOME: " + zeppelinHome.getAbsolutePath());
     FileUtils.copyFile(new File(zeppelinHome, "conf/log4j.properties"), new File(confDir, "log4j.properties"));
     FileUtils.copyFile(new File(zeppelinHome, "conf/log4j_yarn_cluster.properties"), new File(confDir, "log4j_yarn_cluster.properties"));
-    System.setProperty(ZeppelinConfiguration.ConfVars.ZEPPELIN_CONF_DIR.getVarName(), confDir.getAbsolutePath());
-    System.setProperty(ZeppelinConfiguration.ConfVars.ZEPPELIN_NOTEBOOK_DIR.getVarName(), notebookDir.getAbsolutePath());
-    conf = new ZeppelinConfiguration();
+    System.setProperty(SmartsuitesConfiguration.ConfVars.ZEPPELIN_CONF_DIR.getVarName(), confDir.getAbsolutePath());
+    System.setProperty(SmartsuitesConfiguration.ConfVars.ZEPPELIN_NOTEBOOK_DIR.getVarName(), notebookDir.getAbsolutePath());
+    conf = new SmartsuitesConfiguration();
     interpreterSettingManager = new InterpreterSettingManager(conf,
         mock(AngularObjectRegistryListener.class), mock(RemoteInterpreterProcessListener.class), mock(ApplicationEventListener.class));
     interpreterFactory = new InterpreterFactory(interpreterSettingManager);

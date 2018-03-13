@@ -10,7 +10,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import com.smartsuites.conf.ZeppelinConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration;
 import com.smartsuites.notebook.Note;
 import com.smartsuites.user.AuthenticationInfo;
 import org.junit.After;
@@ -28,7 +28,7 @@ import static org.junit.Assert.assertEquals;
 
 public class FileSystemNotebookRepoTest {
 
-  private ZeppelinConfiguration zConf;
+  private SmartsuitesConfiguration zConf;
   private Configuration hadoopConf;
   private FileSystem fs;
   private FileSystemNotebookRepo hdfsNotebookRepo;
@@ -38,8 +38,8 @@ public class FileSystemNotebookRepoTest {
   @Before
   public void setUp() throws IOException {
     notebookDir = Files.createTempDirectory("FileSystemNotebookRepoTest").toFile().getAbsolutePath();
-    zConf = new ZeppelinConfiguration();
-    System.setProperty(ZeppelinConfiguration.ConfVars.ZEPPELIN_NOTEBOOK_DIR.getVarName(), notebookDir);
+    zConf = new SmartsuitesConfiguration();
+    System.setProperty(SmartsuitesConfiguration.ConfVars.ZEPPELIN_NOTEBOOK_DIR.getVarName(), notebookDir);
     hadoopConf = new Configuration();
     fs = FileSystem.get(hadoopConf);
     hdfsNotebookRepo = new FileSystemNotebookRepo(zConf);

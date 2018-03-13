@@ -4,7 +4,7 @@
 package com.smartsuites.interpreter.install;
 
 import org.apache.commons.io.FileUtils;
-import com.smartsuites.conf.ZeppelinConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration;
 import com.smartsuites.dep.DependencyResolver;
 import com.smartsuites.util.Util;
 import org.sonatype.aether.RepositoryException;
@@ -193,7 +193,7 @@ public class InstallInterpreter {
       return;
     }
 
-    ZeppelinConfiguration conf = ZeppelinConfiguration.create();
+    SmartsuitesConfiguration conf = SmartsuitesConfiguration.create();
     InstallInterpreter installer = new InstallInterpreter(
         new File(conf.getInterpreterListPath()),
         new File(conf.getInterpreterDir()),

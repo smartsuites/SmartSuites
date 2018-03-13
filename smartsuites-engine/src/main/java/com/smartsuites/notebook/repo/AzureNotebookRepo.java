@@ -18,7 +18,7 @@ import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import com.smartsuites.conf.ZeppelinConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration;
 import com.smartsuites.notebook.Note;
 import com.smartsuites.notebook.NoteInfo;
 import com.smartsuites.notebook.Paragraph;
@@ -41,19 +41,19 @@ import com.microsoft.azure.storage.file.ListFileItem;
 public class AzureNotebookRepo implements NotebookRepo {
   private static final Logger LOG = LoggerFactory.getLogger(S3NotebookRepo.class);
 
-  private final ZeppelinConfiguration conf;
+  private final SmartsuitesConfiguration conf;
   private final String user;
   private final String shareName;
   private final CloudFileDirectory rootDir;
 
-  public AzureNotebookRepo(ZeppelinConfiguration conf)
+  public AzureNotebookRepo(SmartsuitesConfiguration conf)
       throws URISyntaxException, InvalidKeyException, StorageException {
     this.conf = conf;
-    user = conf.getString(ZeppelinConfiguration.ConfVars.ZEPPELIN_NOTEBOOK_AZURE_USER);
-    shareName = conf.getString(ZeppelinConfiguration.ConfVars.ZEPPELIN_NOTEBOOK_AZURE_SHARE);
+    user = conf.getString(SmartsuitesConfiguration.ConfVars.ZEPPELIN_NOTEBOOK_AZURE_USER);
+    shareName = conf.getString(SmartsuitesConfiguration.ConfVars.ZEPPELIN_NOTEBOOK_AZURE_SHARE);
 
     CloudStorageAccount account = CloudStorageAccount.parse(
-        conf.getString(ZeppelinConfiguration.ConfVars.ZEPPELIN_NOTEBOOK_AZURE_CONNECTION_STRING));
+        conf.getString(SmartsuitesConfiguration.ConfVars.ZEPPELIN_NOTEBOOK_AZURE_CONNECTION_STRING));
     CloudFileClient client = account.createCloudFileClient();
     CloudFileShare share = client.getShareReference(shareName);
     share.createIfNotExists();
@@ -113,7 +113,7 @@ public class AzureNotebookRepo implements NotebookRepo {
     }
 
     String json = IOUtils.toString(ins,
-        conf.getString(ZeppelinConfiguration.ConfVars.ZEPPELIN_ENCODING));
+        conf.getString(SmartsuitesConfiguration.ConfVars.ZEPPELIN_ENCODING));
     ins.close();
     Note note = Note.fromJson(json);
 

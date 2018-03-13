@@ -27,11 +27,11 @@ Basically, newer version of Zeppelin works with previous version notebook direct
 So, copying `notebook` and `conf` directory should be enough.
 
 ## Instructions
-1. Stop Zeppelin: `bin/zeppelin-daemon.sh stop`
+1. Stop Zeppelin: `bin/smartsuites-daemon.sh stop`
 2. Copy your `notebook` and `conf` directory into a backup directory
 3. Download newer version of Zeppelin and Install. See [Install Guide](../../quickstart/install.html#install).
 4. Copy backup `notebook` and `conf` directory into newer version of Zeppelin `notebook` and `conf` directory
-5. Start Zeppelin:  `bin/zeppelin-daemon.sh start`
+5. Start Zeppelin:  `bin/smartsuites-daemon.sh start`
 
 ## Migration Guide
 

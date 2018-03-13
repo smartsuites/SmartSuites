@@ -4,7 +4,7 @@
 
 package com.smartsuites.interpreter.lifecycle;
 
-import com.smartsuites.conf.ZeppelinConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration;
 import com.smartsuites.interpreter.LifecycleManager;
 import com.smartsuites.interpreter.ManagedInterpreterGroup;
 import org.slf4j.Logger;
@@ -36,11 +36,11 @@ public class TimeoutLifecycleManager implements LifecycleManager {
 
   private Timer checkTimer;
 
-  public TimeoutLifecycleManager(ZeppelinConfiguration zConf) {
-    this.checkInterval = zConf.getLong(ZeppelinConfiguration.ConfVars
+  public TimeoutLifecycleManager(SmartsuitesConfiguration zConf) {
+    this.checkInterval = zConf.getLong(SmartsuitesConfiguration.ConfVars
             .ZEPPELIN_INTERPRETER_LIFECYCLE_MANAGER_TIMEOUT_CHECK_INTERVAL);
     this.timeoutThreshold = zConf.getLong(
-        ZeppelinConfiguration.ConfVars.ZEPPELIN_INTERPRETER_LIFECYCLE_MANAGER_TIMEOUT_THRESHOLD);
+        SmartsuitesConfiguration.ConfVars.ZEPPELIN_INTERPRETER_LIFECYCLE_MANAGER_TIMEOUT_THRESHOLD);
     this.checkTimer = new Timer(true);
     this.checkTimer.scheduleAtFixedRate(new TimerTask() {
       @Override

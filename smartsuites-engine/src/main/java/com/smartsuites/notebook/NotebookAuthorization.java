@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import com.smartsuites.conf.ZeppelinConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration;
 import com.smartsuites.user.AuthenticationInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,13 +51,13 @@ public class NotebookAuthorization {
    * contains roles for each user
    */
   private static Map<String, Set<String>> userRoles = new HashMap<>();
-  private static ZeppelinConfiguration conf;
+  private static SmartsuitesConfiguration conf;
   private static Gson gson;
   private static String filePath;
 
   private NotebookAuthorization() {}
 
-  public static NotebookAuthorization init(ZeppelinConfiguration config) {
+  public static NotebookAuthorization init(SmartsuitesConfiguration config) {
     if (instance == null) {
       instance = new NotebookAuthorization();
       conf = config;
@@ -78,7 +78,7 @@ public class NotebookAuthorization {
     if (instance == null) {
       LOG.warn("Notebook authorization module was called without initialization,"
           + " initializing with default configuration");
-      init(ZeppelinConfiguration.create());
+      init(SmartsuitesConfiguration.create());
     }
     return instance;
   }

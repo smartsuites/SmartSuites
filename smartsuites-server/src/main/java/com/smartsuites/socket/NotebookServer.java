@@ -21,8 +21,8 @@ import com.google.common.collect.Sets;
 import com.smartsuites.utils.SecurityUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.vfs2.FileSystemException;
-import com.smartsuites.conf.ZeppelinConfiguration;
-import com.smartsuites.conf.ZeppelinConfiguration.ConfVars;
+import com.smartsuites.conf.SmartsuitesConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration.ConfVars;
 import com.smartsuites.display.AngularObject;
 import com.smartsuites.display.AngularObjectRegistry;
 import com.smartsuites.display.AngularObjectRegistryListener;
@@ -129,7 +129,7 @@ public class NotebookServer extends WebSocketServlet
 
   public boolean checkOrigin(HttpServletRequest request, String origin) {
     try {
-      return SecurityUtils.isValidOrigin(origin, ZeppelinConfiguration.create());
+      return SecurityUtils.isValidOrigin(origin, SmartsuitesConfiguration.create());
     } catch (UnknownHostException e) {
       LOG.error(e.toString(), e);
     } catch (URISyntaxException e) {
@@ -181,7 +181,7 @@ public class NotebookServer extends WebSocketServlet
         return;
       }
 
-      ZeppelinConfiguration conf = ZeppelinConfiguration.create();
+      SmartsuitesConfiguration conf = SmartsuitesConfiguration.create();
       boolean allowAnonymous = conf.isAnonymousAllowed();
       if (!allowAnonymous && messagereceived.principal.equals("anonymous")) {
         throw new Exception("Anonymous access not allowed ");
@@ -621,7 +621,7 @@ public class NotebookServer extends WebSocketServlet
 
     Notebook notebook = notebook();
 
-    ZeppelinConfiguration conf = notebook.getConf();
+    SmartsuitesConfiguration conf = notebook.getConf();
     String homescreenNoteId = conf.getString(ConfVars.ZEPPELIN_NOTEBOOK_HOMESCREEN);
     boolean hideHomeScreenNotebookFromList =
         conf.getBoolean(ConfVars.ZEPPELIN_NOTEBOOK_HOMESCREEN_HIDE);
@@ -1896,14 +1896,14 @@ public class NotebookServer extends WebSocketServlet
 
   private void sendAllConfigurations(NotebookSocket conn, HashSet<String> userAndRoles,
       Notebook notebook) throws IOException {
-    ZeppelinConfiguration conf = notebook.getConf();
+    SmartsuitesConfiguration conf = notebook.getConf();
 
     Map<String, String> configurations =
-        conf.dumpConfigurations(conf, new ZeppelinConfiguration.ConfigurationKeyPredicate() {
+        conf.dumpConfigurations(conf, new SmartsuitesConfiguration.ConfigurationKeyPredicate() {
           @Override
           public boolean apply(String key) {
             return !key.contains("password") && !key.equals(
-                ZeppelinConfiguration.ConfVars.ZEPPELIN_NOTEBOOK_AZURE_CONNECTION_STRING
+                SmartsuitesConfiguration.ConfVars.ZEPPELIN_NOTEBOOK_AZURE_CONNECTION_STRING
                     .getVarName());
           }
         });

@@ -15,8 +15,8 @@ import com.smartsuites.utils.SecurityUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.web.env.EnvironmentLoaderListener;
 import org.apache.shiro.web.servlet.ShiroFilter;
-import com.smartsuites.conf.ZeppelinConfiguration;
-import com.smartsuites.conf.ZeppelinConfiguration.ConfVars;
+import com.smartsuites.conf.SmartsuitesConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration.ConfVars;
 import com.smartsuites.helium.Helium;
 import com.smartsuites.helium.HeliumApplicationFactory;
 import com.smartsuites.helium.HeliumBundleFactory;
@@ -78,7 +78,7 @@ public class ZeppelinServer extends Application {
   private Credentials credentials;
 
   public ZeppelinServer() throws Exception {
-    ZeppelinConfiguration conf = ZeppelinConfiguration.create();
+    SmartsuitesConfiguration conf = SmartsuitesConfiguration.create();
 
     InterpreterOutput.limit = conf.getInt(ConfVars.ZEPPELIN_INTERPRETER_OUTPUT_LIMIT);
 
@@ -150,7 +150,7 @@ public class ZeppelinServer extends Application {
 
   public static void main(String[] args) throws InterruptedException {
 
-    ZeppelinConfiguration conf = ZeppelinConfiguration.create();
+    SmartsuitesConfiguration conf = SmartsuitesConfiguration.create();
     conf.setProperty("args", args);
 
     jettyWebServer = setupJettyServer(conf);
@@ -214,7 +214,7 @@ public class ZeppelinServer extends Application {
     ZeppelinServer.notebook.getInterpreterSettingManager().close();
   }
 
-  private static Server setupJettyServer(ZeppelinConfiguration conf) {
+  private static Server setupJettyServer(SmartsuitesConfiguration conf) {
 
     final Server server = new Server();
     ServerConnector connector;
@@ -261,7 +261,7 @@ public class ZeppelinServer extends Application {
   }
 
   private static void setupNotebookServer(WebAppContext webapp,
-                                          ZeppelinConfiguration conf) {
+                                          SmartsuitesConfiguration conf) {
     notebookWsServer = new NotebookServer();
     String maxTextMessageSize = conf.getWebsocketMaxTextMessageSize();
     final ServletHolder servletHolder = new ServletHolder(notebookWsServer);
@@ -273,7 +273,7 @@ public class ZeppelinServer extends Application {
     webapp.addServlet(servletHolder, "/ws/*");
   }
 
-  private static SslContextFactory getSslContextFactory(ZeppelinConfiguration conf) {
+  private static SslContextFactory getSslContextFactory(SmartsuitesConfiguration conf) {
     SslContextFactory sslContextFactory = new SslContextFactory();
 
     // Set keystore
@@ -295,7 +295,7 @@ public class ZeppelinServer extends Application {
   }
 
   private static void setupRestApiContextHandler(WebAppContext webapp,
-                                                 ZeppelinConfiguration conf) {
+                                                 SmartsuitesConfiguration conf) {
 
     final ServletHolder servletHolder = new ServletHolder(
             new org.glassfish.jersey.servlet.ServletContainer());
@@ -318,7 +318,7 @@ public class ZeppelinServer extends Application {
   }
 
   private static WebAppContext setupWebAppContext(ContextHandlerCollection contexts,
-                                                  ZeppelinConfiguration conf) {
+                                                  SmartsuitesConfiguration conf) {
 
     WebAppContext webApp = new WebAppContext();
     webApp.setContextPath(conf.getServerContextPath());
@@ -397,7 +397,7 @@ public class ZeppelinServer extends Application {
    * Check if it is source build or binary package
    * @return
    */
-  private static boolean isBinaryPackage(ZeppelinConfiguration conf) {
+  private static boolean isBinaryPackage(SmartsuitesConfiguration conf) {
     return !new File(conf.getRelativeDir("smartsuites-web")).isDirectory();
   }
 }

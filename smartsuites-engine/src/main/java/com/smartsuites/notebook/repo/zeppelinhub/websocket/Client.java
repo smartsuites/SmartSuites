@@ -4,7 +4,7 @@
 package com.smartsuites.notebook.repo.zeppelinhub.websocket;
 
 import com.smartsuites.notebook.socket.Message;
-import com.smartsuites.conf.ZeppelinConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +23,7 @@ public class Client {
   private static final int MAXIMUM_NOTE_SIZE = 64 * MB;
 
   public static Client initialize(String zeppelinUri, String zeppelinhubUri, String token, 
-      ZeppelinConfiguration conf) {
+      SmartsuitesConfiguration conf) {
     if (instance == null) {
       instance = new Client(zeppelinUri, zeppelinhubUri, token, conf);
     }
@@ -35,7 +35,7 @@ public class Client {
   }
 
   private Client(String zeppelinUri, String zeppelinhubUri, String token,
-      ZeppelinConfiguration conf) {
+      SmartsuitesConfiguration conf) {
     LOG.debug("Init Client");
     zeppelinhubClient = ZeppelinhubClient.initialize(zeppelinhubUri, token);
     zeppelinClient = ZeppelinClient.initialize(zeppelinUri, token, conf);

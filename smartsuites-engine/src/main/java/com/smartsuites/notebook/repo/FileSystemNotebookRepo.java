@@ -11,7 +11,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.security.UserGroupInformation;
-import com.smartsuites.conf.ZeppelinConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration;
 import com.smartsuites.notebook.Note;
 import com.smartsuites.notebook.NoteInfo;
 import com.smartsuites.user.AuthenticationInfo;
@@ -42,21 +42,21 @@ public class FileSystemNotebookRepo implements NotebookRepo {
   private static final Logger LOGGER = LoggerFactory.getLogger(FileSystemNotebookRepo.class);
 
   private Configuration hadoopConf;
-  private ZeppelinConfiguration zConf;
+  private SmartsuitesConfiguration zConf;
   private boolean isSecurityEnabled = false;
   private FileSystem fs;
   private Path notebookDir;
 
-  public FileSystemNotebookRepo(ZeppelinConfiguration zConf) throws IOException {
+  public FileSystemNotebookRepo(SmartsuitesConfiguration zConf) throws IOException {
     this.zConf = zConf;
     this.hadoopConf = new Configuration();
 
     this.isSecurityEnabled = UserGroupInformation.isSecurityEnabled();
     if (isSecurityEnabled) {
       String keytab = zConf.getString(
-          ZeppelinConfiguration.ConfVars.ZEPPELIN_SERVER_KERBEROS_KEYTAB);
+          SmartsuitesConfiguration.ConfVars.ZEPPELIN_SERVER_KERBEROS_KEYTAB);
       String principal = zConf.getString(
-          ZeppelinConfiguration.ConfVars.ZEPPELIN_SERVER_KERBEROS_PRINCIPAL);
+          SmartsuitesConfiguration.ConfVars.ZEPPELIN_SERVER_KERBEROS_PRINCIPAL);
       if (StringUtils.isBlank(keytab) || StringUtils.isBlank(principal)) {
         throw new IOException("keytab and principal can not be empty, keytab: " + keytab
             + ", principal: " + principal);
@@ -107,7 +107,7 @@ public class FileSystemNotebookRepo implements NotebookRepo {
         ByteArrayOutputStream noteBytes = new ByteArrayOutputStream();
         IOUtils.copyBytes(fs.open(notePath), noteBytes, hadoopConf);
         return Note.fromJson(new String(noteBytes.toString(
-            zConf.getString(ZeppelinConfiguration.ConfVars.ZEPPELIN_ENCODING))));
+            zConf.getString(SmartsuitesConfiguration.ConfVars.ZEPPELIN_ENCODING))));
       }
     });
   }
@@ -124,7 +124,7 @@ public class FileSystemNotebookRepo implements NotebookRepo {
           fs.delete(tmpNotePath, true);
         }
         InputStream in = new ByteArrayInputStream(note.toJson().getBytes(
-            zConf.getString(ZeppelinConfiguration.ConfVars.ZEPPELIN_ENCODING)));
+            zConf.getString(SmartsuitesConfiguration.ConfVars.ZEPPELIN_ENCODING)));
         IOUtils.copyBytes(in, fs.create(tmpNotePath), hadoopConf);
         fs.delete(notePath, true);
         fs.rename(tmpNotePath, notePath);

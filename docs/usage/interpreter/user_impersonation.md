@@ -56,7 +56,7 @@ export ZEPPELIN_IMPERSONATE_CMD='sudo -H -u ${ZEPPELIN_IMPERSONATE_USER} bash -c
 bin/zeppelin-daemon restart
 
 # for windows
-bin\zeppelin.cmd
+bin\smartsuites.cmd
 ```
 
 #### 5. Configure impersonation for interpreter 

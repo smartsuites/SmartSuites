@@ -5,7 +5,7 @@
 package com.smartsuites.interpreter.launcher;
 
 import com.smartsuites.interpreter.launcher.SparkInterpreterLauncher;
-import com.smartsuites.conf.ZeppelinConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration;
 import com.smartsuites.interpreter.InterpreterOption;
 import com.smartsuites.interpreter.remote.RemoteInterpreterManagedProcess;
 import org.junit.Test;
@@ -19,7 +19,7 @@ public class SparkInterpreterLauncherTest {
 
   @Test
   public void testLocalMode() {
-    ZeppelinConfiguration zConf = new ZeppelinConfiguration();
+    SmartsuitesConfiguration zConf = new SmartsuitesConfiguration();
     SparkInterpreterLauncher launcher = new SparkInterpreterLauncher(zConf);
     Properties properties = new Properties();
     properties.setProperty("SPARK_HOME", "/user/spark");
@@ -44,7 +44,7 @@ public class SparkInterpreterLauncherTest {
 
   @Test
   public void testYarnClientMode_1() {
-    ZeppelinConfiguration zConf = new ZeppelinConfiguration();
+    SmartsuitesConfiguration zConf = new SmartsuitesConfiguration();
     SparkInterpreterLauncher launcher = new SparkInterpreterLauncher(zConf);
     Properties properties = new Properties();
     properties.setProperty("SPARK_HOME", "/user/spark");
@@ -69,7 +69,7 @@ public class SparkInterpreterLauncherTest {
 
   @Test
   public void testYarnClientMode_2() {
-    ZeppelinConfiguration zConf = new ZeppelinConfiguration();
+    SmartsuitesConfiguration zConf = new SmartsuitesConfiguration();
     SparkInterpreterLauncher launcher = new SparkInterpreterLauncher(zConf);
     Properties properties = new Properties();
     properties.setProperty("SPARK_HOME", "/user/spark");
@@ -95,7 +95,7 @@ public class SparkInterpreterLauncherTest {
 
   @Test
   public void testYarnClusterMode_1() {
-    ZeppelinConfiguration zConf = new ZeppelinConfiguration();
+    SmartsuitesConfiguration zConf = new SmartsuitesConfiguration();
     SparkInterpreterLauncher launcher = new SparkInterpreterLauncher(zConf);
     Properties properties = new Properties();
     properties.setProperty("SPARK_HOME", "/user/spark");
@@ -121,7 +121,7 @@ public class SparkInterpreterLauncherTest {
 
   @Test
   public void testYarnClusterMode_2() {
-    ZeppelinConfiguration zConf = new ZeppelinConfiguration();
+    SmartsuitesConfiguration zConf = new SmartsuitesConfiguration();
     SparkInterpreterLauncher launcher = new SparkInterpreterLauncher(zConf);
     Properties properties = new Properties();
     properties.setProperty("SPARK_HOME", "/user/spark");

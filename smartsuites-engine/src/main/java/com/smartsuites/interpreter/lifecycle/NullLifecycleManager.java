@@ -5,7 +5,7 @@
 
 package com.smartsuites.interpreter.lifecycle;
 
-import com.smartsuites.conf.ZeppelinConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration;
 import com.smartsuites.interpreter.LifecycleManager;
 import com.smartsuites.interpreter.ManagedInterpreterGroup;
 
@@ -14,7 +14,7 @@ import com.smartsuites.interpreter.ManagedInterpreterGroup;
  */
 public class NullLifecycleManager implements LifecycleManager {
 
-  public NullLifecycleManager(ZeppelinConfiguration zConf) {
+  public NullLifecycleManager(SmartsuitesConfiguration zConf) {
 
   }
 

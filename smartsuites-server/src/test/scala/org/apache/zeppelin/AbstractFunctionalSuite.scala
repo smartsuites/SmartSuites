@@ -39,7 +39,7 @@ class AbstractFunctionalSuite extends FunSuite with WebBrowser with BeforeAndAft
   implicit val webDriver = getDriver()
 
   override def beforeAll() = {
-    "../bin/zeppelin-daemon.sh start" !
+    "../bin/smartsuites-daemon.sh start" !
 
     /*eventually (timeout(Span(180, Seconds))) {
       go to SERVER_ADDRESS
@@ -51,7 +51,7 @@ class AbstractFunctionalSuite extends FunSuite with WebBrowser with BeforeAndAft
     List[Suite](new WelcomePageSuite).toIndexedSeq
 
   override def afterAll() = {
-    "../bin/zeppelin-daemon.sh stop" !
+    "../bin/smartsuites-daemon.sh stop" !
 
     webDriver.close()
   }

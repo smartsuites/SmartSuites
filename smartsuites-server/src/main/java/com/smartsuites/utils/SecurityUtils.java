@@ -23,7 +23,7 @@ import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
-import com.smartsuites.conf.ZeppelinConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration;
 import com.smartsuites.realm.ActiveDirectoryGroupRealm;
 import com.smartsuites.realm.LdapRealm;
 import org.slf4j.Logger;
@@ -45,7 +45,7 @@ public class SecurityUtils {
     isEnabled = value;
   }
 
-  public static Boolean isValidOrigin(String sourceHost, ZeppelinConfiguration conf)
+  public static Boolean isValidOrigin(String sourceHost, SmartsuitesConfiguration conf)
       throws UnknownHostException, URISyntaxException {
 
     String sourceUriHost = "";

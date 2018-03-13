@@ -15,7 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.smartsuites.AbstractZeppelinIT;
 import com.smartsuites.WebDriverManager;
 import com.smartsuites.ZeppelinITUtils;
-import com.smartsuites.conf.ZeppelinConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration;
 import org.hamcrest.CoreMatchers;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -70,8 +70,8 @@ public class AuthenticationIT extends AbstractZeppelinIT {
     }
 
     try {
-      System.setProperty(ZeppelinConfiguration.ConfVars.ZEPPELIN_HOME.getVarName(), new File("../").getAbsolutePath());
-      ZeppelinConfiguration conf = ZeppelinConfiguration.create();
+      System.setProperty(SmartsuitesConfiguration.ConfVars.ZEPPELIN_HOME.getVarName(), new File("../").getAbsolutePath());
+      SmartsuitesConfiguration conf = SmartsuitesConfiguration.create();
       shiroPath = conf.getRelativeDir(String.format("%s/shiro.ini", conf.getConfDir()));
       File file = new File(shiroPath);
       if (file.exists()) {

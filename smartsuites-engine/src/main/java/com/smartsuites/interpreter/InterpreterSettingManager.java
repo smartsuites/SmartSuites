@@ -16,8 +16,8 @@ import com.smartsuites.interpreter.remote.RemoteInterpreterProcessListener;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
-import com.smartsuites.conf.ZeppelinConfiguration;
-import com.smartsuites.conf.ZeppelinConfiguration.ConfVars;
+import com.smartsuites.conf.SmartsuitesConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration.ConfVars;
 import com.smartsuites.dep.Dependency;
 import com.smartsuites.dep.DependencyResolver;
 import com.smartsuites.display.AngularObjectRegistryListener;
@@ -71,7 +71,7 @@ public class InterpreterSettingManager {
       "language", (Object) "text",
       "editOnDblClick", false);
 
-  private final ZeppelinConfiguration conf;
+  private final SmartsuitesConfiguration conf;
   private final Path interpreterDirPath;
   private final Path interpreterSettingPath;
 
@@ -107,19 +107,19 @@ public class InterpreterSettingManager {
   private DependencyResolver dependencyResolver;
   private LifecycleManager lifecycleManager;
 
-  public InterpreterSettingManager(ZeppelinConfiguration zeppelinConfiguration,
+  public InterpreterSettingManager(SmartsuitesConfiguration SmartsuitesConfiguration,
                                    AngularObjectRegistryListener angularObjectRegistryListener,
                                    RemoteInterpreterProcessListener remoteInterpreterProcessListener,
                                    ApplicationEventListener appEventListener)
       throws IOException {
-    this(zeppelinConfiguration, new InterpreterOption(),
+    this(SmartsuitesConfiguration, new InterpreterOption(),
         angularObjectRegistryListener,
         remoteInterpreterProcessListener,
         appEventListener);
   }
 
   @VisibleForTesting
-  public InterpreterSettingManager(ZeppelinConfiguration conf,
+  public InterpreterSettingManager(SmartsuitesConfiguration conf,
                                    InterpreterOption defaultOption,
                                    AngularObjectRegistryListener angularObjectRegistryListener,
                                    RemoteInterpreterProcessListener
@@ -143,7 +143,7 @@ public class InterpreterSettingManager {
     this.appEventListener = appEventListener;
     try {
       this.lifecycleManager = (LifecycleManager)
-          Class.forName(conf.getLifecycleManagerClass()).getConstructor(ZeppelinConfiguration.class)
+          Class.forName(conf.getLifecycleManagerClass()).getConstructor(SmartsuitesConfiguration.class)
               .newInstance(conf);
     } catch (Exception e) {
       throw new IOException("Fail to create LifecycleManager", e);

@@ -107,14 +107,14 @@ hdp-select status hadoop-client | sed 's/hadoop-client - \(.*\)/\1/'
 
 ```
 cd /home/zeppelin/zeppelin
-bin/zeppelin-daemon.sh start
+bin/smartsuites-daemon.sh start
 ```
 After successful start, visit http://[zeppelin-server-host-name]:8080 with your web browser.
 
 ### Stop Zeppelin
 
 ```
-bin/zeppelin-daemon.sh stop
+bin/smartsuites-daemon.sh stop
 ```
 
 ## Interpreter

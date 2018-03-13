@@ -17,16 +17,16 @@ export class BaseUrlService {
   }
 
   getWebsocketUrl():string {
+    // 4200 is for angularjs develop
+    let port = this.getPort() == 4200? 8080 : this.getPort()
     let wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:'
-    //return wsProtocol + '//' + location.hostname + ':' + this.getPort() + this.skipTrailingSlash(location.pathname) + '/ws'
-    return wsProtocol + '//' + location.hostname + ':8080'+ this.skipTrailingSlash(location.pathname) + '/ws'
-    //return wsProtocol + '//localhost:8080/ws'
+    return wsProtocol + '//' + location.hostname + ':'+ port + this.skipTrailingSlash(location.pathname) + '/ws'
   }
 
   getBase():string {
-    //return location.protocol + '//localhost:8080'
-    //return location.protocol + '//' + location.hostname + ':' + this.getPort() + location.pathname
-    return location.protocol + '//' + location.hostname + ':8080' + location.pathname
+    // 4200 is for angularjs develop
+    let port = this.getPort() == 4200? 8080 : this.getPort()
+    return location.protocol + '//' + location.hostname + ':'+ port + location.pathname
   }
 
   getRestApiBase():string {

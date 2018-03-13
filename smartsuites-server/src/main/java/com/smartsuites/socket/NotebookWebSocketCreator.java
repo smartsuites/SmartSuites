@@ -9,7 +9,7 @@ import org.eclipse.jetty.websocket.servlet.WebSocketCreator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.smartsuites.conf.ZeppelinConfiguration.ConfVars.ZEPPELIN_ALLOWED_ORIGINS;
+import static com.smartsuites.conf.SmartsuitesConfiguration.ConfVars.ZEPPELIN_ALLOWED_ORIGINS;
 
 /**
  * Responsible to create the WebSockets for the NotebookServer.

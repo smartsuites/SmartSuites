@@ -19,25 +19,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Zeppelin configuration.
- *
- */
-public class ZeppelinConfiguration extends XMLConfiguration {
-  private static final String ZEPPELIN_SITE_XML = "zeppelin-site.xml";
+
+public class SmartsuitesConfiguration extends XMLConfiguration {
+  private static final String SMARTSUITES_SITE_XML = "smartsuites-site.xml";
+  private static final String SMARTSUITES_SITE_XML_DEV = "smartsuites-site-dev.xml";
   private static final long serialVersionUID = 4749305895693848035L;
-  private static final Logger LOG = LoggerFactory.getLogger(ZeppelinConfiguration.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SmartsuitesConfiguration.class);
 
   private static final String HELIUM_PACKAGE_DEFAULT_URL = "https://s3.amazonaws.com/helium-package/helium.json";
   //private static final String HELIUM_PACKAGE_DEFAULT_URL = "file:///Users/wuyufei/GitHub/zeppelin/conf/helium.json";
-  private static ZeppelinConfiguration conf;
+  private static SmartsuitesConfiguration conf;
 
-  public ZeppelinConfiguration(URL url) throws ConfigurationException {
+  public SmartsuitesConfiguration(URL url) throws ConfigurationException {
     setDelimiterParsingDisabled(true);
     load(url);
   }
 
-  public ZeppelinConfiguration() {
+  public SmartsuitesConfiguration() {
     ConfVars[] vars = ConfVars.values();
     for (ConfVars v : vars) {
       if (v.getType() == ConfVars.VarType.BOOLEAN) {
@@ -60,10 +58,10 @@ public class ZeppelinConfiguration extends XMLConfiguration {
 
   /**
    * Load from resource.
-   *url = ZeppelinConfiguration.class.getResource(ZEPPELIN_SITE_XML);
+   * url = SmartsuitesConfiguration.class.getResource(SMARTSUITES_SITE_XML);
    * @throws ConfigurationException
    */
-  public static synchronized ZeppelinConfiguration create() {
+  public static synchronized SmartsuitesConfiguration create() {
     if (conf != null) {
       return conf;
     }
@@ -71,27 +69,41 @@ public class ZeppelinConfiguration extends XMLConfiguration {
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
     URL url;
 
-    url = ZeppelinConfiguration.class.getResource(ZEPPELIN_SITE_XML);
+    url = SmartsuitesConfiguration.class.getResource(SMARTSUITES_SITE_XML);
     if (url == null) {
-      ClassLoader cl = ZeppelinConfiguration.class.getClassLoader();
+      ClassLoader cl = SmartsuitesConfiguration.class.getClassLoader();
       if (cl != null) {
-        url = cl.getResource(ZEPPELIN_SITE_XML);
+        url = cl.getResource(SMARTSUITES_SITE_XML);
       }
     }
     if (url == null) {
-      url = classLoader.getResource(ZEPPELIN_SITE_XML);
+      url = classLoader.getResource(SMARTSUITES_SITE_XML);
+    }
+
+    // Search For SMARTSUITES_SITE_XML_DEV For Develop
+    if(url ==null){
+      url = SmartsuitesConfiguration.class.getResource(SMARTSUITES_SITE_XML_DEV);
+      if (url == null) {
+        ClassLoader cl = SmartsuitesConfiguration.class.getClassLoader();
+        if (cl != null) {
+          url = cl.getResource(SMARTSUITES_SITE_XML_DEV);
+        }
+      }
+      if (url == null) {
+        url = classLoader.getResource(SMARTSUITES_SITE_XML_DEV);
+      }
     }
 
     if (url == null) {
       LOG.warn("Failed to load configuration, proceeding with a default");
-      conf = new ZeppelinConfiguration();
+      conf = new SmartsuitesConfiguration();
     } else {
       try {
         LOG.info("Load configuration from " + url);
-        conf = new ZeppelinConfiguration(url);
+        conf = new SmartsuitesConfiguration(url);
       } catch (ConfigurationException e) {
         LOG.warn("Failed to load configuration from " + url + " proceeding with a default", e);
-        conf = new ZeppelinConfiguration();
+        conf = new SmartsuitesConfiguration();
       }
     }
 
@@ -102,7 +114,7 @@ public class ZeppelinConfiguration extends XMLConfiguration {
       LOG.info("Server SSL Port: " + conf.getServerSslPort());
     }
     LOG.info("Context Path: " + conf.getServerContextPath());
-    LOG.info("Zeppelin Version: " + Util.getVersion());
+    LOG.info("SmartSuites Version: " + Util.getVersion());
 
     return conf;
   }
@@ -525,7 +537,7 @@ public class ZeppelinConfiguration extends XMLConfiguration {
     return getString(ConfVars.ZEPPELIN_INTERPRETER_LIFECYCLE_MANAGER_CLASS);
   }
 
-  public Map<String, String> dumpConfigurations(ZeppelinConfiguration conf,
+  public Map<String, String> dumpConfigurations(SmartsuitesConfiguration conf,
                                                 ConfigurationKeyPredicate predicate) {
     Map<String, String> configurations = new HashMap<>();
 
@@ -582,7 +594,7 @@ public class ZeppelinConfiguration extends XMLConfiguration {
     ZEPPELIN_SSL_TRUSTSTORE_PATH("zeppelin.ssl.truststore.path", null),
     ZEPPELIN_SSL_TRUSTSTORE_TYPE("zeppelin.ssl.truststore.type", null),
     ZEPPELIN_SSL_TRUSTSTORE_PASSWORD("zeppelin.ssl.truststore.password", null),
-    ZEPPELIN_WAR("zeppelin.war", "smartsuites-web/dist"),
+    ZEPPELIN_WAR("zeppelin.war", "smartsuites-web/descriptor"),
     ZEPPELIN_WAR_TEMPDIR("zeppelin.war.tempdir", "webapps"),
     ZEPPELIN_INTERPRETERS("zeppelin.interpreters", "com.smartsuites.spark.SparkInterpreter,"
         + "com.smartsuites.spark.PySparkInterpreter,"
@@ -833,7 +845,7 @@ public class ZeppelinConfiguration extends XMLConfiguration {
         try {
           checkType(value);
         } catch (Exception e) {
-          LOG.error("Exception in ZeppelinConfiguration while isType", e);
+          LOG.error("Exception in SmartsuitesConfiguration while isType", e);
           return false;
         }
         return true;

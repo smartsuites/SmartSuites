@@ -19,7 +19,7 @@
 # description: Start and stop daemon script for.
 #
 
-USAGE="-e Usage: zeppelin-daemon.sh\n\t
+USAGE="-e Usage: smartsuites-daemon.sh\n\t
         [--config <conf-dir>] {start|stop|upstart|restart|reload|status}\n\t
         [--version | -v]"
 

@@ -168,11 +168,11 @@ class ZeppelinTerpWrangler:
 #######################################################################################################################
 
 def valid_zeppelin_home(path):
-    return isfile(path + "/bin/zeppelin-daemon.sh")
+    return isfile(path + "/bin/smartsuites-daemon.sh")
 
 if args.zeppelin_home == None:
     zeppelin_home = getcwd()
-    if (zeppelin_home.split("/")[-1] == "bin") and (isfile("zeppelin-daemon.sh")):
+    if (zeppelin_home.split("/")[-1] == "bin") and (isfile("smartsuites-daemon.sh")):
         print "we're in the zeppelin/bin"
         zeppelin_home = "/".join(zeppelin_home.split("/")[:-1])
     print "--zeppelin_home not specified, using %s" % zeppelin_home
@@ -190,11 +190,11 @@ interpreter_json_path = zeppelin_home + "/conf/interpreter.json"
 
 if not isfile(interpreter_json_path):
     print "interpreter.json doesn't exist. Checking weather Zeppelin is running."
-    status = call(["bin/zeppelin-daemon.sh", 'status'], cwd=zeppelin_home)
+    status = call(["bin/smartsuites-daemon.sh", 'status'], cwd=zeppelin_home)
     if status == 1:
         print "Zeppelin doesn't appear to be running- it is possible that Zeppelin has never been run (interpreter.json is created when Zeppelin is run)"
         print "I'm going to try to start Zeppelin to create interpreter.json"
-        call(["bin/zeppelin-daemon.sh", 'start'], cwd=zeppelin_home)
+        call(["bin/smartsuites-daemon.sh", 'start'], cwd=zeppelin_home)
         from time import sleep
         sleep(3)
     else:
@@ -277,7 +277,7 @@ else:
 #######################################################################################################################
 if not args.restart_later:
     print "restarting Apache Zeppelin to load new interpreters..."
-    check_call(["bin/zeppelin-daemon.sh", 'restart'], cwd= zeppelin_home)
+    check_call(["bin/smartsuites-daemon.sh", 'restart'], cwd= zeppelin_home)
 else:
     print "--restart_later flag detected: remember to restart Zeppelin to see new Mahout interpreters!!"
 

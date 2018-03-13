@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.smartsuites.conf.ZeppelinConfiguration;
-import com.smartsuites.conf.ZeppelinConfiguration.ConfVars;
+import com.smartsuites.conf.SmartsuitesConfiguration;
+import com.smartsuites.conf.SmartsuitesConfiguration.ConfVars;
 import com.smartsuites.notebook.Note;
 import com.smartsuites.notebook.NoteInfo;
 import com.smartsuites.notebook.NotebookAuthorization;
@@ -37,7 +37,7 @@ public class NotebookRepoSync implements NotebookRepo {
   private static final String pullKey = "pullNoteIds";
   private static final String delDstKey = "delDstNoteIds";
 
-  private static ZeppelinConfiguration config;
+  private static SmartsuitesConfiguration config;
   private static final String defaultStorage = "GitNotebookRepo";
 
   private List<NotebookRepo> repos = new ArrayList<>();
@@ -47,7 +47,7 @@ public class NotebookRepoSync implements NotebookRepo {
    * @param conf
    */
   @SuppressWarnings("static-access")
-  public NotebookRepoSync(ZeppelinConfiguration conf) {
+  public NotebookRepoSync(SmartsuitesConfiguration conf) {
     config = conf;
     oneWaySync = conf.getBoolean(ConfVars.ZEPPELIN_NOTEBOOK_ONE_WAY_SYNC);
     String allStorageClassNames = conf.getString(ConfVars.ZEPPELIN_NOTEBOOK_STORAGE).trim();
@@ -66,7 +66,7 @@ public class NotebookRepoSync implements NotebookRepo {
       try {
         notebookStorageClass = getClass().forName(storageClassNames[i].trim());
         Constructor<?> constructor = notebookStorageClass.getConstructor(
-            ZeppelinConfiguration.class);
+            SmartsuitesConfiguration.class);
         repos.add((NotebookRepo) constructor.newInstance(conf));
         LOG.info("Instantiate NotebookRepo: " + storageClassNames[i]);
       } catch (ClassNotFoundException | NoSuchMethodException | SecurityException |
@@ -91,12 +91,12 @@ public class NotebookRepoSync implements NotebookRepo {
   }
 
   @SuppressWarnings("static-access")
-  private void initializeDefaultStorage(ZeppelinConfiguration conf) {
+  private void initializeDefaultStorage(SmartsuitesConfiguration conf) {
     Class<?> notebookStorageClass;
     try {
       notebookStorageClass = getClass().forName(defaultStorage);
       Constructor<?> constructor = notebookStorageClass.getConstructor(
-                ZeppelinConfiguration.class);
+                SmartsuitesConfiguration.class);
       repos.add((NotebookRepo) constructor.newInstance(conf));
     } catch (ClassNotFoundException | NoSuchMethodException | SecurityException |
         InstantiationException | IllegalAccessException | IllegalArgumentException |
