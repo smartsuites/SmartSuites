@@ -21,18 +21,18 @@
             </includes>
             <useProjectArtifact>false</useProjectArtifact>
             <useTransitiveDependencies>false</useTransitiveDependencies>
-            <outputDirectory>/lib</outputDirectory>
+            <outputDirectory>./lib</outputDirectory>
         </dependencySet>
         <!-- 打包解析器主程序 -->
         <dependencySet>
-            <outputDirectory>/lib/interpreter</outputDirectory>
+            <outputDirectory>./lib/interpreter</outputDirectory>
             <includes>
                 <include>${project.groupId}:smartsuites-interpreter</include>
             </includes>
         </dependencySet>
         <!-- 打包主程序【包含传递性依赖】 -->
         <dependencySet>
-            <outputDirectory>/lib</outputDirectory>
+            <outputDirectory>./lib</outputDirectory>
             <excludes>
                 <exclude>${project.groupId}:smartsuites-interpreter</exclude>
                 <exclude>${project.groupId}:smartsuites-web</exclude>

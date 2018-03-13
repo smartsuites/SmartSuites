@@ -38,7 +38,7 @@ public class ShellScriptLauncher extends InterpreterLauncher {
     String groupName = context.getInterpreterGroupName();
 
     int connectTimeout =
-        zConf.getInt(SmartsuitesConfiguration.ConfVars.ZEPPELIN_INTERPRETER_CONNECT_TIMEOUT);
+        zConf.getInt(SmartsuitesConfiguration.ConfVars.SMARTSUITES_INTERPRETER_CONNECT_TIMEOUT);
     if (option.isExistingProcess()) {
       return new RemoteInterpreterRunningProcess(
           connectTimeout,

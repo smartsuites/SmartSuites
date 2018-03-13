@@ -54,11 +54,11 @@ public abstract class AbstractInterpreterTest {
     FileUtils.copyDirectory(new File("src/test/resources/interpreter"), interpreterDir);
     FileUtils.copyDirectory(new File("src/test/resources/conf"), confDir);
 
-    System.setProperty(SmartsuitesConfiguration.ConfVars.ZEPPELIN_HOME.getVarName(), zeppelinHome.getAbsolutePath());
-    System.setProperty(SmartsuitesConfiguration.ConfVars.ZEPPELIN_CONF_DIR.getVarName(), confDir.getAbsolutePath());
-    System.setProperty(SmartsuitesConfiguration.ConfVars.ZEPPELIN_INTERPRETER_DIR.getVarName(), interpreterDir.getAbsolutePath());
-    System.setProperty(SmartsuitesConfiguration.ConfVars.ZEPPELIN_NOTEBOOK_DIR.getVarName(), notebookDir.getAbsolutePath());
-    System.setProperty(SmartsuitesConfiguration.ConfVars.ZEPPELIN_INTERPRETER_GROUP_ORDER.getVarName(), "test,mock1,mock2,mock_resource_pool");
+    System.setProperty(SmartsuitesConfiguration.ConfVars.SMARTSUITES_HOME.getVarName(), zeppelinHome.getAbsolutePath());
+    System.setProperty(SmartsuitesConfiguration.ConfVars.SMARTSUITES_CONF_DIR.getVarName(), confDir.getAbsolutePath());
+    System.setProperty(SmartsuitesConfiguration.ConfVars.SMARTSUITES_INTERPRETER_DIR.getVarName(), interpreterDir.getAbsolutePath());
+    System.setProperty(SmartsuitesConfiguration.ConfVars.SMARTSUITES_NOTEBOOK_DIR.getVarName(), notebookDir.getAbsolutePath());
+    System.setProperty(SmartsuitesConfiguration.ConfVars.SMARTSUITES_INTERPRETER_GROUP_ORDER.getVarName(), "test,mock1,mock2,mock_resource_pool");
 
     conf = new SmartsuitesConfiguration();
     interpreterSettingManager = new InterpreterSettingManager(conf,

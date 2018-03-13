@@ -44,8 +44,8 @@ public class VFSNotebookRepoTest extends AbstractInterpreterTest implements JobL
 
   @Before
   public void setUp() throws Exception {
-    System.setProperty(ConfVars.ZEPPELIN_INTERPRETER_GROUP_ORDER.getVarName(), "mock1,mock2");
-    System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_STORAGE.getVarName(), "VFSNotebookRepo");
+    System.setProperty(ConfVars.SMARTSUITES_INTERPRETER_GROUP_ORDER.getVarName(), "mock1,mock2");
+    System.setProperty(ConfVars.SMARTSUITES_NOTEBOOK_STORAGE.getVarName(), "VFSNotebookRepo");
 
     super.setUp();
 

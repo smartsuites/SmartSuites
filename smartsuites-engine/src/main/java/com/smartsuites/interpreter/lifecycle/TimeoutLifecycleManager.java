@@ -38,9 +38,9 @@ public class TimeoutLifecycleManager implements LifecycleManager {
 
   public TimeoutLifecycleManager(SmartsuitesConfiguration zConf) {
     this.checkInterval = zConf.getLong(SmartsuitesConfiguration.ConfVars
-            .ZEPPELIN_INTERPRETER_LIFECYCLE_MANAGER_TIMEOUT_CHECK_INTERVAL);
+            .SMARTSUITES_INTERPRETER_LIFECYCLE_MANAGER_TIMEOUT_CHECK_INTERVAL);
     this.timeoutThreshold = zConf.getLong(
-        SmartsuitesConfiguration.ConfVars.ZEPPELIN_INTERPRETER_LIFECYCLE_MANAGER_TIMEOUT_THRESHOLD);
+        SmartsuitesConfiguration.ConfVars.SMARTSUITES_INTERPRETER_LIFECYCLE_MANAGER_TIMEOUT_THRESHOLD);
     this.checkTimer = new Timer(true);
     this.checkTimer.scheduleAtFixedRate(new TimerTask() {
       @Override

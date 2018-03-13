@@ -132,7 +132,7 @@ public class Notebook implements NoteEventListener {
   public Note createNote(AuthenticationInfo subject) throws IOException {
     Preconditions.checkNotNull(subject, "AuthenticationInfo should not be null");
     Note note;
-    if (conf.getBoolean(ConfVars.ZEPPELIN_NOTEBOOK_AUTO_INTERPRETER_BINDING)) {
+    if (conf.getBoolean(ConfVars.SMARTSUITES_NOTEBOOK_AUTO_INTERPRETER_BINDING)) {
       note = createNote(interpreterSettingManager.getInterpreterSettingIds(), subject);
     } else {
       note = createNote(null, subject);

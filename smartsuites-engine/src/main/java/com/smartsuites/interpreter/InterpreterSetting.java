@@ -47,8 +47,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import static com.smartsuites.conf.SmartsuitesConfiguration.ConfVars.ZEPPELIN_INTERPRETER_MAX_POOL_SIZE;
-import static com.smartsuites.conf.SmartsuitesConfiguration.ConfVars.ZEPPELIN_INTERPRETER_OUTPUT_LIMIT;
+import static com.smartsuites.conf.SmartsuitesConfiguration.ConfVars.SMARTSUITES_INTERPRETER_MAX_POOL_SIZE;
+import static com.smartsuites.conf.SmartsuitesConfiguration.ConfVars.SMARTSUITES_INTERPRETER_OUTPUT_LIMIT;
 import static com.smartsuites.util.IdHashes.generateId;
 
 /**
@@ -488,12 +488,12 @@ public class InterpreterSetting {
 
     if (!jProperties.containsKey("zeppelin.interpreter.output.limit")) {
       jProperties.setProperty("zeppelin.interpreter.output.limit",
-          conf.getInt(ZEPPELIN_INTERPRETER_OUTPUT_LIMIT) + "");
+          conf.getInt(SMARTSUITES_INTERPRETER_OUTPUT_LIMIT) + "");
     }
 
     if (!jProperties.containsKey("zeppelin.interpreter.max.poolsize")) {
       jProperties.setProperty("zeppelin.interpreter.max.poolsize",
-          conf.getInt(ZEPPELIN_INTERPRETER_MAX_POOL_SIZE) + "");
+          conf.getInt(SMARTSUITES_INTERPRETER_MAX_POOL_SIZE) + "");
     }
 
     String interpreterLocalRepoPath = conf.getInterpreterLocalRepoPath();
@@ -737,7 +737,7 @@ public class InterpreterSetting {
           if (deps != null) {
             for (Dependency d : deps) {
               File destDir = new File(
-                  conf.getRelativeDir(SmartsuitesConfiguration.ConfVars.ZEPPELIN_DEP_LOCALREPO));
+                  conf.getRelativeDir(SmartsuitesConfiguration.ConfVars.SMARTSUITES_DEP_LOCALREPO));
 
               if (d.getExclusions() != null) {
                 dependencyResolver.load(d.getGroupArtifactVersion(), d.getExclusions(),

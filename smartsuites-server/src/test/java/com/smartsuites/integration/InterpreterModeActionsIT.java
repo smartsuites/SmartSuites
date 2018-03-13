@@ -68,7 +68,7 @@ public class InterpreterModeActionsIT extends AbstractZeppelinIT {
       return;
     }
     try {
-      System.setProperty(SmartsuitesConfiguration.ConfVars.ZEPPELIN_HOME.getVarName(), new File("../").getAbsolutePath());
+      System.setProperty(SmartsuitesConfiguration.ConfVars.SMARTSUITES_HOME.getVarName(), new File("../").getAbsolutePath());
       SmartsuitesConfiguration conf = SmartsuitesConfiguration.create();
       shiroPath = conf.getRelativeDir(String.format("%s/shiro.ini", conf.getConfDir()));
       interpreterOptionPath = conf.getRelativeDir(String.format("%s/interpreter.json", conf.getConfDir()));

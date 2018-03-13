@@ -9,7 +9,7 @@ import org.eclipse.jetty.websocket.servlet.WebSocketCreator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.smartsuites.conf.SmartsuitesConfiguration.ConfVars.ZEPPELIN_ALLOWED_ORIGINS;
+import static com.smartsuites.conf.SmartsuitesConfiguration.ConfVars.SMARTSUITES_ALLOWED_ORIGINS;
 
 /**
  * Responsible to create the WebSockets for the NotebookServer.
@@ -28,7 +28,7 @@ public class NotebookWebSocketCreator implements WebSocketCreator {
       return new NotebookSocket(request.getHttpServletRequest(), "", notebookServer);
     } else {
       LOG.error("Websocket request is not allowed by {} settings. Origin: {}",
-          ZEPPELIN_ALLOWED_ORIGINS, origin);
+              SMARTSUITES_ALLOWED_ORIGINS, origin);
       return null;
     }
   }

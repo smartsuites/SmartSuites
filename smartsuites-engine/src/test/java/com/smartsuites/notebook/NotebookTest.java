@@ -71,8 +71,8 @@ public class NotebookTest extends AbstractInterpreterTest implements JobListener
 
   @Before
   public void setUp() throws Exception {
-    System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_PUBLIC.getVarName(), "true");
-    System.setProperty(ConfVars.ZEPPELIN_INTERPRETER_GROUP_ORDER.getVarName(), "mock1,mock2");
+    System.setProperty(ConfVars.SMARTSUITES_NOTEBOOK_PUBLIC.getVarName(), "true");
+    System.setProperty(ConfVars.SMARTSUITES_INTERPRETER_GROUP_ORDER.getVarName(), "mock1,mock2");
     super.setUp();
 
     schedulerFactory = SchedulerFactory.singleton();
@@ -1143,7 +1143,7 @@ public class NotebookTest extends AbstractInterpreterTest implements JobListener
     assertEquals(notebookAuthorization.getWriters(notePublic.getId()).size(), 0);
 
     // case of private note
-    System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_PUBLIC.getVarName(), "false");
+    System.setProperty(ConfVars.SMARTSUITES_NOTEBOOK_PUBLIC.getVarName(), "false");
     SmartsuitesConfiguration conf2 = SmartsuitesConfiguration.create();
     assertFalse(conf2.isNotebokPublic());
     // notebook authorization reads from conf, so no need to re-initilize
@@ -1172,7 +1172,7 @@ public class NotebookTest extends AbstractInterpreterTest implements JobListener
     assertEquals(notebookAuthorization.getWriters(notePrivate.getId()).size(), 1);
     
     //set back public to true
-    System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_PUBLIC.getVarName(), "true");
+    System.setProperty(ConfVars.SMARTSUITES_NOTEBOOK_PUBLIC.getVarName(), "true");
     SmartsuitesConfiguration.create();
   }
   

@@ -79,7 +79,7 @@ public class SmartsuitesServer extends Application {
   public SmartsuitesServer() throws Exception {
     SmartsuitesConfiguration conf = SmartsuitesConfiguration.create();
 
-    InterpreterOutput.limit = conf.getInt(ConfVars.ZEPPELIN_INTERPRETER_OUTPUT_LIMIT);
+    InterpreterOutput.limit = conf.getInt(ConfVars.SMARTSUITES_INTERPRETER_OUTPUT_LIMIT);
 
     HeliumApplicationFactory heliumApplicationFactory = new HeliumApplicationFactory();
     HeliumBundleFactory heliumBundleFactory;
@@ -93,7 +93,7 @@ public class SmartsuitesServer extends Application {
       heliumBundleFactory = new HeliumBundleFactory(
           conf,
           null,
-          new File(conf.getRelativeDir(ConfVars.ZEPPELIN_DEP_LOCALREPO)),
+          new File(conf.getRelativeDir(ConfVars.SMARTSUITES_DEP_LOCALREPO)),
           new File(conf.getRelativeDir("lib/node_modules/zeppelin-tabledata")),
           new File(conf.getRelativeDir("lib/node_modules/zeppelin-vis")),
           new File(conf.getRelativeDir("lib/node_modules/zeppelin-spell")));
@@ -101,7 +101,7 @@ public class SmartsuitesServer extends Application {
       heliumBundleFactory = new HeliumBundleFactory(
           conf,
           null,
-          new File(conf.getRelativeDir(ConfVars.ZEPPELIN_DEP_LOCALREPO)),
+          new File(conf.getRelativeDir(ConfVars.SMARTSUITES_DEP_LOCALREPO)),
           new File(conf.getRelativeDir("zeppelin-web/src/app/tabledata")),
           new File(conf.getRelativeDir("zeppelin-web/src/app/visualization")),
           new File(conf.getRelativeDir("zeppelin-web/src/app/spell")));
@@ -125,7 +125,7 @@ public class SmartsuitesServer extends Application {
     SmartsuitesServer.helium = new Helium(
         conf.getHeliumConfPath(),
         conf.getHeliumRegistry(),
-        new File(conf.getRelativeDir(ConfVars.ZEPPELIN_DEP_LOCALREPO),
+        new File(conf.getRelativeDir(ConfVars.SMARTSUITES_DEP_LOCALREPO),
             "helium-registry-cache"),
         heliumBundleFactory,
         heliumApplicationFactory,
@@ -147,7 +147,27 @@ public class SmartsuitesServer extends Application {
     notebook.addNotebookEventListener(notebookWsServer.getNotebookInformationListener());
   }
 
+  private static void getSystemConfigs(){
+    LOG.info("**************************************");
+    LOG.info("*********    System Env    ***********");
+    LOG.info("**************************************");
+
+    for(String key : System.getenv().keySet()){
+      LOG.info(key + " : " + System.getenv(key));
+    }
+
+    LOG.info("**************************************");
+    LOG.info("*******  System Properties ***********");
+    LOG.info("**************************************");
+
+    for(Object key : System.getProperties().keySet()){
+      LOG.info(key + " : " + System.getProperty((String) key));
+    }
+  }
+
   public static void main(String[] args) throws InterruptedException {
+
+    getSystemConfigs();
 
     SmartsuitesConfiguration conf = SmartsuitesConfiguration.create();
     conf.setProperty("args", args);
@@ -169,7 +189,7 @@ public class SmartsuitesServer extends Application {
     //Below is commented since zeppelin-docs module is removed.
     //final WebAppContext webAppSwagg = setupWebAppSwagger(conf);
 
-    LOG.info("Starting zeppelin server");
+    LOG.info("Starting smartsuites server");
     try {
       jettyWebServer.start(); //Instantiates SmartsuitesServer
       if (conf.getJettyName() != null) {
@@ -179,11 +199,11 @@ public class SmartsuitesServer extends Application {
       LOG.error("Error while running jettyServer", e);
       System.exit(-1);
     }
-    LOG.info("Done, zeppelin server started");
+    LOG.info("Done, smartsuites server started");
 
     Runtime.getRuntime().addShutdownHook(new Thread(){
       @Override public void run() {
-        LOG.info("Shutting down Zeppelin Server ... ");
+        LOG.info("Shutting down smartsuites Server ... ");
         try {
           jettyWebServer.stop();
           notebook.getInterpreterSettingManager().close();
@@ -200,7 +220,7 @@ public class SmartsuitesServer extends Application {
     // when zeppelin is started inside of ide (especially for eclipse)
     // for graceful shutdown, input any key in console window
 
-    /*if (System.getenv("ZEPPELIN_IDENT_STRING") == null) {
+    /*if (System.getenv("SMARTSUITES_IDENT_STRING") == null) {
       try {
         System.in.read();
       } catch (IOException e) {
@@ -219,7 +239,7 @@ public class SmartsuitesServer extends Application {
     ServerConnector connector;
 
     if (conf.useSsl()) {
-      LOG.debug("Enabling SSL for Zeppelin Server on port " + conf.getServerSslPort());
+      LOG.debug("Enabling SSL for Smartsuites Server on port " + conf.getServerSslPort());
       HttpConfiguration httpConfig = new HttpConfiguration();
       httpConfig.setSecureScheme("https");
       httpConfig.setSecurePort(conf.getServerSslPort());
@@ -321,7 +341,7 @@ public class SmartsuitesServer extends Application {
 
     WebAppContext webApp = new WebAppContext();
     webApp.setContextPath(conf.getServerContextPath());
-    File warPath = new File(conf.getString(ConfVars.ZEPPELIN_WAR));
+    File warPath = new File(conf.getString(ConfVars.SMARTSUITES_WAR));
     if (warPath.isDirectory()) {
       // Development mode, read from FS
       // webApp.setDescriptor(warPath+"/WEB-INF/web.xml");
@@ -330,7 +350,7 @@ public class SmartsuitesServer extends Application {
     } else {
       // use packaged WAR
       webApp.setWar(warPath.getAbsolutePath());
-      File warTempDirectory = new File(conf.getRelativeDir(ConfVars.ZEPPELIN_WAR_TEMPDIR));
+      File warTempDirectory = new File(conf.getRelativeDir(ConfVars.SMARTSUITES_WAR_TEMPDIR));
       warTempDirectory.mkdir();
       LOG.info("SmartsuitesServer Webapp path: {}", warTempDirectory.getPath());
       webApp.setTempDirectory(warTempDirectory);
@@ -343,7 +363,7 @@ public class SmartsuitesServer extends Application {
         EnumSet.allOf(DispatcherType.class));
 
     webApp.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed",
-            Boolean.toString(conf.getBoolean(ConfVars.ZEPPELIN_SERVER_DEFAULT_DIR_ALLOWED)));
+            Boolean.toString(conf.getBoolean(ConfVars.SMARTSUITES_SERVER_DEFAULT_DIR_ALLOWED)));
 
     return webApp;
 

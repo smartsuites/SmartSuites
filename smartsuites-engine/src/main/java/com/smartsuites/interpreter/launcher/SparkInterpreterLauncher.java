@@ -43,7 +43,7 @@ public class SparkInterpreterLauncher extends ShellScriptLauncher {
     setupPropertiesForPySpark(sparkProperties);
     setupPropertiesForSparkR(sparkProperties);
     if (isYarnMode() && getDeployMode().equals("cluster")) {
-      env.put("ZEPPELIN_SPARK_YARN_CLUSTER", "true");
+      env.put("SMARTSUITES_SPARK_YARN_CLUSTER", "true");
     }
 
     StringBuilder sparkConfBuilder = new StringBuilder();
@@ -57,7 +57,7 @@ public class SparkInterpreterLauncher extends ShellScriptLauncher {
       sparkConfBuilder.append(" --conf " + name + "=" + sparkProperties.getProperty(name));
     }
 
-    env.put("ZEPPELIN_SPARK_CONF", sparkConfBuilder.toString());
+    env.put("SMARTSUITES_SPARK_CONF", sparkConfBuilder.toString());
 
     // set these env in the order of
     // 1. interpreter-setting
@@ -120,7 +120,7 @@ public class SparkInterpreterLauncher extends ShellScriptLauncher {
             " for non-local mode, if you specify it in zeppelin-env.sh, please move that into " +
             " interpreter setting");
       }
-      String zeppelinHome = zConf.getString(SmartsuitesConfiguration.ConfVars.ZEPPELIN_HOME);
+      String zeppelinHome = zConf.getString(SmartsuitesConfiguration.ConfVars.SMARTSUITES_HOME);
       sparkRBasePath = new File(zeppelinHome,
           "interpreter" + File.separator + "spark" + File.separator + "R");
     } else {

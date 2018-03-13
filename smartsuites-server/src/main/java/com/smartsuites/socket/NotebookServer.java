@@ -622,9 +622,9 @@ public class NotebookServer extends WebSocketServlet
     Notebook notebook = notebook();
 
     SmartsuitesConfiguration conf = notebook.getConf();
-    String homescreenNoteId = conf.getString(ConfVars.ZEPPELIN_NOTEBOOK_HOMESCREEN);
+    String homescreenNoteId = conf.getString(ConfVars.SMARTSUITES_NOTEBOOK_HOMESCREEN);
     boolean hideHomeScreenNotebookFromList =
-        conf.getBoolean(ConfVars.ZEPPELIN_NOTEBOOK_HOMESCREEN_HIDE);
+        conf.getBoolean(ConfVars.SMARTSUITES_NOTEBOOK_HOMESCREEN_HIDE);
 
     if (needsReload) {
       try {
@@ -871,7 +871,7 @@ public class NotebookServer extends WebSocketServlet
   // 返回Home的Note，
   private void sendHomeNote(NotebookSocket conn, HashSet<String> userAndRoles, Notebook notebook,
       Message fromMessage) throws IOException {
-    String noteId = notebook.getConf().getString(ConfVars.ZEPPELIN_NOTEBOOK_HOMESCREEN);
+    String noteId = notebook.getConf().getString(ConfVars.SMARTSUITES_NOTEBOOK_HOMESCREEN);
     String user = fromMessage.principal;
 
     Note note = null;
@@ -1903,7 +1903,7 @@ public class NotebookServer extends WebSocketServlet
           @Override
           public boolean apply(String key) {
             return !key.contains("password") && !key.equals(
-                SmartsuitesConfiguration.ConfVars.ZEPPELIN_NOTEBOOK_AZURE_CONNECTION_STRING
+                SmartsuitesConfiguration.ConfVars.SMARTSUITES_NOTEBOOK_AZURE_CONNECTION_STRING
                     .getVarName());
           }
         });

@@ -70,7 +70,7 @@ public class AuthenticationIT extends AbstractZeppelinIT {
     }
 
     try {
-      System.setProperty(SmartsuitesConfiguration.ConfVars.ZEPPELIN_HOME.getVarName(), new File("../").getAbsolutePath());
+      System.setProperty(SmartsuitesConfiguration.ConfVars.SMARTSUITES_HOME.getVarName(), new File("../").getAbsolutePath());
       SmartsuitesConfiguration conf = SmartsuitesConfiguration.create();
       shiroPath = conf.getRelativeDir(String.format("%s/shiro.ini", conf.getConfDir()));
       File file = new File(shiroPath);

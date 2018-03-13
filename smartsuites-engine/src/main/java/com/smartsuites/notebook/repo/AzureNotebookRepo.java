@@ -49,11 +49,11 @@ public class AzureNotebookRepo implements NotebookRepo {
   public AzureNotebookRepo(SmartsuitesConfiguration conf)
       throws URISyntaxException, InvalidKeyException, StorageException {
     this.conf = conf;
-    user = conf.getString(SmartsuitesConfiguration.ConfVars.ZEPPELIN_NOTEBOOK_AZURE_USER);
-    shareName = conf.getString(SmartsuitesConfiguration.ConfVars.ZEPPELIN_NOTEBOOK_AZURE_SHARE);
+    user = conf.getString(SmartsuitesConfiguration.ConfVars.SMARTSUITES_NOTEBOOK_AZURE_USER);
+    shareName = conf.getString(SmartsuitesConfiguration.ConfVars.SMARTSUITES_NOTEBOOK_AZURE_SHARE);
 
     CloudStorageAccount account = CloudStorageAccount.parse(
-        conf.getString(SmartsuitesConfiguration.ConfVars.ZEPPELIN_NOTEBOOK_AZURE_CONNECTION_STRING));
+        conf.getString(SmartsuitesConfiguration.ConfVars.SMARTSUITES_NOTEBOOK_AZURE_CONNECTION_STRING));
     CloudFileClient client = account.createCloudFileClient();
     CloudFileShare share = client.getShareReference(shareName);
     share.createIfNotExists();
@@ -113,7 +113,7 @@ public class AzureNotebookRepo implements NotebookRepo {
     }
 
     String json = IOUtils.toString(ins,
-        conf.getString(SmartsuitesConfiguration.ConfVars.ZEPPELIN_ENCODING));
+        conf.getString(SmartsuitesConfiguration.ConfVars.SMARTSUITES_ENCODING));
     ins.close();
     Note note = Note.fromJson(json);
 

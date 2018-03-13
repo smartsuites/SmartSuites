@@ -265,31 +265,31 @@ public class SmartsuitesConfiguration extends XMLConfiguration {
   }
 
   public boolean useSsl() {
-    return getBoolean(ConfVars.ZEPPELIN_SSL);
+    return getBoolean(ConfVars.SMARTSUITES_SSL);
   }
 
   public int getServerSslPort() {
-    return getInt(ConfVars.ZEPPELIN_SSL_PORT);
+    return getInt(ConfVars.SMARTSUITES_SSL_PORT);
   }
 
   public boolean useClientAuth() {
-    return getBoolean(ConfVars.ZEPPELIN_SSL_CLIENT_AUTH);
+    return getBoolean(ConfVars.SMARTSUITES_SSL_CLIENT_AUTH);
   }
 
   public String getServerAddress() {
-    return getString(ConfVars.ZEPPELIN_ADDR);
+    return getString(ConfVars.SMARTSUITES_ADDR);
   }
 
   public int getServerPort() {
-    return getInt(ConfVars.ZEPPELIN_PORT);
+    return getInt(ConfVars.SMARTSUITES_PORT);
   }
 
   public String getServerContextPath() {
-    return getString(ConfVars.ZEPPELIN_SERVER_CONTEXT_PATH);
+    return getString(ConfVars.SMARTSUITES_SERVER_CONTEXT_PATH);
   }
 
   public String getKeyStorePath() {
-    String path = getString(ConfVars.ZEPPELIN_SSL_KEYSTORE_PATH);
+    String path = getString(ConfVars.SMARTSUITES_SSL_KEYSTORE_PATH);
     if (path != null && path.startsWith("/") || isWindowsPath(path)) {
       return path;
     } else {
@@ -301,15 +301,15 @@ public class SmartsuitesConfiguration extends XMLConfiguration {
   }
 
   public String getKeyStoreType() {
-    return getString(ConfVars.ZEPPELIN_SSL_KEYSTORE_TYPE);
+    return getString(ConfVars.SMARTSUITES_SSL_KEYSTORE_TYPE);
   }
 
   public String getKeyStorePassword() {
-    return getString(ConfVars.ZEPPELIN_SSL_KEYSTORE_PASSWORD);
+    return getString(ConfVars.SMARTSUITES_SSL_KEYSTORE_PASSWORD);
   }
 
   public String getKeyManagerPassword() {
-    String password = getString(ConfVars.ZEPPELIN_SSL_KEY_MANAGER_PASSWORD);
+    String password = getString(ConfVars.SMARTSUITES_SSL_KEY_MANAGER_PASSWORD);
     if (password == null) {
       return getKeyStorePassword();
     } else {
@@ -318,7 +318,7 @@ public class SmartsuitesConfiguration extends XMLConfiguration {
   }
 
   public String getTrustStorePath() {
-    String path = getString(ConfVars.ZEPPELIN_SSL_TRUSTSTORE_PATH);
+    String path = getString(ConfVars.SMARTSUITES_SSL_TRUSTSTORE_PATH);
     if (path == null) {
       path = getKeyStorePath();
     }
@@ -333,7 +333,7 @@ public class SmartsuitesConfiguration extends XMLConfiguration {
   }
 
   public String getTrustStoreType() {
-    String type = getString(ConfVars.ZEPPELIN_SSL_TRUSTSTORE_TYPE);
+    String type = getString(ConfVars.SMARTSUITES_SSL_TRUSTSTORE_TYPE);
     if (type == null) {
       return getKeyStoreType();
     } else {
@@ -342,7 +342,7 @@ public class SmartsuitesConfiguration extends XMLConfiguration {
   }
 
   public String getTrustStorePassword() {
-    String password = getString(ConfVars.ZEPPELIN_SSL_TRUSTSTORE_PASSWORD);
+    String password = getString(ConfVars.SMARTSUITES_SSL_TRUSTSTORE_PASSWORD);
     if (password == null) {
       return getKeyStorePassword();
     } else {
@@ -351,55 +351,55 @@ public class SmartsuitesConfiguration extends XMLConfiguration {
   }
 
   public String getNotebookDir() {
-    return getString(ConfVars.ZEPPELIN_NOTEBOOK_DIR);
+    return getString(ConfVars.SMARTSUITES_NOTEBOOK_DIR);
   }
 
   public String getUser() {
-    return getString(ConfVars.ZEPPELIN_NOTEBOOK_S3_USER);
+    return getString(ConfVars.SMARTSUITES_NOTEBOOK_S3_USER);
   }
 
   public String getBucketName() {
-    return getString(ConfVars.ZEPPELIN_NOTEBOOK_S3_BUCKET);
+    return getString(ConfVars.SMARTSUITES_NOTEBOOK_S3_BUCKET);
   }
 
   public String getEndpoint() {
-    return getString(ConfVars.ZEPPELIN_NOTEBOOK_S3_ENDPOINT);
+    return getString(ConfVars.SMARTSUITES_NOTEBOOK_S3_ENDPOINT);
   }
 
   public String getS3KMSKeyID() {
-    return getString(ConfVars.ZEPPELIN_NOTEBOOK_S3_KMS_KEY_ID);
+    return getString(ConfVars.SMARTSUITES_NOTEBOOK_S3_KMS_KEY_ID);
   }
 
   public String getS3KMSKeyRegion() {
-    return getString(ConfVars.ZEPPELIN_NOTEBOOK_S3_KMS_KEY_REGION);
+    return getString(ConfVars.SMARTSUITES_NOTEBOOK_S3_KMS_KEY_REGION);
   }
 
   public String getS3EncryptionMaterialsProviderClass() {
-    return getString(ConfVars.ZEPPELIN_NOTEBOOK_S3_EMP);
+    return getString(ConfVars.SMARTSUITES_NOTEBOOK_S3_EMP);
   }
 
   public boolean isS3ServerSideEncryption() {
-    return getBoolean(ConfVars.ZEPPELIN_NOTEBOOK_S3_SSE);
+    return getBoolean(ConfVars.SMARTSUITES_NOTEBOOK_S3_SSE);
   }
 
   public String getS3SignerOverride() {
-    return getString(ConfVars.ZEPPELIN_NOTEBOOK_S3_SIGNEROVERRIDE);
+    return getString(ConfVars.SMARTSUITES_NOTEBOOK_S3_SIGNEROVERRIDE);
   }
 
   public String getMongoUri() {
-    return getString(ConfVars.ZEPPELIN_NOTEBOOK_MONGO_URI);
+    return getString(ConfVars.SMARTSUITES_NOTEBOOK_MONGO_URI);
   }
 
   public String getMongoDatabase() {
-    return getString(ConfVars.ZEPPELIN_NOTEBOOK_MONGO_DATABASE);
+    return getString(ConfVars.SMARTSUITES_NOTEBOOK_MONGO_DATABASE);
   }
 
   public String getMongoCollection() {
-    return getString(ConfVars.ZEPPELIN_NOTEBOOK_MONGO_COLLECTION);
+    return getString(ConfVars.SMARTSUITES_NOTEBOOK_MONGO_COLLECTION);
   }
 
   public boolean getMongoAutoimport() {
-    return getBoolean(ConfVars.ZEPPELIN_NOTEBOOK_MONGO_AUTOIMPORT);
+    return getBoolean(ConfVars.SMARTSUITES_NOTEBOOK_MONGO_AUTOIMPORT);
   }
 
   public String getInterpreterListPath() {
@@ -407,11 +407,11 @@ public class SmartsuitesConfiguration extends XMLConfiguration {
   }
 
   public String getInterpreterDir() {
-    return getRelativeDir(ConfVars.ZEPPELIN_INTERPRETER_DIR);
+    return getRelativeDir(ConfVars.SMARTSUITES_INTERPRETER_DIR);
   }
 
   public String getInterpreterJson() {
-    return getString(ConfVars.ZEPPELIN_INTERPRETER_JSON);
+    return getString(ConfVars.SMARTSUITES_INTERPRETER_JSON);
   }
 
   public String getInterpreterSettingPath() {
@@ -423,19 +423,19 @@ public class SmartsuitesConfiguration extends XMLConfiguration {
   }
 
   public String getHeliumRegistry() {
-    return getRelativeDir(ConfVars.ZEPPELIN_HELIUM_REGISTRY);
+    return getRelativeDir(ConfVars.SMARTSUITES_HELIUM_REGISTRY);
   }
 
   public String getHeliumNodeInstallerUrl() {
-    return getString(ConfVars.ZEPPELIN_HELIUM_NODE_INSTALLER_URL);
+    return getString(ConfVars.SMARTSUITES_HELIUM_NODE_INSTALLER_URL);
   }
 
   public String getHeliumNpmInstallerUrl() {
-    return getString(ConfVars.ZEPPELIN_HELIUM_NPM_INSTALLER_URL);
+    return getString(ConfVars.SMARTSUITES_HELIUM_NPM_INSTALLER_URL);
   }
 
   public String getHeliumYarnInstallerUrl() {
-    return getString(ConfVars.ZEPPELIN_HELIUM_YARNPKG_INSTALLER_URL);
+    return getString(ConfVars.SMARTSUITES_HELIUM_YARNPKG_INSTALLER_URL);
   }
 
   public String getNotebookAuthorizationPath() {
@@ -443,11 +443,11 @@ public class SmartsuitesConfiguration extends XMLConfiguration {
   }
 
   public Boolean credentialsPersist() {
-    return getBoolean(ConfVars.ZEPPELIN_CREDENTIALS_PERSIST);
+    return getBoolean(ConfVars.SMARTSUITES_CREDENTIALS_PERSIST);
   }
 
   public String getCredentialsEncryptKey() {
-    return getString(ConfVars.ZEPPELIN_CREDENTIALS_ENCRYPT_KEY);
+    return getString(ConfVars.SMARTSUITES_CREDENTIALS_ENCRYPT_KEY);
   }
 
   public String getCredentialsPath() {
@@ -460,15 +460,15 @@ public class SmartsuitesConfiguration extends XMLConfiguration {
   }
 
   public String getInterpreterRemoteRunnerPath() {
-    return getRelativeDir(ConfVars.ZEPPELIN_INTERPRETER_REMOTE_RUNNER);
+    return getRelativeDir(ConfVars.SMARTSUITES_INTERPRETER_REMOTE_RUNNER);
   }
 
   public String getInterpreterLocalRepoPath() {
-    return getRelativeDir(ConfVars.ZEPPELIN_INTERPRETER_LOCALREPO);
+    return getRelativeDir(ConfVars.SMARTSUITES_INTERPRETER_LOCALREPO);
   }
 
   public String getInterpreterMvnRepoPath() {
-    return getString(ConfVars.ZEPPELIN_INTERPRETER_DEP_MVNREPO);
+    return getString(ConfVars.SMARTSUITES_INTERPRETER_DEP_MVNREPO);
   }
 
   public String getRelativeDir(ConfVars c) {
@@ -479,12 +479,12 @@ public class SmartsuitesConfiguration extends XMLConfiguration {
     if (path != null && path.startsWith("/") || isWindowsPath(path)) {
       return path;
     } else {
-      return getString(ConfVars.ZEPPELIN_HOME) + "/" + path;
+      return getString(ConfVars.SMARTSUITES_HOME) + "/" + path;
     }
   }
 
   public String getCallbackPortRange() {
-    return getString(ConfVars.ZEPPELIN_INTERPRETER_CALLBACK_PORTRANGE);
+    return getString(ConfVars.SMARTSUITES_INTERPRETER_CALLBACK_PORTRANGE);
   }
 
   public boolean isWindowsPath(String path){
@@ -492,49 +492,49 @@ public class SmartsuitesConfiguration extends XMLConfiguration {
   }
 
   public boolean isAnonymousAllowed() {
-    return getBoolean(ConfVars.ZEPPELIN_ANONYMOUS_ALLOWED);
+    return getBoolean(ConfVars.SMARTSUITES_ANONYMOUS_ALLOWED);
   }
 
   public boolean isNotebokPublic() {
-    return getBoolean(ConfVars.ZEPPELIN_NOTEBOOK_PUBLIC);
+    return getBoolean(ConfVars.SMARTSUITES_NOTEBOOK_PUBLIC);
   }
 
   public String getConfDir() {
-    return getRelativeDir(ConfVars.ZEPPELIN_CONF_DIR);
+    return getRelativeDir(ConfVars.SMARTSUITES_CONF_DIR);
   }
 
   public List<String> getAllowedOrigins()
   {
-    if (getString(ConfVars.ZEPPELIN_ALLOWED_ORIGINS).isEmpty()) {
+    if (getString(ConfVars.SMARTSUITES_ALLOWED_ORIGINS).isEmpty()) {
       return Arrays.asList(new String[0]);
     }
 
-    return Arrays.asList(getString(ConfVars.ZEPPELIN_ALLOWED_ORIGINS).toLowerCase().split(","));
+    return Arrays.asList(getString(ConfVars.SMARTSUITES_ALLOWED_ORIGINS).toLowerCase().split(","));
   }
 
   public String getWebsocketMaxTextMessageSize() {
-    return getString(ConfVars.ZEPPELIN_WEBSOCKET_MAX_TEXT_MESSAGE_SIZE);
+    return getString(ConfVars.SMARTSUITES_WEBSOCKET_MAX_TEXT_MESSAGE_SIZE);
   }
 
   public String getJettyName() {
-    return getString(ConfVars.ZEPPELIN_SERVER_JETTY_NAME);
+    return getString(ConfVars.SMARTSUITES_SERVER_JETTY_NAME);
   }
 
 
   public String getXFrameOptions() {
-    return getString(ConfVars.ZEPPELIN_SERVER_XFRAME_OPTIONS);
+    return getString(ConfVars.SMARTSUITES_SERVER_XFRAME_OPTIONS);
   }
 
   public String getXxssProtection() {
-    return getString(ConfVars.ZEPPELIN_SERVER_X_XSS_PROTECTION);
+    return getString(ConfVars.SMARTSUITES_SERVER_X_XSS_PROTECTION);
   }
 
   public String getStrictTransport() {
-    return getString(ConfVars.ZEPPELIN_SERVER_STRICT_TRANSPORT);
+    return getString(ConfVars.SMARTSUITES_SERVER_STRICT_TRANSPORT);
   }
 
   public String getLifecycleManagerClass() {
-    return getString(ConfVars.ZEPPELIN_INTERPRETER_LIFECYCLE_MANAGER_CLASS);
+    return getString(ConfVars.SMARTSUITES_INTERPRETER_LIFECYCLE_MANAGER_CLASS);
   }
 
   public Map<String, String> dumpConfigurations(SmartsuitesConfiguration conf,
@@ -580,23 +580,23 @@ public class SmartsuitesConfiguration extends XMLConfiguration {
    * Wrapper class.
    */
   public static enum ConfVars {
-    ZEPPELIN_HOME("zeppelin.home", "./"),
-    ZEPPELIN_ADDR("zeppelin.server.addr", "0.0.0.0"),
-    ZEPPELIN_PORT("zeppelin.server.port", 8080),
-    ZEPPELIN_SERVER_CONTEXT_PATH("zeppelin.server.context.path", "/"),
-    ZEPPELIN_SSL("zeppelin.ssl", false),
-    ZEPPELIN_SSL_PORT("zeppelin.server.ssl.port", 8443),
-    ZEPPELIN_SSL_CLIENT_AUTH("zeppelin.ssl.client.auth", false),
-    ZEPPELIN_SSL_KEYSTORE_PATH("zeppelin.ssl.keystore.path", "keystore"),
-    ZEPPELIN_SSL_KEYSTORE_TYPE("zeppelin.ssl.keystore.type", "JKS"),
-    ZEPPELIN_SSL_KEYSTORE_PASSWORD("zeppelin.ssl.keystore.password", ""),
-    ZEPPELIN_SSL_KEY_MANAGER_PASSWORD("zeppelin.ssl.key.manager.password", null),
-    ZEPPELIN_SSL_TRUSTSTORE_PATH("zeppelin.ssl.truststore.path", null),
-    ZEPPELIN_SSL_TRUSTSTORE_TYPE("zeppelin.ssl.truststore.type", null),
-    ZEPPELIN_SSL_TRUSTSTORE_PASSWORD("zeppelin.ssl.truststore.password", null),
-    ZEPPELIN_WAR("zeppelin.war", "smartsuites-web/descriptor"),
-    ZEPPELIN_WAR_TEMPDIR("zeppelin.war.tempdir", "webapps"),
-    ZEPPELIN_INTERPRETERS("zeppelin.interpreters", "com.smartsuites.spark.SparkInterpreter,"
+    SMARTSUITES_HOME("zeppelin.home", "./"),
+    SMARTSUITES_ADDR("zeppelin.server.addr", "0.0.0.0"),
+    SMARTSUITES_PORT("zeppelin.server.port", 8080),
+    SMARTSUITES_SERVER_CONTEXT_PATH("zeppelin.server.context.path", "/"),
+    SMARTSUITES_SSL("zeppelin.ssl", false),
+    SMARTSUITES_SSL_PORT("zeppelin.server.ssl.port", 8443),
+    SMARTSUITES_SSL_CLIENT_AUTH("zeppelin.ssl.client.auth", false),
+    SMARTSUITES_SSL_KEYSTORE_PATH("zeppelin.ssl.keystore.path", "keystore"),
+    SMARTSUITES_SSL_KEYSTORE_TYPE("zeppelin.ssl.keystore.type", "JKS"),
+    SMARTSUITES_SSL_KEYSTORE_PASSWORD("zeppelin.ssl.keystore.password", ""),
+    SMARTSUITES_SSL_KEY_MANAGER_PASSWORD("zeppelin.ssl.key.manager.password", null),
+    SMARTSUITES_SSL_TRUSTSTORE_PATH("zeppelin.ssl.truststore.path", null),
+    SMARTSUITES_SSL_TRUSTSTORE_TYPE("zeppelin.ssl.truststore.type", null),
+    SMARTSUITES_SSL_TRUSTSTORE_PASSWORD("zeppelin.ssl.truststore.password", null),
+    SMARTSUITES_WAR("zeppelin.war", "smartsuites-web/descriptor"),
+    SMARTSUITES_WAR_TEMPDIR("zeppelin.war.tempdir", "webapps"),
+    SMARTSUITES_INTERPRETERS("zeppelin.interpreters", "com.smartsuites.spark.SparkInterpreter,"
         + "com.smartsuites.spark.PySparkInterpreter,"
         + "com.smartsuites.rinterpreter.RRepl,"
         + "com.smartsuites.rinterpreter.KnitR,"
@@ -636,80 +636,80 @@ public class SmartsuitesConfiguration extends XMLConfiguration {
         + "com.smartsuites.groovy.GroovyInterpreter,"
         + "com.smartsuites.neo4j.Neo4jCypherInterpreter"
         ),
-    ZEPPELIN_INTERPRETER_JSON("zeppelin.interpreter.setting", "interpreter-setting.json"),
-    ZEPPELIN_INTERPRETER_DIR("zeppelin.interpreter.dir", "interpreter"),
-    ZEPPELIN_INTERPRETER_LOCALREPO("zeppelin.interpreter.localRepo", "local-repo"),
-    ZEPPELIN_INTERPRETER_DEP_MVNREPO("zeppelin.interpreter.dep.mvnRepo",
+    SMARTSUITES_INTERPRETER_JSON("zeppelin.interpreter.setting", "interpreter-setting.json"),
+    SMARTSUITES_INTERPRETER_DIR("zeppelin.interpreter.dir", "interpreter"),
+    SMARTSUITES_INTERPRETER_LOCALREPO("zeppelin.interpreter.localRepo", "local-repo"),
+    SMARTSUITES_INTERPRETER_DEP_MVNREPO("zeppelin.interpreter.dep.mvnRepo",
         "http://repo1.maven.org/maven2/"),
-    ZEPPELIN_INTERPRETER_CONNECT_TIMEOUT("zeppelin.interpreter.connect.timeout", 30000),
-    ZEPPELIN_INTERPRETER_MAX_POOL_SIZE("zeppelin.interpreter.max.poolsize", 10),
-    ZEPPELIN_INTERPRETER_GROUP_ORDER("zeppelin.interpreter.group.order", "spark,md,angular,sh,"
+    SMARTSUITES_INTERPRETER_CONNECT_TIMEOUT("zeppelin.interpreter.connect.timeout", 30000),
+    SMARTSUITES_INTERPRETER_MAX_POOL_SIZE("zeppelin.interpreter.max.poolsize", 10),
+    SMARTSUITES_INTERPRETER_GROUP_ORDER("zeppelin.interpreter.group.order", "spark,md,angular,sh,"
         + "livy,alluxio,file,psql,flink,python,ignite,lens,cassandra,geode,kylin,elasticsearch,"
         + "scalding,jdbc,hbase,bigquery,beam,pig,scio,groovy,neo4j"),
-    ZEPPELIN_INTERPRETER_OUTPUT_LIMIT("zeppelin.interpreter.output.limit", 1024 * 100),
-    ZEPPELIN_ENCODING("zeppelin.encoding", "UTF-8"),
-    ZEPPELIN_NOTEBOOK_DIR("zeppelin.notebook.dir", "notebook"),
+    SMARTSUITES_INTERPRETER_OUTPUT_LIMIT("zeppelin.interpreter.output.limit", 1024 * 100),
+    SMARTSUITES_ENCODING("zeppelin.encoding", "UTF-8"),
+    SMARTSUITES_NOTEBOOK_DIR("zeppelin.notebook.dir", "notebook"),
     // use specified notebook (id) as homescreen
-    ZEPPELIN_NOTEBOOK_HOMESCREEN("zeppelin.notebook.homescreen", null),
+    SMARTSUITES_NOTEBOOK_HOMESCREEN("zeppelin.notebook.homescreen", null),
     // whether homescreen notebook will be hidden from notebook list or not
-    ZEPPELIN_NOTEBOOK_HOMESCREEN_HIDE("zeppelin.notebook.homescreen.hide", false),
-    ZEPPELIN_NOTEBOOK_S3_BUCKET("zeppelin.notebook.s3.bucket", "zeppelin"),
-    ZEPPELIN_NOTEBOOK_S3_ENDPOINT("zeppelin.notebook.s3.endpoint", "s3.amazonaws.com"),
-    ZEPPELIN_NOTEBOOK_S3_USER("zeppelin.notebook.s3.user", "user"),
-    ZEPPELIN_NOTEBOOK_S3_EMP("zeppelin.notebook.s3.encryptionMaterialsProvider", null),
-    ZEPPELIN_NOTEBOOK_S3_KMS_KEY_ID("zeppelin.notebook.s3.kmsKeyID", null),
-    ZEPPELIN_NOTEBOOK_S3_KMS_KEY_REGION("zeppelin.notebook.s3.kmsKeyRegion", null),
-    ZEPPELIN_NOTEBOOK_S3_SSE("zeppelin.notebook.s3.sse", false),
-    ZEPPELIN_NOTEBOOK_S3_SIGNEROVERRIDE("zeppelin.notebook.s3.signerOverride", null),
-    ZEPPELIN_NOTEBOOK_AZURE_CONNECTION_STRING("zeppelin.notebook.azure.connectionString", null),
-    ZEPPELIN_NOTEBOOK_AZURE_SHARE("zeppelin.notebook.azure.share", "zeppelin"),
-    ZEPPELIN_NOTEBOOK_AZURE_USER("zeppelin.notebook.azure.user", "user"),
-    ZEPPELIN_NOTEBOOK_MONGO_DATABASE("zeppelin.notebook.mongo.database", "zeppelin"),
-    ZEPPELIN_NOTEBOOK_MONGO_COLLECTION("zeppelin.notebook.mongo.collection", "notes"),
-    ZEPPELIN_NOTEBOOK_MONGO_URI("zeppelin.notebook.mongo.uri", "mongodb://localhost"),
-    ZEPPELIN_NOTEBOOK_MONGO_AUTOIMPORT("zeppelin.notebook.mongo.autoimport", false),
-    ZEPPELIN_NOTEBOOK_STORAGE("zeppelin.notebook.storage",
+    SMARTSUITES_NOTEBOOK_HOMESCREEN_HIDE("zeppelin.notebook.homescreen.hide", false),
+    SMARTSUITES_NOTEBOOK_S3_BUCKET("zeppelin.notebook.s3.bucket", "zeppelin"),
+    SMARTSUITES_NOTEBOOK_S3_ENDPOINT("zeppelin.notebook.s3.endpoint", "s3.amazonaws.com"),
+    SMARTSUITES_NOTEBOOK_S3_USER("zeppelin.notebook.s3.user", "user"),
+    SMARTSUITES_NOTEBOOK_S3_EMP("zeppelin.notebook.s3.encryptionMaterialsProvider", null),
+    SMARTSUITES_NOTEBOOK_S3_KMS_KEY_ID("zeppelin.notebook.s3.kmsKeyID", null),
+    SMARTSUITES_NOTEBOOK_S3_KMS_KEY_REGION("zeppelin.notebook.s3.kmsKeyRegion", null),
+    SMARTSUITES_NOTEBOOK_S3_SSE("zeppelin.notebook.s3.sse", false),
+    SMARTSUITES_NOTEBOOK_S3_SIGNEROVERRIDE("zeppelin.notebook.s3.signerOverride", null),
+    SMARTSUITES_NOTEBOOK_AZURE_CONNECTION_STRING("zeppelin.notebook.azure.connectionString", null),
+    SMARTSUITES_NOTEBOOK_AZURE_SHARE("zeppelin.notebook.azure.share", "zeppelin"),
+    SMARTSUITES_NOTEBOOK_AZURE_USER("zeppelin.notebook.azure.user", "user"),
+    SMARTSUITES_NOTEBOOK_MONGO_DATABASE("zeppelin.notebook.mongo.database", "zeppelin"),
+    SMARTSUITES_NOTEBOOK_MONGO_COLLECTION("zeppelin.notebook.mongo.collection", "notes"),
+    SMARTSUITES_NOTEBOOK_MONGO_URI("zeppelin.notebook.mongo.uri", "mongodb://localhost"),
+    SMARTSUITES_NOTEBOOK_MONGO_AUTOIMPORT("zeppelin.notebook.mongo.autoimport", false),
+    SMARTSUITES_NOTEBOOK_STORAGE("zeppelin.notebook.storage",
         "com.smartsuites.notebook.repo.GitNotebookRepo"),
-    ZEPPELIN_NOTEBOOK_ONE_WAY_SYNC("zeppelin.notebook.one.way.sync", false),
+    SMARTSUITES_NOTEBOOK_ONE_WAY_SYNC("zeppelin.notebook.one.way.sync", false),
     // whether by default note is public or private
-    ZEPPELIN_NOTEBOOK_PUBLIC("zeppelin.notebook.public", true),
-    ZEPPELIN_INTERPRETER_REMOTE_RUNNER("zeppelin.interpreter.remoterunner",
+    SMARTSUITES_NOTEBOOK_PUBLIC("zeppelin.notebook.public", true),
+    SMARTSUITES_INTERPRETER_REMOTE_RUNNER("zeppelin.interpreter.remoterunner",
         System.getProperty("os.name")
                 .startsWith("Windows") ? "bin/interpreter.cmd" : "bin/interpreter.sh"),
     // Decide when new note is created, interpreter settings will be binded automatically or not.
-    ZEPPELIN_NOTEBOOK_AUTO_INTERPRETER_BINDING("zeppelin.notebook.autoInterpreterBinding", true),
-    ZEPPELIN_CONF_DIR("zeppelin.conf.dir", "conf"),
-    ZEPPELIN_DEP_LOCALREPO("zeppelin.dep.localrepo", "local-repo"),
-    ZEPPELIN_HELIUM_REGISTRY("zeppelin.helium.registry", "helium," + HELIUM_PACKAGE_DEFAULT_URL),
-    ZEPPELIN_HELIUM_NODE_INSTALLER_URL("zeppelin.helium.node.installer.url",
+    SMARTSUITES_NOTEBOOK_AUTO_INTERPRETER_BINDING("zeppelin.notebook.autoInterpreterBinding", true),
+    SMARTSUITES_CONF_DIR("zeppelin.conf.dir", "conf"),
+    SMARTSUITES_DEP_LOCALREPO("zeppelin.dep.localrepo", "local-repo"),
+    SMARTSUITES_HELIUM_REGISTRY("zeppelin.helium.registry", "helium," + HELIUM_PACKAGE_DEFAULT_URL),
+    SMARTSUITES_HELIUM_NODE_INSTALLER_URL("zeppelin.helium.node.installer.url",
             "https://nodejs.org/dist/"),
-    ZEPPELIN_HELIUM_NPM_INSTALLER_URL("zeppelin.helium.npm.installer.url",
+    SMARTSUITES_HELIUM_NPM_INSTALLER_URL("zeppelin.helium.npm.installer.url",
             "http://registry.npmjs.org/"),
-    ZEPPELIN_HELIUM_YARNPKG_INSTALLER_URL("zeppelin.helium.yarnpkg.installer.url",
+    SMARTSUITES_HELIUM_YARNPKG_INSTALLER_URL("zeppelin.helium.yarnpkg.installer.url",
             "https://github.com/yarnpkg/yarn/releases/download/"),
     // Allows a way to specify a ',' separated list of allowed origins for rest and websockets
     // i.e. http://localhost:8080
-    ZEPPELIN_ALLOWED_ORIGINS("zeppelin.server.allowed.origins", "*"),
-    ZEPPELIN_ANONYMOUS_ALLOWED("zeppelin.anonymous.allowed", true),
-    ZEPPELIN_CREDENTIALS_PERSIST("zeppelin.credentials.persist", true),
-    ZEPPELIN_CREDENTIALS_ENCRYPT_KEY("zeppelin.credentials.encryptKey", null),
-    ZEPPELIN_WEBSOCKET_MAX_TEXT_MESSAGE_SIZE("zeppelin.websocket.max.text.message.size", "1024000"),
-    ZEPPELIN_SERVER_DEFAULT_DIR_ALLOWED("zeppelin.server.default.dir.allowed", false),
-    ZEPPELIN_SERVER_XFRAME_OPTIONS("zeppelin.server.xframe.options", "SAMEORIGIN"),
-    ZEPPELIN_SERVER_JETTY_NAME("zeppelin.server.jetty.name", null),
-    ZEPPELIN_SERVER_STRICT_TRANSPORT("zeppelin.server.strict.transport", "max-age=631138519"),
-    ZEPPELIN_SERVER_X_XSS_PROTECTION("zeppelin.server.xxss.protection", "1"),
+    SMARTSUITES_ALLOWED_ORIGINS("zeppelin.server.allowed.origins", "*"),
+    SMARTSUITES_ANONYMOUS_ALLOWED("zeppelin.anonymous.allowed", true),
+    SMARTSUITES_CREDENTIALS_PERSIST("zeppelin.credentials.persist", true),
+    SMARTSUITES_CREDENTIALS_ENCRYPT_KEY("zeppelin.credentials.encryptKey", null),
+    SMARTSUITES_WEBSOCKET_MAX_TEXT_MESSAGE_SIZE("zeppelin.websocket.max.text.message.size", "1024000"),
+    SMARTSUITES_SERVER_DEFAULT_DIR_ALLOWED("zeppelin.server.default.dir.allowed", false),
+    SMARTSUITES_SERVER_XFRAME_OPTIONS("zeppelin.server.xframe.options", "SAMEORIGIN"),
+    SMARTSUITES_SERVER_JETTY_NAME("zeppelin.server.jetty.name", null),
+    SMARTSUITES_SERVER_STRICT_TRANSPORT("zeppelin.server.strict.transport", "max-age=631138519"),
+    SMARTSUITES_SERVER_X_XSS_PROTECTION("zeppelin.server.xxss.protection", "1"),
 
-    ZEPPELIN_SERVER_KERBEROS_KEYTAB("zeppelin.server.kerberos.keytab", ""),
-    ZEPPELIN_SERVER_KERBEROS_PRINCIPAL("zeppelin.server.kerberos.principal", ""),
+    SMARTSUITES_SERVER_KERBEROS_KEYTAB("zeppelin.server.kerberos.keytab", ""),
+    SMARTSUITES_SERVER_KERBEROS_PRINCIPAL("zeppelin.server.kerberos.principal", ""),
 
-    ZEPPELIN_INTERPRETER_CALLBACK_PORTRANGE("zeppelin.interpreter.callback.portRange", ":"),
+    SMARTSUITES_INTERPRETER_CALLBACK_PORTRANGE("zeppelin.interpreter.callback.portRange", ":"),
 
-    ZEPPELIN_INTERPRETER_LIFECYCLE_MANAGER_CLASS("zeppelin.interpreter.lifecyclemanager.class",
+    SMARTSUITES_INTERPRETER_LIFECYCLE_MANAGER_CLASS("zeppelin.interpreter.lifecyclemanager.class",
         "com.smartsuites.interpreter.lifecycle.TimeoutLifecycleManager"),
-    ZEPPELIN_INTERPRETER_LIFECYCLE_MANAGER_TIMEOUT_CHECK_INTERVAL(
+    SMARTSUITES_INTERPRETER_LIFECYCLE_MANAGER_TIMEOUT_CHECK_INTERVAL(
         "zeppelin.interpreter.lifecyclemanager.timeout.checkinterval", 6000L),
-    ZEPPELIN_INTERPRETER_LIFECYCLE_MANAGER_TIMEOUT_THRESHOLD(
+    SMARTSUITES_INTERPRETER_LIFECYCLE_MANAGER_TIMEOUT_THRESHOLD(
         "zeppelin.interpreter.lifecyclemanager.timeout.threshold", 3600000L);
 
     private String varName;

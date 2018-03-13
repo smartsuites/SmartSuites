@@ -44,8 +44,7 @@ public class ConfigurationsRestApi {
         public boolean apply(String key) {
           return !key.contains("password") &&
               !key.equals(SmartsuitesConfiguration
-                  .ConfVars
-                  .ZEPPELIN_NOTEBOOK_AZURE_CONNECTION_STRING
+                  .ConfVars.SMARTSUITES_NOTEBOOK_AZURE_CONNECTION_STRING
                   .getVarName());
         }
       }
@@ -67,7 +66,7 @@ public class ConfigurationsRestApi {
           return !key.contains("password") &&
               !key.equals(SmartsuitesConfiguration
                   .ConfVars
-                  .ZEPPELIN_NOTEBOOK_AZURE_CONNECTION_STRING
+                  .SMARTSUITES_NOTEBOOK_AZURE_CONNECTION_STRING
                   .getVarName()) &&
               key.startsWith(prefix);
         }

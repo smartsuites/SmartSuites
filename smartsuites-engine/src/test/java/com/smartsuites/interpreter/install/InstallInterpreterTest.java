@@ -35,7 +35,7 @@ public class InstallInterpreterTest {
 
 
     // create interpreter list file
-    System.setProperty(SmartsuitesConfiguration.ConfVars.ZEPPELIN_HOME.getVarName(), tmpDir.getAbsolutePath());
+    System.setProperty(SmartsuitesConfiguration.ConfVars.SMARTSUITES_HOME.getVarName(), tmpDir.getAbsolutePath());
 
     String interpreterList = "";
     interpreterList += "intp1   org.apache.commons:commons-csv:1.1   test interpreter 1\n";

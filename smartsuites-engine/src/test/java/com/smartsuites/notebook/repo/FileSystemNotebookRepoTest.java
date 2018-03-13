@@ -39,7 +39,7 @@ public class FileSystemNotebookRepoTest {
   public void setUp() throws IOException {
     notebookDir = Files.createTempDirectory("FileSystemNotebookRepoTest").toFile().getAbsolutePath();
     zConf = new SmartsuitesConfiguration();
-    System.setProperty(SmartsuitesConfiguration.ConfVars.ZEPPELIN_NOTEBOOK_DIR.getVarName(), notebookDir);
+    System.setProperty(SmartsuitesConfiguration.ConfVars.SMARTSUITES_NOTEBOOK_DIR.getVarName(), notebookDir);
     hadoopConf = new Configuration();
     fs = FileSystem.get(hadoopConf);
     hdfsNotebookRepo = new FileSystemNotebookRepo(zConf);

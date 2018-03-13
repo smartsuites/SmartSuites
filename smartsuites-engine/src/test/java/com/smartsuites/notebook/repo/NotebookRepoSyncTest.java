@@ -72,10 +72,10 @@ public class NotebookRepoSyncTest implements JobListenerFactory {
     mainNotebookDir.mkdirs();
     secNotebookDir.mkdirs();
 
-    System.setProperty(ConfVars.ZEPPELIN_HOME.getVarName(), mainZepDir.getAbsolutePath());
-    System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_DIR.getVarName(), mainNotebookDir.getAbsolutePath());
-    System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_STORAGE.getVarName(), "VFSNotebookRepo,com.smartsuites.notebook.repo.mock.VFSNotebookRepoMock");
-    System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_ONE_WAY_SYNC.getVarName(), "false");
+    System.setProperty(ConfVars.SMARTSUITES_HOME.getVarName(), mainZepDir.getAbsolutePath());
+    System.setProperty(ConfVars.SMARTSUITES_NOTEBOOK_DIR.getVarName(), mainNotebookDir.getAbsolutePath());
+    System.setProperty(ConfVars.SMARTSUITES_NOTEBOOK_STORAGE.getVarName(), "VFSNotebookRepo,com.smartsuites.notebook.repo.mock.VFSNotebookRepoMock");
+    System.setProperty(ConfVars.SMARTSUITES_NOTEBOOK_ONE_WAY_SYNC.getVarName(), "false");
     LOG.info("main Note dir : " + mainNotePath);
     LOG.info("secondary note dir : " + secNotePath);
     conf = SmartsuitesConfiguration.create();
@@ -216,8 +216,8 @@ public class NotebookRepoSyncTest implements JobListenerFactory {
 
   @Test
   public void testOneWaySyncOnReloadedList() throws IOException, SchedulerException {
-    System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_DIR.getVarName(), mainNotebookDir.getAbsolutePath());
-    System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_ONE_WAY_SYNC.getVarName(), "true");
+    System.setProperty(ConfVars.SMARTSUITES_NOTEBOOK_DIR.getVarName(), mainNotebookDir.getAbsolutePath());
+    System.setProperty(ConfVars.SMARTSUITES_NOTEBOOK_ONE_WAY_SYNC.getVarName(), "true");
     conf = SmartsuitesConfiguration.create();
     notebookRepoSync = new NotebookRepoSync(conf);
     notebookSync = new Notebook(conf, notebookRepoSync, schedulerFactory, factory, interpreterSettingManager, this, search,
@@ -264,7 +264,7 @@ public class NotebookRepoSyncTest implements JobListenerFactory {
 
   @Test
   public void testCheckpointOneStorage() throws IOException, SchedulerException {
-    System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_STORAGE.getVarName(), "GitNotebookRepo");
+    System.setProperty(ConfVars.SMARTSUITES_NOTEBOOK_STORAGE.getVarName(), "GitNotebookRepo");
     SmartsuitesConfiguration vConf = SmartsuitesConfiguration.create();
 
     NotebookRepoSync vRepoSync = new NotebookRepoSync(vConf);

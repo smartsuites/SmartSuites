@@ -44,7 +44,7 @@ public class NotebookRepoSyncInitializationTest {
   public void validInitOneStorageTest() throws IOException {
     // no need to initialize folder due to one storage
     // set confs
-    System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_STORAGE.getVarName(), validOneStorageConf);
+    System.setProperty(ConfVars.SMARTSUITES_NOTEBOOK_STORAGE.getVarName(), validOneStorageConf);
     SmartsuitesConfiguration conf = SmartsuitesConfiguration.create();
     // create repo
     NotebookRepoSync notebookRepoSync = new NotebookRepoSync(conf);
@@ -68,9 +68,9 @@ public class NotebookRepoSyncInitializationTest {
     secNotebookDir.mkdirs();
     
     // set confs
-    System.setProperty(ConfVars.ZEPPELIN_HOME.getVarName(), mainZepDir.getAbsolutePath());
-    System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_DIR.getVarName(), mainNotebookDir.getAbsolutePath());
-    System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_STORAGE.getVarName(), validTwoStorageConf);
+    System.setProperty(ConfVars.SMARTSUITES_HOME.getVarName(), mainZepDir.getAbsolutePath());
+    System.setProperty(ConfVars.SMARTSUITES_NOTEBOOK_DIR.getVarName(), mainNotebookDir.getAbsolutePath());
+    System.setProperty(ConfVars.SMARTSUITES_NOTEBOOK_STORAGE.getVarName(), validTwoStorageConf);
     SmartsuitesConfiguration conf = SmartsuitesConfiguration.create();
     // create repo
     NotebookRepoSync notebookRepoSync = new NotebookRepoSync(conf);
@@ -83,7 +83,7 @@ public class NotebookRepoSyncInitializationTest {
   @Test
   public void invalidInitTwoStorageTest() throws IOException {
     // set confs
-    System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_STORAGE.getVarName(), invalidTwoStorageConf);
+    System.setProperty(ConfVars.SMARTSUITES_NOTEBOOK_STORAGE.getVarName(), invalidTwoStorageConf);
     SmartsuitesConfiguration conf = SmartsuitesConfiguration.create();
     // create repo
     NotebookRepoSync notebookRepoSync = new NotebookRepoSync(conf);
@@ -108,9 +108,9 @@ public class NotebookRepoSyncInitializationTest {
     secNotebookDir.mkdirs();
     
     // set confs
-    System.setProperty(ConfVars.ZEPPELIN_HOME.getVarName(), mainZepDir.getAbsolutePath());
-    System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_DIR.getVarName(), mainNotebookDir.getAbsolutePath());
-    System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_STORAGE.getVarName(), unsupportedStorageConf);
+    System.setProperty(ConfVars.SMARTSUITES_HOME.getVarName(), mainZepDir.getAbsolutePath());
+    System.setProperty(ConfVars.SMARTSUITES_NOTEBOOK_DIR.getVarName(), mainNotebookDir.getAbsolutePath());
+    System.setProperty(ConfVars.SMARTSUITES_NOTEBOOK_STORAGE.getVarName(), unsupportedStorageConf);
     SmartsuitesConfiguration conf = SmartsuitesConfiguration.create();
     // create repo
     NotebookRepoSync notebookRepoSync = new NotebookRepoSync(conf);
@@ -123,7 +123,7 @@ public class NotebookRepoSyncInitializationTest {
   @Test
   public void initEmptyStorageTest() throws IOException {
     // set confs
-    System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_STORAGE.getVarName(), emptyStorageConf);
+    System.setProperty(ConfVars.SMARTSUITES_NOTEBOOK_STORAGE.getVarName(), emptyStorageConf);
     SmartsuitesConfiguration conf = SmartsuitesConfiguration.create();
     // create repo
     NotebookRepoSync notebookRepoSync = new NotebookRepoSync(conf);
@@ -135,7 +135,7 @@ public class NotebookRepoSyncInitializationTest {
   @Test
   public void initOneDummyStorageTest() throws IOException {
  // set confs
-    System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_STORAGE.getVarName(), invalidStorageClass);
+    System.setProperty(ConfVars.SMARTSUITES_NOTEBOOK_STORAGE.getVarName(), invalidStorageClass);
     SmartsuitesConfiguration conf = SmartsuitesConfiguration.create();
     // create repo
     NotebookRepoSync notebookRepoSync = new NotebookRepoSync(conf);

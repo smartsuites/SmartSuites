@@ -132,10 +132,10 @@ public class InterpreterSettingManager {
     this.interpreterSettingPath = Paths.get(conf.getInterpreterSettingPath());
     LOGGER.debug("InterpreterSettingPath: {}", interpreterSettingPath);
     this.dependencyResolver = new DependencyResolver(
-        conf.getString(ConfVars.ZEPPELIN_INTERPRETER_LOCALREPO));
+        conf.getString(ConfVars.SMARTSUITES_INTERPRETER_LOCALREPO));
     this.interpreterRepositories = dependencyResolver.getRepos();
     this.interpreterGroupOrderList = Arrays.asList(conf.getString(
-        ConfVars.ZEPPELIN_INTERPRETER_GROUP_ORDER).split(","));
+        ConfVars.SMARTSUITES_INTERPRETER_GROUP_ORDER).split(","));
     this.gson = new GsonBuilder().setPrettyPrinting().create();
 
     this.angularObjectRegistryListener = angularObjectRegistryListener;
@@ -266,10 +266,10 @@ public class InterpreterSettingManager {
 
         /**
          * Register interpreter by the following ordering
-         * 1. Register it from path {ZEPPELIN_HOME}/interpreter/{interpreter_name}/
+         * 1. Register it from path {SMARTSUITES_HOME}/interpreter/{interpreter_name}/
          *    interpreter-setting.json
          * 2. Register it from interpreter-setting.json in classpath
-         *    {ZEPPELIN_HOME}/interpreter/{interpreter_name}
+         *    {SMARTSUITES_HOME}/interpreter/{interpreter_name}
          */
         if (!registerInterpreterFromPath(interpreterDirString, interpreterJson)) {
           if (!registerInterpreterFromResource(cl, interpreterDirString, interpreterJson)) {
@@ -569,7 +569,7 @@ public class InterpreterSettingManager {
             if (deps != null) {
               for (Dependency d : deps) {
                 File destDir = new File(
-                    conf.getRelativeDir(ConfVars.ZEPPELIN_DEP_LOCALREPO));
+                    conf.getRelativeDir(ConfVars.SMARTSUITES_DEP_LOCALREPO));
 
                 int numSplits = d.getGroupArtifactVersion().split(":").length;
                 if (!(numSplits >= 3 && numSplits <= 6)) {
@@ -598,7 +598,7 @@ public class InterpreterSettingManager {
   /**
    * Return ordered interpreter setting list.
    * The list does not contain more than one setting from the same interpreter class.
-   * Order by InterpreterClass (order defined by ZEPPELIN_INTERPRETERS), Interpreter setting name
+   * Order by InterpreterClass (order defined by SMARTSUITES_INTERPRETERS), Interpreter setting name
    */
   public List<String> getInterpreterSettingIds() {
     List<String> settingIdList = new ArrayList<>();
@@ -852,13 +852,13 @@ public class InterpreterSettingManager {
           int j = interpreterGroupOrderList.indexOf(o2.getGroup());
           if (i < 0) {
             LOGGER.warn("InterpreterGroup " + o1.getGroup()
-                + " is not specified in " + ConfVars.ZEPPELIN_INTERPRETER_GROUP_ORDER.getVarName());
+                + " is not specified in " + ConfVars.SMARTSUITES_INTERPRETER_GROUP_ORDER.getVarName());
             // move the unknown interpreter to last
             i = Integer.MAX_VALUE;
           }
           if (j < 0) {
             LOGGER.warn("InterpreterGroup " + o2.getGroup()
-                + " is not specified in " + ConfVars.ZEPPELIN_INTERPRETER_GROUP_ORDER.getVarName());
+                + " is not specified in " + ConfVars.SMARTSUITES_INTERPRETER_GROUP_ORDER.getVarName());
             // move the unknown interpreter to last
             j = Integer.MAX_VALUE;
           }

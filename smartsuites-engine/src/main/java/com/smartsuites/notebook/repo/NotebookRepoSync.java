@@ -49,15 +49,15 @@ public class NotebookRepoSync implements NotebookRepo {
   @SuppressWarnings("static-access")
   public NotebookRepoSync(SmartsuitesConfiguration conf) {
     config = conf;
-    oneWaySync = conf.getBoolean(ConfVars.ZEPPELIN_NOTEBOOK_ONE_WAY_SYNC);
-    String allStorageClassNames = conf.getString(ConfVars.ZEPPELIN_NOTEBOOK_STORAGE).trim();
+    oneWaySync = conf.getBoolean(ConfVars.SMARTSUITES_NOTEBOOK_ONE_WAY_SYNC);
+    String allStorageClassNames = conf.getString(ConfVars.SMARTSUITES_NOTEBOOK_STORAGE).trim();
     if (allStorageClassNames.isEmpty()) {
       allStorageClassNames = defaultStorage;
-      LOG.warn("Empty ZEPPELIN_NOTEBOOK_STORAGE conf parameter, using default {}", defaultStorage);
+      LOG.warn("Empty SMARTSUITES_NOTEBOOK_STORAGE conf parameter, using default {}", defaultStorage);
     }
     String[] storageClassNames = allStorageClassNames.split(",");
     if (storageClassNames.length > getMaxRepoNum()) {
-      LOG.warn("Unsupported number {} of storage classes in ZEPPELIN_NOTEBOOK_STORAGE : {}\n" +
+      LOG.warn("Unsupported number {} of storage classes in SMARTSUITES_NOTEBOOK_STORAGE : {}\n" +
           "first {} will be used", storageClassNames.length, allStorageClassNames, getMaxRepoNum());
     }
 
@@ -81,7 +81,7 @@ public class NotebookRepoSync implements NotebookRepo {
       initializeDefaultStorage(conf);
     }
     // sync for anonymous mode on start
-    if (getRepoCount() > 1 && conf.getBoolean(ConfVars.ZEPPELIN_ANONYMOUS_ALLOWED)) {
+    if (getRepoCount() > 1 && conf.getBoolean(ConfVars.SMARTSUITES_ANONYMOUS_ALLOWED)) {
       try {
         sync(AuthenticationInfo.ANONYMOUS);
       } catch (IOException e) {

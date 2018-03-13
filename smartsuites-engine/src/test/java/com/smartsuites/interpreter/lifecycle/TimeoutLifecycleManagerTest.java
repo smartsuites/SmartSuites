@@ -29,10 +29,10 @@ public class TimeoutLifecycleManagerTest extends AbstractInterpreterTest {
 
   @Override
   public void setUp() throws Exception {
-    System.setProperty(SmartsuitesConfiguration.ConfVars.ZEPPELIN_INTERPRETER_LIFECYCLE_MANAGER_CLASS.getVarName(),
+    System.setProperty(SmartsuitesConfiguration.ConfVars.SMARTSUITES_INTERPRETER_LIFECYCLE_MANAGER_CLASS.getVarName(),
         TimeoutLifecycleManager.class.getName());
-    System.setProperty(SmartsuitesConfiguration.ConfVars.ZEPPELIN_INTERPRETER_LIFECYCLE_MANAGER_TIMEOUT_CHECK_INTERVAL.getVarName(), "1000");
-    System.setProperty(SmartsuitesConfiguration.ConfVars.ZEPPELIN_INTERPRETER_LIFECYCLE_MANAGER_TIMEOUT_THRESHOLD.getVarName(), "10000");
+    System.setProperty(SmartsuitesConfiguration.ConfVars.SMARTSUITES_INTERPRETER_LIFECYCLE_MANAGER_TIMEOUT_CHECK_INTERVAL.getVarName(), "1000");
+    System.setProperty(SmartsuitesConfiguration.ConfVars.SMARTSUITES_INTERPRETER_LIFECYCLE_MANAGER_TIMEOUT_THRESHOLD.getVarName(), "10000");
     super.setUp();
   }
 

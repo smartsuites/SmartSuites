@@ -61,9 +61,9 @@ public class GitNotebookRepoTest {
         new File(testNoteDir2)
     );
 
-    System.setProperty(ConfVars.ZEPPELIN_HOME.getVarName(), zeppelinDir.getAbsolutePath());
-    System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_DIR.getVarName(), notebookDir.getAbsolutePath());
-    System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_STORAGE.getVarName(), "GitNotebookRepo");
+    System.setProperty(ConfVars.SMARTSUITES_HOME.getVarName(), zeppelinDir.getAbsolutePath());
+    System.setProperty(ConfVars.SMARTSUITES_NOTEBOOK_DIR.getVarName(), notebookDir.getAbsolutePath());
+    System.setProperty(ConfVars.SMARTSUITES_NOTEBOOK_STORAGE.getVarName(), "GitNotebookRepo");
 
     conf = SmartsuitesConfiguration.create();
   }

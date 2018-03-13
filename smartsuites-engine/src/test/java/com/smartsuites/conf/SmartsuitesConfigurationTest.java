@@ -23,7 +23,7 @@ import java.util.List;
 public class SmartsuitesConfigurationTest {
     @Before
     public void clearSystemVariables() {
-        System.clearProperty(ConfVars.ZEPPELIN_NOTEBOOK_DIR.getVarName());
+        System.clearProperty(ConfVars.SMARTSUITES_NOTEBOOK_DIR.getVarName());
     }
 
     @Test

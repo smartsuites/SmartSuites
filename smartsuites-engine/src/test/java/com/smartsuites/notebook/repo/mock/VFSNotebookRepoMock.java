@@ -13,7 +13,7 @@ public class VFSNotebookRepoMock extends VFSNotebookRepo {
 
   private static SmartsuitesConfiguration modifyNotebookDir(SmartsuitesConfiguration conf) {
     String secNotebookDir = conf.getNotebookDir() + "_secondary";
-    System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_DIR.getVarName(), secNotebookDir);
+    System.setProperty(ConfVars.SMARTSUITES_NOTEBOOK_DIR.getVarName(), secNotebookDir);
     SmartsuitesConfiguration secConf = SmartsuitesConfiguration.create();
     return secConf;
   }

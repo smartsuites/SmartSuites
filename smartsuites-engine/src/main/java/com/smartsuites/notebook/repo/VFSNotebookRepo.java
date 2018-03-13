@@ -150,7 +150,7 @@ public class VFSNotebookRepo implements NotebookRepo {
     
     FileContent content = noteJson.getContent();
     InputStream ins = content.getInputStream();
-    String json = IOUtils.toString(ins, conf.getString(ConfVars.ZEPPELIN_ENCODING));
+    String json = IOUtils.toString(ins, conf.getString(ConfVars.SMARTSUITES_ENCODING));
     ins.close();
 
     Note note = Note.fromJson(json);
@@ -221,7 +221,7 @@ public class VFSNotebookRepo implements NotebookRepo {
     FileObject noteJson = noteDir.resolveFile(".note.json", NameScope.CHILD);
     // false means not appending. creates file if not exists
     OutputStream out = noteJson.getContent().getOutputStream(false);
-    out.write(json.getBytes(conf.getString(ConfVars.ZEPPELIN_ENCODING)));
+    out.write(json.getBytes(conf.getString(ConfVars.SMARTSUITES_ENCODING)));
     out.close();
     noteJson.moveTo(noteDir.resolveFile("note.json", NameScope.CHILD));
   }

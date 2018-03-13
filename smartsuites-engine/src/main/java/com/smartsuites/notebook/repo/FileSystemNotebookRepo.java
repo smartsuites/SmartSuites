@@ -54,9 +54,9 @@ public class FileSystemNotebookRepo implements NotebookRepo {
     this.isSecurityEnabled = UserGroupInformation.isSecurityEnabled();
     if (isSecurityEnabled) {
       String keytab = zConf.getString(
-          SmartsuitesConfiguration.ConfVars.ZEPPELIN_SERVER_KERBEROS_KEYTAB);
+          SmartsuitesConfiguration.ConfVars.SMARTSUITES_SERVER_KERBEROS_KEYTAB);
       String principal = zConf.getString(
-          SmartsuitesConfiguration.ConfVars.ZEPPELIN_SERVER_KERBEROS_PRINCIPAL);
+          SmartsuitesConfiguration.ConfVars.SMARTSUITES_SERVER_KERBEROS_PRINCIPAL);
       if (StringUtils.isBlank(keytab) || StringUtils.isBlank(principal)) {
         throw new IOException("keytab and principal can not be empty, keytab: " + keytab
             + ", principal: " + principal);
@@ -107,7 +107,7 @@ public class FileSystemNotebookRepo implements NotebookRepo {
         ByteArrayOutputStream noteBytes = new ByteArrayOutputStream();
         IOUtils.copyBytes(fs.open(notePath), noteBytes, hadoopConf);
         return Note.fromJson(new String(noteBytes.toString(
-            zConf.getString(SmartsuitesConfiguration.ConfVars.ZEPPELIN_ENCODING))));
+            zConf.getString(SmartsuitesConfiguration.ConfVars.SMARTSUITES_ENCODING))));
       }
     });
   }
@@ -124,7 +124,7 @@ public class FileSystemNotebookRepo implements NotebookRepo {
           fs.delete(tmpNotePath, true);
         }
         InputStream in = new ByteArrayInputStream(note.toJson().getBytes(
-            zConf.getString(SmartsuitesConfiguration.ConfVars.ZEPPELIN_ENCODING)));
+            zConf.getString(SmartsuitesConfiguration.ConfVars.SMARTSUITES_ENCODING)));
         IOUtils.copyBytes(in, fs.create(tmpNotePath), hadoopConf);
         fs.delete(notePath, true);
         fs.rename(tmpNotePath, notePath);
