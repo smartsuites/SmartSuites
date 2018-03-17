@@ -76,15 +76,15 @@ export class JobmanagerComponent implements OnInit, OnDestroy {
 
     // self.jobManagerService.subscribeSetJobs($scope, self.setJobsCallback)
     // 需要注册销毁
-    self.eventService.subscribe('jobmanager:set-jobs',function (data) {
+    self.eventService.subscribe('jobmanager:set-jobs',function (noteJobs) {
       //console.log(data)
-      self.setJobs(data.jobs)
+      self.setJobs(noteJobs.jobs)
       self.filterJobs(self.jobs, self.filterConfig)
     })
 
     // self.jobManagerService.subscribeUpdateJobs($scope, self.updateJobsCallback)
     // 需要注册销毁
-    self.eventService.subscribe('jobmanager:update-jobs',function (data) {
+    self.eventService.subscribe('jobmanager:update-jobs',function (noteRunningJobs) {
       self.updateJobsCallback
     })
 

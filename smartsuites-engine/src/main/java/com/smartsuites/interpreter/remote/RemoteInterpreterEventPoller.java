@@ -36,8 +36,9 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * TODO 考虑使用AKKA框架替换
  * Processes message from RemoteInterpreter process
- * 用于处理远程进程的消息
+ * 用于不断的获取远程进程的消息
  */
 public class RemoteInterpreterEventPoller extends Thread {
   private static final Logger logger = LoggerFactory.getLogger(RemoteInterpreterEventPoller.class);

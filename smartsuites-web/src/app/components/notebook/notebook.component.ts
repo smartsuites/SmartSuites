@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, OnInit, Renderer2, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, OnDestroy, OnInit, Renderer2, ViewChild} from '@angular/core';
 import {EventService1} from "../../service/event/event.service";
 import {WebsocketMessageService} from "../../service/websocket/websocket-message.service";
 import {ActivatedRoute, Params, Router} from "@angular/router";
@@ -24,7 +24,7 @@ import {NoteCreateComponent} from "../note-create/note-create.component";
   templateUrl: './notebook.component.html',
   styleUrls: ['./notebook.component.css']
 })
-export class NotebookComponent implements OnInit {
+export class NotebookComponent implements OnInit,OnDestroy{
 
 
   /**************** 更新Note名称 ***************/
@@ -887,6 +887,7 @@ export class NotebookComponent implements OnInit {
     }
   }
 
+  // 启动保存
   startSaveTimer() {
     let self = this;
     self.killSaveTimer()
@@ -894,7 +895,7 @@ export class NotebookComponent implements OnInit {
     console.log('startSaveTimer called ' + this.note.id);
     self.saveTimer = setTimeout(function () {
       self.saveNote()
-    }, 1000)
+    }, 10000)
   }
 
   /**************** 添加Notebook中的片段 **************/
@@ -1253,6 +1254,8 @@ export class NotebookComponent implements OnInit {
     }
   }
 
+  subscribers = []
+
   ngOnInit(): void {
 
     let self = this;
@@ -1290,7 +1293,7 @@ export class NotebookComponent implements OnInit {
     })
 
     // 监听Websocket的连接状态
-    this.eventService.subscribe('setConnectedStatus', function (data) {
+    self.eventService.subscribeRegister(self.subscribers,'setConnectedStatus', function (data) {
       if (self.connectedOnce && data) {
         // 初始化NoteBook
         self.initNotebook()
@@ -1299,7 +1302,7 @@ export class NotebookComponent implements OnInit {
     })
 
     // 监听列出版本历史
-    this.eventService.subscribe('listRevisionHistory', function (data) {
+    self.eventService.subscribeRegister(self.subscribers,'listRevisionHistory', function (data) {
       console.debug('received list of revisions %o', data)
       self.noteRevisions = data.revisionList
       self.noteRevisions.splice(0, 0, {
@@ -1317,7 +1320,7 @@ export class NotebookComponent implements OnInit {
     })
 
     // 监听设置Note版本事件
-    this.eventService.subscribe('noteRevision', function (data) {
+    self.eventService.subscribeRegister(self.subscribers,'noteRevision', function (data) {
       console.log('received note revision %o', data)
       if (data.note) {
         self.note = data.note
@@ -1328,7 +1331,7 @@ export class NotebookComponent implements OnInit {
     })
 
     // 监听设置Note版本事件
-    this.eventService.subscribe('setNoteRevisionResult', function (data) {
+    self.eventService.subscribeRegister(self.subscribers,'setNoteRevisionResult', function (data) {
       console.log('received set note revision result %o', data)
       if (data.status) {
         self.location.go('/notebook/' + self.noteId)
@@ -1336,47 +1339,47 @@ export class NotebookComponent implements OnInit {
     })
 
     // 监听添加片段事件
-    this.eventService.subscribe('addParagraph', function (data) {
+    self.eventService.subscribeRegister(self.subscribers,'addParagraph', function (paragraph,index) {
       if (self.paragraphUrl || self.revisionView === true) {
         return
       }
-      self.addPara(data.paragraph, data.index)
+      self.addPara(paragraph, index)
     })
 
     // 监听删除片段事件
-    this.eventService.subscribe('removeParagraph', function (data) {
+    self.eventService.subscribeRegister(self.subscribers,'removeParagraph', function (id) {
       if (self.paragraphUrl || self.revisionView === true) {
         return
       }
       //self.removePara(data.paragraphId)
-      self.removePara(data.id)
+      self.removePara(id)
     })
 
     // 监听向上移动片段事件
-    this.eventService.subscribe('moveParagraph', function (data) {
+    self.eventService.subscribeRegister(self.subscribers,'moveParagraph', function (id,index) {
       if (self.revisionView === true) {
         return
       }
-      let removedPara = self.removePara(data.id)
+      let removedPara = self.removePara(id)
       if (removedPara && removedPara.length === 1) {
-        self.addPara(removedPara[0], data.index)
+        self.addPara(removedPara[0], index)
       }
     })
 
     // 监听更新笔记事件
-    this.eventService.subscribe('updateNote', function (data) {
+    self.eventService.subscribeRegister(self.subscribers,'updateNote', function (name,config,info) {
       /** update Note name */
-      if (data.name !== self.note.name) {
+      if (name !== self.note.name) {
         console.log('change note name to : %o', self.note.name)
-        self.note.name = data.name
+        self.note.name = name
       }
-      self.note.config = data.config
-      self.note.info = data.info
+      self.note.config = config
+      self.note.info = info
       self.initializeLookAndFeel()
     })
 
     // 设置Bingding信息获取到的回调
-    this.eventService.subscribe('interpreterBindings', function (data) {
+    self.eventService.subscribeRegister(self.subscribers,'interpreterBindings', function (data) {
       self.interpreterBindings = data.interpreterBindings
       Object.assign(self.interpreterBindingsOrig,self.interpreterBindings) // to check dirty
 
@@ -1407,7 +1410,7 @@ export class NotebookComponent implements OnInit {
     })
 
     // 监听查询是否存在事件【搜索】
-    this.eventService.subscribe('occurrencesExists', function(data) {
+    self.eventService.subscribeRegister(self.subscribers,'occurrencesExists', function(data) {
       self.search.occurrencesCount += data.count
       if (self.search.needHighlightFirst) {
         self.sendNextOccurrenceMessage()
@@ -1416,25 +1419,25 @@ export class NotebookComponent implements OnInit {
     })
 
     // 监听下一个显示事件【搜索】
-    this.eventService.subscribe('noNextOccurrence', function(event) {
+    self.eventService.subscribeRegister(self.subscribers,'noNextOccurrence', function(event) {
       self.increaseCurrentSearchParagraph()
       self.sendNextOccurrenceMessage()
     })
 
     // 监听上一个显示事件【搜索】
-    this.eventService.subscribe('noPrevOccurrence', function(event) {
+    self.eventService.subscribeRegister(self.subscribers,'noPrevOccurrence', function(event) {
       self.decreaseCurrentSearchParagraph()
       self.sendPrevOccurrenceMessage()
     })
 
     // 监听编辑器点击事件
-    this.eventService.subscribe('editorClicked', function() {
+    self.eventService.subscribeRegister(self.subscribers,'editorClicked', function() {
       self.search.occurrencesHidden = true
       self.eventService.broadcast('unmarkAll')
     })
 
     // 监听显示数量变更事件
-    this.eventService.subscribe('occurrencesCountChanged', function(data) {
+    self.eventService.subscribeRegister(self.subscribers,'occurrencesCountChanged', function(data) {
       self.search.occurrencesCount += data.cnt
       if (self.search.occurrencesCount === 0) {
         self.search.currentOccurrence = 0
@@ -1447,7 +1450,7 @@ export class NotebookComponent implements OnInit {
     })
 
     // 监听替换后事件
-    this.eventService.subscribe('noNextOccurrenceAfterReplace', function() {
+    self.eventService.subscribeRegister(self.subscribers,'noNextOccurrenceAfterReplace', function() {
       self.search.occurrencesCount = 0
       self.search.needHighlightFirst = false
       self.search.needToSendNextOccurrenceAfterReplace = false
@@ -1459,7 +1462,7 @@ export class NotebookComponent implements OnInit {
     })
 
     // 监听显示、隐藏搜索窗口
-    this.eventService.subscribe('toggleSearchBox', function() {
+    self.eventService.subscribeRegister(self.subscribers,'toggleSearchBox', function() {
       /*let elem = angular.element('#searchGroup')
       if (self.search.searchBoxOpened) {
         elem.removeClass('open')
@@ -1470,7 +1473,7 @@ export class NotebookComponent implements OnInit {
     })
 
     // 监听片段向上移动事件
-    this.eventService.subscribe('moveParagraphUp', function (paragraph) {
+    self.eventService.subscribeRegister(self.subscribers,'moveParagraphUp', function (paragraph) {
       let newIndex = -1
       for (let i = 0; i < self.note.paragraphs.length; i++) {
         if (self.note.paragraphs[i].id === paragraph.id) {
@@ -1495,7 +1498,7 @@ export class NotebookComponent implements OnInit {
     })
 
     // 监听片段向下移动事件
-    this.eventService.subscribe('moveParagraphDown', function (data) {
+    self.eventService.subscribeRegister(self.subscribers,'moveParagraphDown', function (data) {
       let newIndex = -1
       for (let i = 0; i < self.note.paragraphs.length; i++) {
         if (self.note.paragraphs[i].id === data.paragraph.id) {
@@ -1521,7 +1524,7 @@ export class NotebookComponent implements OnInit {
     })
 
     // 监听聚焦到上一个片段事件
-    this.eventService.subscribe('moveFocusToPreviousParagraph', function (data) {
+    self.eventService.subscribeRegister(self.subscribers,'moveFocusToPreviousParagraph', function (data) {
       let focus = false
       for (let i = self.note.paragraphs.length - 1; i >= 0; i--) {
         if (focus === false) {
@@ -1537,7 +1540,7 @@ export class NotebookComponent implements OnInit {
     })
 
     // 监听聚焦到下一个片段事件
-    this.eventService.subscribe('moveFocusToNextParagraph', function (data) {
+    self.eventService.subscribeRegister(self.subscribers,'moveFocusToNextParagraph', function (data) {
       let focus = false
       for (let i = 0; i < self.note.paragraphs.length; i++) {
         if (focus === false) {
@@ -1553,7 +1556,7 @@ export class NotebookComponent implements OnInit {
     })
 
     // 监听插入片段事件
-    this.eventService.subscribe('insertParagraph', function (data) {
+    self.eventService.subscribeRegister(self.subscribers,'insertParagraph', function (data) {
       if (self.revisionView === true) {
         return
       }
@@ -1577,9 +1580,10 @@ export class NotebookComponent implements OnInit {
     })
 
     // 监听设置Note内容获取到的回调
-    this.eventService.subscribe('setNoteContent', function (note) {
+    self.eventService.subscribeRegister(self.subscribers,'setNoteContent', function (note) {
       if (note === undefined) {
-        this.router.navigate(['/login']);
+        //this.router.navigate(['/login']);
+        return
       }
       self.note = note
       self.noteName = self.getNoteName(self.note)
@@ -1606,7 +1610,7 @@ export class NotebookComponent implements OnInit {
     })
 
     // TODO 监听路由更改事件
-    this.eventService.subscribe('$routeChangeStart', function (data) {
+    self.eventService.subscribeRegister(self.subscribers,'$routeChangeStart', function (data) {
       if (!self.note || !self.note.paragraphs) {
         return
       }
@@ -1631,7 +1635,7 @@ export class NotebookComponent implements OnInit {
     })
 
     // TODO 监听笔记销毁事件
-    this.eventService.subscribe('$destroy', function () {
+    self.eventService.subscribeRegister(self.subscribers,'$destroy', function () {
       //angular.element(window).off('beforeunload')
       self.killSaveTimer()
       self.saveNote()
@@ -1646,7 +1650,7 @@ export class NotebookComponent implements OnInit {
     })
 
     // TODO 监听解绑键盘事件
-    this.eventService.subscribe('$unBindKeyEvent', function () {
+    self.eventService.subscribeRegister(self.subscribers,'$unBindKeyEvent', function () {
       document.removeEventListener('click', self.focusParagraphOnClick)
       //document.removeEventListener('keydown', self.keyboardShortcut)
       document.removeEventListener('keydown', function(keyEvent){
@@ -1657,5 +1661,10 @@ export class NotebookComponent implements OnInit {
     })
 
   }
+
+  ngOnDestroy(): void {
+    this.eventService.unsubscribeSubscriptions(this.subscribers)
+  }
+
 
 }

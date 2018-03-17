@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, EventEmitter, ViewChild} from '@angular/core';
+import {Component, Input, OnInit, EventEmitter, ViewChild, OnDestroy} from '@angular/core';
 import {trigger, state, style, transition, animate} from '@angular/animations';
 import {Location} from '@angular/common';
 import {Router} from '@angular/router';
@@ -12,7 +12,7 @@ import {NoteCreateComponent} from "../../components/note-create/note-create.comp
   selector: 'app-menu',
   templateUrl:'./app.menu.component.html',
 })
-export class AppMenuComponent implements OnInit {
+export class AppMenuComponent implements OnInit,OnDestroy {
 
   @Input() reset: boolean;
 
@@ -50,11 +50,17 @@ export class AppMenuComponent implements OnInit {
               private eventService: EventService1) {
   }
 
+  subscribers = []
+
+  ngOnDestroy(): void {
+    this.eventService.unsubscribeSubscriptions(this.subscribers)
+  }
+
   ngOnInit() {
 
     let self = this;
     // 用于监听笔记加载消息，异步加载Notes
-    this.eventService.subscribe('noteComplete', function (notes) {
+    self.eventService.subscribeRegister(self.subscribers,'noteComplete', function (notes) {
 
       self.items = self.generateNoteBookMenu(self.app.notes.root.children)
 
@@ -81,7 +87,7 @@ export class AppMenuComponent implements OnInit {
     });
 
 
-    this.eventService.subscribe('businessMenu', function () {
+    self.eventService.subscribeRegister(self.subscribers,'businessMenu', function () {
 
       self.model = [
         /*{label: '系统首页', icon: 'fa fa-fw fa-home', routerLink: ['/home']},*/
@@ -194,7 +200,7 @@ export class AppMenuComponent implements OnInit {
 
     })
 
-    this.eventService.subscribe('managerMenu', function () {
+    self.eventService.subscribeRegister(self.subscribers,'managerMenu', function () {
 
       self.model = [
         /*{label: '系统首页', icon: 'fa fa-fw fa-home', routerLink: ['/home']},*/

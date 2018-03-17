@@ -1,5 +1,5 @@
 import {
-  AfterViewInit, Component, ElementRef, OnInit, Renderer, Renderer2, ViewChild, ViewChildren,
+  AfterViewInit, Component, ElementRef, OnDestroy, OnInit, Renderer, Renderer2, ViewChild, ViewChildren,
   ViewContainerRef
 } from '@angular/core';
 import {DefaultDisplayType, SpellResult} from "../../../../service/spell";
@@ -18,6 +18,7 @@ import PiechartVisualization from "../../../../service/visualization/builtins/vi
 import LinechartVisualization from "../../../../service/visualization/builtins/visualization-linechart";
 import ScatterchartVisualization from "../../../../service/visualization/builtins/visualization-scatterchart";
 import {HighlightJsService} from "angular2-highlight-js";
+import {ObjectEqual} from "../../../../utils/Utils";
 /*import {AnsiUp} from "ansi_up/ansi_up"*/
 
 @Component({
@@ -27,7 +28,7 @@ import {HighlightJsService} from "angular2-highlight-js";
   styleUrls: ['./result.component.css'],
   providers:[JitCompileService]
 })
-export class ResultComponent implements OnInit,AfterViewInit {
+export class ResultComponent implements OnInit,AfterViewInit,OnDestroy {
 
   paragraphid
   index
@@ -180,22 +181,6 @@ export class ResultComponent implements OnInit,AfterViewInit {
       : {'pointer-events': 'none' }
   }
 
-  createDisplayDOMId(baseDOMId, type) {
-    if (type === DefaultDisplayType.TABLE || type === DefaultDisplayType.NETWORK) {
-      return `${baseDOMId}_graph`
-    } else if (type === DefaultDisplayType.HTML) {
-      return `${baseDOMId}_html`
-    } else if (type === DefaultDisplayType.ANGULAR) {
-      return `${baseDOMId}_angular`
-    } else if (type === DefaultDisplayType.TEXT) {
-      return `${baseDOMId}_text`
-    } else if (type === DefaultDisplayType.ELEMENT) {
-      return `${baseDOMId}_elem`
-    } else {
-      console.error(`Cannot create display DOM Id due to unknown display type: ${type}`)
-    }
-  }
-
   init(result, config, paragraph, index) {
     // register helium plugin vis packages
     let self = this;
@@ -247,18 +232,7 @@ export class ResultComponent implements OnInit,AfterViewInit {
     setTimeout(retry,10)
   }
 
-  /*$scope.$on('updateResult', function (event, result, newConfig, paragraphRef, index) {
-    if (paragraph.id !== paragraphRef.id || index !== resultIndex) {
-      return
-    }
-
-    let refresh = !angular.equals(newConfig, $scope.config) ||
-      !angular.equals(result.type, $scope.type) ||
-      !angular.equals(result.data, data)
-
-    updateData(result, newConfig, paragraph, resultIndex)
-    renderResult($scope.type, refresh)
-  })
+  /*
 
   $scope.$on('appendParagraphOutput', function (event, data) {
     /!* It has been observed that append events
@@ -278,6 +252,24 @@ export class ResultComponent implements OnInit,AfterViewInit {
       appendTextOutput(data.data)
     }
   })*/
+
+  //*************** 更新结果 *******************//
+
+  createDisplayDOMId(baseDOMId, type) {
+    if (type === DefaultDisplayType.TABLE || type === DefaultDisplayType.NETWORK) {
+      return `${baseDOMId}_graph`
+    } else if (type === DefaultDisplayType.HTML) {
+      return `${baseDOMId}_html`
+    } else if (type === DefaultDisplayType.ANGULAR) {
+      return `${baseDOMId}_angular`
+    } else if (type === DefaultDisplayType.TEXT) {
+      return `${baseDOMId}_text`
+    } else if (type === DefaultDisplayType.ELEMENT) {
+      return `${baseDOMId}_elem`
+    } else {
+      console.error(`Cannot create display DOM Id due to unknown display type: ${type}`)
+    }
+  }
 
   updateData(result, config, paragraphRef, index) {
     this.data = result.data
@@ -326,12 +318,12 @@ export class ResultComponent implements OnInit,AfterViewInit {
     }
   }
 
+  // 渲染结果数据
   renderResult(type, refresh) {
     let activeApp
     if (this.enableHelium) {
-      this.getSuggestions()
       //this.getApplicationStates()
-      activeApp = this.config.get('helium.activeApp')
+      activeApp = this.config['helium.activeApp']
     }
 
     if (activeApp) {
@@ -347,6 +339,7 @@ export class ResultComponent implements OnInit,AfterViewInit {
     }
   }
 
+  // 渲染内置的结果
   renderDefaultDisplay(targetElemId, type, data, refresh) {
     const afterLoaded = () => {
       if (type === DefaultDisplayType.TABLE || type === DefaultDisplayType.NETWORK) {
@@ -376,45 +369,6 @@ export class ResultComponent implements OnInit,AfterViewInit {
   }
 
   /**
-   * Render multiple sub results for custom display
-   */
-  /*$scope.renderCustomDisplay = function (type, data) {
-    // get result from intp
-    if (!heliumService.getSpellByMagic(type)) {
-      console.error(`Can't execute spell due to unknown display type: ${type}`)
-      return
-    }
-
-    // custom display result can include multiple subset results
-    heliumService.executeSpellAsDisplaySystem(type, data)
-      .then(dataWithTypes => {
-        const containerDOMId = `p${$scope.id}_custom`
-        const afterLoaded = () => {
-          const containerDOM = angular.element(`#${containerDOMId}`)
-          // Spell.interpret() can create multiple outputs
-          for (let i = 0; i < dataWithTypes.length; i++) {
-            const dt = dataWithTypes[i]
-            const data = dt.data
-            const type = dt.type
-
-            // prepare each DOM to be filled
-            const subResultDOMId = $scope.createDisplayDOMId(`p${$scope.id}_custom_${i}`, type)
-            const subResultDOM = document.createElement('div')
-            containerDOM.append(subResultDOM)
-            subResultDOM.setAttribute('id', subResultDOMId)
-
-            $scope.renderDefaultDisplay(subResultDOMId, type, data, true)
-          }
-        }
-
-        retryUntilElemIsLoaded(containerDOMId, afterLoaded)
-      })
-      .catch(error => {
-        console.error(`Failed to render custom display: ${$scope.type}\n` + error)
-      })
-  }*/
-
-  /**
    * generates actually object which will be consumed from `data` property
    * feed it to the success callback.
    * if error occurs, the error is passed to the failure callback
@@ -441,119 +395,7 @@ export class ResultComponent implements OnInit,AfterViewInit {
     }
   }
 
-  renderElem(targetElemId, data) {
-    const elem = this.getDomById(`#${targetElemId}`)
-    this.handleData(() => { data(targetElemId) }, DefaultDisplayType.ELEMENT,
-      () => {}, /** HTML element will be filled with data. thus pass empty success callback */
-      (error) => { elem.nativeElement.html(`${error.stack}`) }
-    )
-  }
-
-  renderHtml(targetElemId, data) {
-    let self = this;
-    const elem = self.commonService._jQuery(`#${targetElemId}`)
-    this.handleData(data, DefaultDisplayType.HTML,
-      (generated) => {
-        elem.html(generated)
-        elem.find('pre code').each(function (i, e) {
-          self.highlightJsService.highlight(e,false)
-        })
-        /*
-        /!* eslint new-cap: [2, {"capIsNewExceptions": ["MathJax.Hub.Queue"]}] *!/
-        */
-        MathJax.Hub.Queue(['Typeset', MathJax.Hub, elem[0]])
-      },
-      (error) => { elem.html(`${error.stack}`) }
-    )
-  }
-
-  renderAngular(targetElemId, data) {
-    /*const elem = angular.element(`#${targetElemId}`)
-    const paragraphScope = noteVarShareService.get(`${paragraph.id}_paragraphScope`)
-    handleData(data, DefaultDisplayType.ANGULAR,
-      (generated) => {
-        elem.html(generated)
-        $compile(elem.contents())(paragraphScope)
-      },
-      (error) => { elem.html(`${error.stack}`) }
-    )*/
-  }
-
-  getTextResultElemId(resultId) {
-    return `p${resultId}_text`
-  }
-
-  //TODO有问题
-  renderText(targetElemId, data) {
-    let self = this;
-    const elem = self.commonService._jQuery(`#${targetElemId}`)
-    this.handleData(data, DefaultDisplayType.TEXT,
-      (generated) => {
-        // clear all lines before render
-        self.removeChildrenDOM(targetElemId)
-
-        if (generated) {
-          /*let ansi = new AnsiUp()
-          const escaped = ansi.ansi_to_html(generated)*/
-          /*let ansi = new AnsiUp()
-          const escaped = ansi.ansi_to_html(generated)*/
-          //const divDom = self.renderer2.createElement('<div>');
-          //self.renderer2.setValue(divDom,generated)
-          const divDOM = document.createElement("div").innerHTML = generated
-          //self.renderer2.appendChild(elem,divDom)
-          elem.append(divDOM)
-        }
-
-        elem.bind('mousewheel', (e) => { /*self.keepScrollDown = false*/ })
-      },
-      (error) => { elem.html(`${error.stack}`) }
-    )
-  }
-
-  removeChildrenDOM(targetElemId) {
-    const elem = this.commonService._jQuery(`#${targetElemId}`)
-    if (elem.length) {
-      elem.children().remove()
-    }
-  }
-
-  appendTextOutput(data) {
-    /*const elemId = getTextResultElemId($scope.id)
-    textResultQueueForAppend.push(data)
-
-    // if DOM is not loaded, just push data and return
-    if (!isDOMLoaded(elemId)) {
-      return
-    }
-
-    const elem = angular.element(`#${elemId}`)
-
-    // pop all stacked data and append to the DOM
-    while (textResultQueueForAppend.length > 0) {
-      const line = textResultQueueForAppend.pop()
-      elem.append(angular.element('<div></div>').text(line))
-
-      if ($scope.keepScrollDown) {
-        const doc = angular.element(`#${elemId}`)
-        doc[0].scrollTop = doc[0].scrollHeight
-      }
-    }*/
-  }
-
-  getTrSettingElem(scopeId, graphMode) {
-    return this.getDomById('#trsetting' + scopeId + '_' + graphMode)
-  }
-
-  getVizSettingElem(scopeId, graphMode) {
-    return this.getDomById('#vizsetting' + scopeId + '_' + graphMode)
-  }
-
-  @ViewChild('trsetting', {read: ViewContainerRef})
-  transformationSettingTargetEl: ViewContainerRef;
-
-  @ViewChild('vizsetting', {read: ViewContainerRef})
-  visualizationSettingTargetEl: ViewContainerRef;
-
+  // 渲染图表
   renderGraph(graphElemId, graphMode, refresh) {
     // set graph height
     let self = this;
@@ -681,6 +523,165 @@ export class ResultComponent implements OnInit,AfterViewInit {
     //具体的类型
     self.retryUntilElemIsLoaded(tableElemId, afterLoaded)
   }
+
+  // 渲染HTML
+  renderHtml(targetElemId, data) {
+    let self = this;
+    const elem = self.commonService._jQuery(`#${targetElemId}`)
+    this.handleData(data, DefaultDisplayType.HTML,
+      (generated) => {
+        elem.html(generated)
+        elem.find('pre code').each(function (i, e) {
+          self.highlightJsService.highlight(e,false)
+        })
+        /*
+        /!* eslint new-cap: [2, {"capIsNewExceptions": ["MathJax.Hub.Queue"]}] *!/
+        */
+        MathJax.Hub.Queue(['Typeset', MathJax.Hub, elem[0]])
+      },
+      (error) => { elem.html(`${error.stack}`) }
+    )
+  }
+
+  // 渲染Angular对象
+  renderAngular(targetElemId, data) {
+    /*const elem = angular.element(`#${targetElemId}`)
+    const paragraphScope = noteVarShareService.get(`${paragraph.id}_paragraphScope`)
+    handleData(data, DefaultDisplayType.ANGULAR,
+      (generated) => {
+        elem.html(generated)
+        $compile(elem.contents())(paragraphScope)
+      },
+      (error) => { elem.html(`${error.stack}`) }
+    )*/
+  }
+
+  // 渲染文本数据
+  renderText(targetElemId, data) {
+    let self = this;
+    const elem = self.commonService._jQuery(`#${targetElemId}`)
+    this.handleData(data, DefaultDisplayType.TEXT,
+      (generated) => {
+        // clear all lines before render
+        self.removeChildrenDOM(targetElemId)
+
+        if (generated) {
+          /*let ansi = new AnsiUp()
+          const escaped = ansi.ansi_to_html(generated)*/
+          /*let ansi = new AnsiUp()
+          const escaped = ansi.ansi_to_html(generated)*/
+          //const divDom = self.renderer2.createElement('<div>');
+          //self.renderer2.setValue(divDom,generated)
+          const divDOM = document.createElement("div").innerHTML = generated
+          //self.renderer2.appendChild(elem,divDom)
+          elem.append(divDOM)
+        }
+
+        elem.bind('mousewheel', (e) => { /*self.keepScrollDown = false*/ })
+      },
+      (error) => { elem.html(`${error.stack}`) }
+    )
+  }
+
+  // 渲染元素
+  renderElem(targetElemId, data) {
+    const elem = this.getDomById(`#${targetElemId}`)
+    this.handleData(() => { data(targetElemId) }, DefaultDisplayType.ELEMENT,
+      () => {}, /** HTML element will be filled with data. thus pass empty success callback */
+      (error) => { elem.nativeElement.html(`${error.stack}`) }
+    )
+  }
+
+  /**
+   * Render multiple sub results for custom display
+   */
+  /*$scope.renderCustomDisplay = function (type, data) {
+    // get result from intp
+    if (!heliumService.getSpellByMagic(type)) {
+      console.error(`Can't execute spell due to unknown display type: ${type}`)
+      return
+    }
+
+    // custom display result can include multiple subset results
+    heliumService.executeSpellAsDisplaySystem(type, data)
+      .then(dataWithTypes => {
+        const containerDOMId = `p${$scope.id}_custom`
+        const afterLoaded = () => {
+          const containerDOM = angular.element(`#${containerDOMId}`)
+          // Spell.interpret() can create multiple outputs
+          for (let i = 0; i < dataWithTypes.length; i++) {
+            const dt = dataWithTypes[i]
+            const data = dt.data
+            const type = dt.type
+
+            // prepare each DOM to be filled
+            const subResultDOMId = $scope.createDisplayDOMId(`p${$scope.id}_custom_${i}`, type)
+            const subResultDOM = document.createElement('div')
+            containerDOM.append(subResultDOM)
+            subResultDOM.setAttribute('id', subResultDOMId)
+
+            $scope.renderDefaultDisplay(subResultDOMId, type, data, true)
+          }
+        }
+
+        retryUntilElemIsLoaded(containerDOMId, afterLoaded)
+      })
+      .catch(error => {
+        console.error(`Failed to render custom display: ${$scope.type}\n` + error)
+      })
+  }*/
+
+  getTextResultElemId(resultId) {
+    return `p${resultId}_text`
+  }
+
+
+
+  removeChildrenDOM(targetElemId) {
+    const elem = this.commonService._jQuery(`#${targetElemId}`)
+    if (elem.length) {
+      elem.children().remove()
+    }
+  }
+
+  appendTextOutput(data) {
+    /*const elemId = getTextResultElemId($scope.id)
+    textResultQueueForAppend.push(data)
+
+    // if DOM is not loaded, just push data and return
+    if (!isDOMLoaded(elemId)) {
+      return
+    }
+
+    const elem = angular.element(`#${elemId}`)
+
+    // pop all stacked data and append to the DOM
+    while (textResultQueueForAppend.length > 0) {
+      const line = textResultQueueForAppend.pop()
+      elem.append(angular.element('<div></div>').text(line))
+
+      if ($scope.keepScrollDown) {
+        const doc = angular.element(`#${elemId}`)
+        doc[0].scrollTop = doc[0].scrollHeight
+      }
+    }*/
+  }
+
+  getTrSettingElem(scopeId, graphMode) {
+    return this.getDomById('#trsetting' + scopeId + '_' + graphMode)
+  }
+
+  getVizSettingElem(scopeId, graphMode) {
+    return this.getDomById('#vizsetting' + scopeId + '_' + graphMode)
+  }
+
+  @ViewChild('trsetting', {read: ViewContainerRef})
+  transformationSettingTargetEl: ViewContainerRef;
+
+  @ViewChild('vizsetting', {read: ViewContainerRef})
+  visualizationSettingTargetEl: ViewContainerRef;
+
+
 
   switchViz(newMode) {
     let newConfig = this.config
@@ -1003,6 +1004,8 @@ export class ResultComponent implements OnInit,AfterViewInit {
 
   }
 
+  subscribers = []
+
   ngOnInit() {
     let self = this;
     let paragraph = self.notebookCom.getParagraphById(self.paragraphid);
@@ -1010,7 +1013,7 @@ export class ResultComponent implements OnInit,AfterViewInit {
     this.init(paragraph.results.msg[self.index],paragraph.config.results[self.index],paragraph,self.index)
 
 
-    this.eventService.subscribe('appendAppOutput', function (event, data) {
+    self.eventService.subscribeRegister(self.subscribers,'appendAppOutput', function (event, data) {
       let self = this;
       /*if (paragraph.id === data.paragraphId) {
         let app = self.apps.find({id: data.appId})
@@ -1028,7 +1031,7 @@ export class ResultComponent implements OnInit,AfterViewInit {
       }*/
     })
 
-    this.eventService.subscribe('updateAppOutput', function (event, data) {
+    self.eventService.subscribeRegister(self.subscribers,'updateAppOutput', function (event, data) {
       /*if (paragraph.id === data.paragraphId) {
         let app = _.find($scope.apps, {id: data.appId})
         if (app) {
@@ -1045,7 +1048,7 @@ export class ResultComponent implements OnInit,AfterViewInit {
       }*/
     })
 
-    this.eventService.subscribe('appLoad', function (event, data) {
+    self.eventService.subscribeRegister(self.subscribers,'appLoad', function (event, data) {
       /*if (paragraph.id === data.paragraphId) {
         let app = _.find($scope.apps, {id: data.appId})
         if (!app) {
@@ -1063,7 +1066,7 @@ export class ResultComponent implements OnInit,AfterViewInit {
       }*/
     })
 
-    this.eventService.subscribe('appStatusChange', function (event, data) {
+    self.eventService.subscribeRegister(self.subscribers,'appStatusChange', function (event, data) {
       /*if (paragraph.id === data.paragraphId) {
         let app = _.find($scope.apps, {id: data.appId})
         if (app) {
@@ -1074,7 +1077,7 @@ export class ResultComponent implements OnInit,AfterViewInit {
       }*/
     })
 
-    this.eventService.subscribe('angularObjectUpdate', function (event, data) {
+    self.eventService.subscribeRegister(self.subscribers,'angularObjectUpdate', function (event, data) {
       /*let noteId = $route.current.pathParams.noteId
       if (!data.noteId || data.noteId === noteId) {
         let scope
@@ -1142,7 +1145,7 @@ export class ResultComponent implements OnInit,AfterViewInit {
       }*/
     })
 
-    this.eventService.subscribe('angularObjectRemove', function (event, data) {
+    self.eventService.subscribeRegister(self.subscribers,'angularObjectRemove', function (event, data) {
       /*let noteId = $route.current.pathParams.noteId
       if (!data.noteId || data.noteId === noteId) {
         let scope
@@ -1174,6 +1177,32 @@ export class ResultComponent implements OnInit,AfterViewInit {
           scope[funcName] = undefined
         }
       }*/
+
+    })
+
+    // 监听更新结果
+    self.eventService.subscribeRegister(self.subscribers,'updateResult', function (newResult, newConfig, paragraphRef, index) {
+      if (!(self.paragraphid === paragraphRef.id) || !(index === self.resultIndex)) {
+        return
+      }
+
+      let refresh = !ObjectEqual(newConfig,self.config) ||
+        !(newResult.type === self.type) ||
+        !(newResult.data === self.data)
+
+      self.updateData(newResult, newConfig, self.paragraph, self.resultIndex)
+      self.renderResult(self.type, refresh)
+    })
+
+    // 监听片段更改结果
+    self.eventService.subscribeRegister(self.subscribers,'paragraphResized', function (paragraphId) {
+      // paragraph col width changed
+      if (paragraphId === paragraph.id) {
+        let builtInViz = self.builtInVisualizations[self.graphMode]
+        if (builtInViz && builtInViz.instance) {
+          builtInViz.instance.resize()
+        }
+      }
     })
 
   }
@@ -1187,5 +1216,10 @@ export class ResultComponent implements OnInit,AfterViewInit {
 
     this.init(paragraph.results.msg[self.index],paragraph.config.results[self.index],paragraph,self.index)*/
   }
+
+  ngOnDestroy(): void {
+    this.eventService.unsubscribeSubscriptions(this.subscribers)
+  }
+
 
 }

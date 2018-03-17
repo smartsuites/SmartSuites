@@ -71,3 +71,7 @@
 .interpreterConfig .ui-datatable-footer{
   text-align: left;
 }
+
+.ui-overlaypanel-content {
+  padding: 0px;
+}

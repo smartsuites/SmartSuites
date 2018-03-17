@@ -101,7 +101,7 @@ class PyZeppelinContext(object):
 # start JVM gateway
 client = GatewayClient(address='127.0.0.1', port=${JVM_GATEWAY_PORT})
 gateway = JavaGateway(client)
-java_import(gateway.jvm, "org.apache.zeppelin.display.Input")
+java_import(gateway.jvm, "com.smartsuites.display.Input")
 intp = gateway.entry_point
 z = __zeppelin__ = PyZeppelinContext(intp.getZeppelinContext())
 

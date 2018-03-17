@@ -378,6 +378,12 @@ public class InterpreterSetting {
     return key;
   }
 
+  /**
+   * 创建当前Group配置的实例
+   * @param user
+   * @param noteId
+   * @return
+   */
   public ManagedInterpreterGroup getOrCreateInterpreterGroup(String user, String noteId) {
     String groupId = getInterpreterGroupId(user, noteId);
     try {

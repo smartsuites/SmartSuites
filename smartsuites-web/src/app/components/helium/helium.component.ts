@@ -10,6 +10,8 @@ import {ConfirmationService} from "primeng/primeng";
 })
 export class HeliumComponent implements OnInit {
 
+  min_height = window.innerHeight - 183 + 'px'
+
   constructor(public heliumService:HeliumService,
               public confirmationService:ConfirmationService) { }
 

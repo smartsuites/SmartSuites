@@ -229,8 +229,8 @@ public class IPythonInterpreter extends Interpreter implements ExecuteResultHand
 
     if (useBuiltinPy4j) {
       String py4jLibPath = null;
-      if (System.getenv("ZEPPELIN_HOME") != null) {
-        py4jLibPath = System.getenv("ZEPPELIN_HOME") + File.separator
+      if (System.getenv("SMARTSUITES_HOME") != null) {
+        py4jLibPath = System.getenv("SMARTSUITES_HOME") + File.separator
             + PythonInterpreter.ZEPPELIN_PY4JPATH;
       } else {
         Path workingPath = Paths.get("..").toAbsolutePath();

@@ -1,4 +1,4 @@
-<div class="ui-g" id="{{paragraph.id}}_container" [ngClass]="{'paragraph': !asIframe, 'paragraphAsIframe': asIframe, 'fullScreen': fullScreen}" (click)="handleFocus(true)">
+<div class="ui-g" id="{{paragraph.id}}_container" style="display: inherit;" [ngClass]="{'paragraph': !asIframe, 'paragraphAsIframe': asIframe, 'fullScreen': fullScreen}" (click)="handleFocus(true)">
   <!-- control -->
   <div class="ui-g-12" style="margin-bottom: 8px">
     <!--<div style="float: left;" (dblclick)="this.editParagraphTitle()" class="paragraphTitle" *ngIf="paragraph.config.title" id="{{paragraph.id}}_title">-->
@@ -42,7 +42,7 @@
               (click)="this.runParagraphFromButton(this.getEditorValue())"
               *ngIf="!revisionView && paragraph.status!='RUNNING' && paragraph.status!='PENDING' && paragraph.config.enabled"></button>
 
-      <button pButton type="button" pTooltip="取消运行" tooltipPosition="bottom" icon="fa-play"
+      <button pButton type="button" pTooltip="取消运行" tooltipPosition="bottom" icon="fa-pause"
               class="ui-button-secondary"
               (click)="this.cancelParagraph(paragraph)"
               *ngIf="!revisionView && (paragraph.status=='RUNNING' || paragraph.status=='PENDING')"></button>
@@ -95,7 +95,6 @@
               <span>{{paragraph.id}}</span>
             </a>
           </li>
-          <li role="separator" class="divider"></li>
           <!-- Auto Run -->
           <li style="padding-top:8px"
               *ngIf="paragraph.config.runOnSelectionChange == true || paragraph.config.runOnSelectionChange == false">
@@ -116,7 +115,7 @@
               <span style="margin-top: 2px;" class="fa fa-arrows-h shortcut-icon"></span>
               <select style="float: right" [(ngModel)]="paragraph.config.colWidth"
                       class="selectpicker"
-                      (change)="changeColWidth(paragraph, paragraph.config.colWidth)">
+                      (change)="changeColWidth(paragraph, paragraph.config.colWidth);setting.hide()">
                 <option *ngFor="let col of colWidthOption" value="{{col}}">{{col}}</option>
               </select>
               Width
@@ -127,9 +126,9 @@
           <li>
             <a (click)="$event.stopPropagation()" class="dropdown">
               <span class="fa fa-text-height shortcut-icon"></span>
-              <select style="float: right" ng-model="paragraph.config.fontSize"
+              <select style="float: right" [(ngModel)]="paragraph.config.fontSize"
                       class="selectpicker"
-                      (change)="changeFontSize(paragraph, paragraph.config.fontSize)">
+                      (change)="changeFontSize(paragraph, paragraph.config.fontSize);setting.hide()">
                 <option *ngFor="let s of fontSizeOption" value="{{s}}">{{s}}</option>
               </select>
               Font size
@@ -138,14 +137,14 @@
 
           <!-- Move Up Down -->
           <li>
-            <a (click)="moveUp(paragraph)" [hidden]="$first">
+            <a (click)="moveUp(paragraph);setting.hide()" [hidden]="$first">
               <span class="fa fa-arrow-circle-o-up shortcut-icon"></span>
               Move up
               <span class="shortcut-keys" style="float:right">Ctrl+{{ isMac ? 'Option' : 'Alt'}}+K</span>
             </a>
           </li>
           <li>
-            <a (click)="moveDown(paragraph)" [hidden]="$last">
+            <a (click)="moveDown(paragraph);setting.hide()" [hidden]="$last">
               <span class="fa fa-arrow-circle-o-down shortcut-icon"></span>
               Move down
               <span class="shortcut-keys" style="float:right">Ctrl+{{ isMac ? 'Option' : 'Alt'}}+J</span>
@@ -154,7 +153,7 @@
 
           <!-- Insert -->
           <li>
-            <a (click)="insertNew('below')">
+            <a (click)="insertNew('below');setting.hide()">
               <span class="fa fa-plus-circle shortcut-icon"></span>
               Insert new
               <span class="shortcut-keys" style="float:right">Ctrl+{{ isMac ? 'Option' : 'Alt'}}+B</span>
@@ -163,7 +162,7 @@
 
           <!-- Clone -->
           <li>
-            <a (click)="copyParagraph(getEditorValue())">
+            <a (click)="copyParagraph(getEditorValue());setting.hide()">
               <span class="fa fa-copy shortcut-icon"></span>
               Clone paragraph
               <span class="shortcut-keys" style="float:right">Ctrl+Shift+C</span>
@@ -173,14 +172,14 @@
           <!-- Title -->
           <li>
             <div [hidden]="!paragraph.config.title">
-              <a (click)="hideTitle(paragraph)">
+              <a (click)="hideTitle(paragraph);setting.hide()">
                 <span class="fa fa-font shortcut-icon"></span>
                 Hide title
                 <span class="shortcut-keys" style="float:right">Ctrl+{{ isMac ? 'Option' : 'Alt'}}+T</span>
               </a>
             </div>
             <div [hidden]="paragraph.config.title">
-              <a (click)="showTitle(paragraph)">
+              <a (click)="showTitle(paragraph);setting.hide()">
                 <span class="fa fa-font shortcut-icon"></span>
                 Show title
                 <span class="shortcut-keys" style="float:right">Ctrl+{{ isMac ? 'Option' : 'Alt'}}+T</span>
@@ -191,14 +190,14 @@
           <!-- Line Number -->
           <li>
             <div [hidden]="!paragraph.config.lineNumbers">
-              <a (click)="hideLineNumbers(paragraph)">
+              <a (click)="hideLineNumbers(paragraph);setting.hide()">
                 <span class="fa fa-list-ol shortcut-icon"></span>
                 Hide line numbers
                 <span class="shortcut-keys" style="float:right">Ctrl+{{ isMac ? 'Option' : 'Alt'}}+M</span>
               </a>
             </div>
             <div [hidden]="paragraph.config.lineNumbers">
-              <a (click)="showLineNumbers(paragraph)">
+              <a (click)="showLineNumbers(paragraph);setting.hide()">
                 <span class="fa fa-list-ol shortcut-icon"></span>
                 Show line numbers
                 <span class="shortcut-keys" style="float:right">Ctrl+{{ isMac ? 'Option' : 'Alt'}}+M</span>
@@ -208,7 +207,7 @@
 
           <!-- Run -->
           <li>
-            <a (click)="toggleEnableDisable(paragraph)">
+            <a (click)="toggleEnableDisable(paragraph);setting.hide()">
               <span class="fa fa-play shortcut-icon"></span>
               {{paragraph.config.enabled ? "Disable" : "Enable"}} run
               <span class="shortcut-keys" style="float:right">Ctrl+ {{ isMac ? 'Option' : 'Alt'}}+R</span>
@@ -217,7 +216,7 @@
 
           <!-- Link -->
           <li>
-            <a (click)="goToSingleParagraph()">
+            <a (click)="goToSingleParagraph();setting.hide()">
               <span class="fa fa-external-link shortcut-icon"></span>
               Link this paragraph
               <span class="shortcut-keys" style="float:right">Ctrl+{{ isMac ? 'Option' : 'Alt'}}+W</span>
@@ -226,7 +225,7 @@
 
           <!-- Clear -->
           <li>
-            <a (click)="clearParagraphOutput(paragraph)">
+            <a (click)="clearParagraphOutput(paragraph);setting.hide()">
               <span class="fa fa-eraser shortcut-icon"></span>
               Clear output
               <span class="shortcut-keys" style="float:right">Ctrl+{{ isMac ? 'Option' : 'Alt'}}+L</span>
@@ -235,7 +234,7 @@
 
           <!-- Remove -->
           <li>
-            <a (click)="removeParagraph(paragraph)" >
+            <a (click)="removeParagraph(paragraph);setting.hide()" >
               <span class="fa fa-times shortcut-icon"></span>
               Remove
               <span class="shortcut-keys" style="float:right">Ctrl+{{ isMac ? 'Option' : 'Alt'}}+D</span>
@@ -248,18 +247,18 @@
     </div>
   </div>
   <!-- editor -->
-  <div class="ui-g-12">
+  <div class="ui-g-12" [hidden]="paragraph.config.editorHide || viewOnly">
 
-    <div id="{{paragraph.id}}_editor" class="editor" [hidden]="paragraph.config.editorHide || viewOnly"></div>
+    <div id="{{paragraph.id}}_editor" class="editor"></div>
 
   </div>
   <!-- Processor Bar -->
   <div class="ui-g-12">
     <div id="{{paragraph.id}}_runControl" class="runControl">
-      <div id="{{paragraph.id}}_progress" class="progress" *ngIf="paragraph.status=='RUNNING'">
+      <div id="{{paragraph.id}}_progress" class="progress" *ngIf="paragraph.status === 'RUNNING'">
 
-        <p-progressBar [value]="this.getProgress()" *ngIf="this.getProgress()>0 && this.getProgress()<100 && paragraph.status=='RUNNING'"></p-progressBar>
-        <p-progressBar [value]="100" *ngIf="(this.getProgress()<=0 || this.getProgress()>=100) && (paragraph.status=='RUNNING' )"></p-progressBar>
+        <p-progressBar [style]="{'height': '6px'}" [showValue]="false" [value]="this.getProgress()" *ngIf="this.getProgress()>0 && this.getProgress()<100 && paragraph.status=='RUNNING'"></p-progressBar>
+        <p-progressBar [style]="{'height': '6px'}" [showValue]="false" [value]="100" *ngIf="(this.getProgress()<=0 || this.getProgress()>=100) && (paragraph.status=='RUNNING' )"></p-progressBar>
 
       </div>
     </div>
@@ -329,7 +328,7 @@
   <!-- result -->
   <div class="ui-g-12">
 
-    <div *ngFor="let result of paragraph.results.msg; let i = index" [hidden]="paragraph.config.tableHide" >
+    <div *ngFor="let result of paragraph.results.msg; let i = index" [hidden]="paragraph.config.tableHide">
       <app-result class="tableDisplay" paragraphid="{{paragraphid}}" index="{{i}}" noteid="{{notebook.noteId}}"></app-result>
     </div>
 

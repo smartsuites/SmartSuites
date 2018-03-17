@@ -43,8 +43,8 @@ public class PythonDockerInterpreter extends Interpreter {
 
   @Override
   public void open() {
-    if (System.getenv("ZEPPELIN_HOME") != null) {
-      zeppelinHome = new File(System.getenv("ZEPPELIN_HOME"));
+    if (System.getenv("SMARTSUITES_HOME") != null) {
+      zeppelinHome = new File(System.getenv("SMARTSUITES_HOME"));
     } else {
       zeppelinHome = Paths.get("..").toAbsolutePath().toFile();
     }

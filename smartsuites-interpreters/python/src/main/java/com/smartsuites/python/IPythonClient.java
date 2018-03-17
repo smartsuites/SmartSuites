@@ -43,7 +43,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Grpc client for IPython kernel
+ * Grpc client for IPython kernel 用于连接到IPython
  */
 public class IPythonClient {
 

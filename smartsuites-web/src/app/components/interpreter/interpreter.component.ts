@@ -359,7 +359,12 @@ export class InterpreterComponent implements OnInit {
     }*/
     // TODO 版本差异
     for (let p in newSetting.properties) {
-      newProperties[p] = newSetting.properties[p].value
+      //newProperties[p] = newSetting.properties[p].value
+      newProperties[p] = {
+        value: newSetting.properties[p].value,
+        type: newSetting.properties[p].type,
+        name: p
+      }
     }
 
     request.properties = newProperties

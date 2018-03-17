@@ -22,6 +22,7 @@ import static com.smartsuites.spark.ZeppelinRDisplay.render;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.smartsuites.spark.utils.RDisplay;
 import org.apache.spark.SparkContext;
 import org.apache.spark.SparkRBackend;
 import org.apache.spark.api.java.JavaSparkContext;

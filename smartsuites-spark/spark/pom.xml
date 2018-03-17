@@ -17,7 +17,7 @@
     <properties>
         <!--library versions-->
         <jsoup.version>1.8.2</jsoup.version>
-        <spark.version>2.0.2</spark.version>
+        <spark.version>2.2.0</spark.version>
         <guava.version>14.0.1</guava.version>
         <commons.exec.version>1.3</commons.exec.version>
         <commons.compress.version>1.9</commons.compress.version>
@@ -90,14 +90,14 @@
 
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-repl_${scala.binary.version}</artifactId>
+            <artifactId>spark-repl_2.11</artifactId>
             <version>${spark.version}</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-hive_${scala.binary.version}</artifactId>
+            <artifactId>spark-hive_2.11</artifactId>
             <version>${spark.version}</version>
             <scope>provided</scope>
         </dependency>
@@ -534,50 +534,11 @@
     </build>
 
     <profiles>
-        <!--<profile>
-            <id>spark-1.4</id>
-            <properties>
-                <spark.version>1.4.1</spark.version>
-            </properties>
-
-            <dependencies>
-            </dependencies>
-        </profile>
-
-        <profile>
-            <id>spark-1.5</id>
-            <properties>
-                <spark.version>1.5.2</spark.version>
-                <akka.group>com.typesafe.akka</akka.group>
-                <akka.version>2.3.11</akka.version>
-                <protobuf.version>2.5.0</protobuf.version>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>spark-1.6</id>
-            <properties>
-                <spark.version>1.6.3</spark.version>
-                <spark.py4j.version>0.9</spark.py4j.version>
-                <akka.group>com.typesafe.akka</akka.group>
-                <akka.version>2.3.11</akka.version>
-                <protobuf.version>2.5.0</protobuf.version>
-            </properties>
-        </profile>-->
-
-        <profile>
-            <id>spark-2.0</id>
-            <properties>
-                <spark.version>2.0.2</spark.version>
-                <protobuf.version>2.5.0</protobuf.version>
-                <spark.py4j.version>0.10.3</spark.py4j.version>
-            </properties>
-        </profile>
 
         <profile>
             <id>spark-2.1</id>
             <properties>
-                <spark.version>2.1.0</spark.version>
+                <spark.version>2.1.1</spark.version>
                 <protobuf.version>2.5.0</protobuf.version>
                 <spark.py4j.version>0.10.4</spark.py4j.version>
                 <scala.version>2.11.8</scala.version>

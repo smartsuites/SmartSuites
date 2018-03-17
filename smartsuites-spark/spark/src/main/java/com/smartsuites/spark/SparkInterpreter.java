@@ -355,8 +355,7 @@ public class SparkInterpreter extends Interpreter {
   }
 
   /**
-   * Spark 2.x
-   * Create SparkSession
+   * 创建Spark 2.x SparkSession
    */
   public Object createSparkSession() {
     // use local mode for embedded spark mode when spark.master is not found
@@ -413,6 +412,7 @@ public class SparkInterpreter extends Interpreter {
     return sparkSession;
   }
 
+
   public SparkContext createSparkContext() {
     if (Utils.isSpark2()) {
       return createSparkContext_2();
@@ -422,13 +422,17 @@ public class SparkInterpreter extends Interpreter {
   }
 
   /**
-   * Create SparkContext for spark 2.x
+   * 从SparkSession 创建 spark 2.x版本的 SparkContext
    * @return
    */
   private SparkContext createSparkContext_2() {
     return (SparkContext) Utils.invokeMethod(sparkSession, "sparkContext");
   }
 
+  /**
+   * 创建 spark 1.x 版本的 SparkContext
+   * @return
+   */
   public SparkContext createSparkContext_1() {
     // use local mode for embedded spark mode when spark.master is not found
     if (!conf.contains("spark.master")) {

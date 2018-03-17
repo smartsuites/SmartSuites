@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {WebsocketMessageService} from "../../../service/websocket/websocket-message.service";
 import {NoteVarShareService} from "../../../service/note-var-share/note-var-share.service";
 import {EventService1} from "../../../service/event/event.service";
@@ -12,6 +12,8 @@ import {SpellResult} from "../../../service/spell";
 import {HeliumService} from "../../../service/helium/helium.service";
 import * as Q from "Q"
 import * as moment from "moment";
+import {ObjectEqual} from "../../../utils/Utils";
+import {Subscription} from "rxjs/Subscription";
 
 const ParagraphExecutor = {
   SPELL: 'SPELL',
@@ -25,7 +27,7 @@ const ParagraphExecutor = {
   inputs: ['paragraphid'],
   styleUrls: ['./paragraph.component.css']
 })
-export class ParagraphComponent implements OnInit,AfterViewInit {
+export class ParagraphComponent implements OnInit,AfterViewInit,OnDestroy {
 
   ANGULAR_FUNCTION_OBJECT_NAME_PREFIX = '_Z_ANGULAR_FUNC_'
 
@@ -67,6 +69,7 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
   openEditor(paragraph) {
     console.log('open the note')
     paragraph.config.editorHide = false
+    this.autoAdjustEditorHeight(this.getEditor())
     this.commitParagraph(paragraph)
   }
 
@@ -215,6 +218,7 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
   /**************  清除当前的片段的输出 ***************/
 
   clearParagraphOutput(paragraph) {
+    console.log('Clear Output %o', paragraph.id)
     this.websocketMsgSrv.clearParagraphOutput(paragraph.id)
   }
 
@@ -411,8 +415,8 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
 
   saveParagraph(paragraph) {
     let self = this;
-    const dirtyText = paragraph.text
-    if (dirtyText === undefined || dirtyText === this.originalText) {
+    //const dirtyText = paragraph.text
+    if (self.dirtyText === undefined || self.dirtyText === this.originalText) {
       return
     }
     self.bindBeforeUnload()
@@ -422,8 +426,11 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
       self.dirtyText = undefined
       self.unBindBeforeUnload()
     })*/
+
+    self.paragraph.text = self.dirtyText
+
     self.commitParagraph(paragraph)
-    self.originalText = dirtyText
+    self.originalText = self.dirtyText
     self.dirtyText = undefined
     self.unBindBeforeUnload()
   }
@@ -455,6 +462,8 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
 
   editorSetting
 
+  currentProgress = 0
+
   // flag that is used to set editor setting on paste percent sign
   pastePercentSign = false
 
@@ -484,11 +493,7 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
   }
 
   autoAdjustEditorHeight(editor) {
-    let height =
-      editor.getSession().getScreenLength() *
-      editor.renderer.lineHeight +
-      editor.renderer.scrollBar.getWidth()
-
+    let height = editor.getSession().getScreenLength() * editor.renderer.lineHeight + editor.renderer.scrollBar.getWidth()
     this.jQuery('#' + editor.container.id).height(height.toString() + 'px')
     editor.resize()
   }
@@ -508,10 +513,10 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
       let dirtyText = session.getValue()
       self.dirtyText = dirtyText
       //如果和原来的数据不一样就保存
-      if (self.dirtyText !== self.originalText) {
-        //self.notebook.startSaveTimer()
-        self.paragraph.text = self.dirtyText
-        self.saveParagraph(self.paragraph)
+      if (self.dirtyText != self.originalText) {
+        self.notebook.startSaveTimer()
+        /*self.paragraph.text = self.dirtyText
+        self.saveParagraph(self.paragraph)*/
       }
       self.setParagraphMode(session, dirtyText, self.editor.getCursorPosition())
     })
@@ -579,7 +584,7 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
 
           self.websocketMsgSrv.completion(self.paragraph.id, buf, pos)
 
-          self.eventService.subscribe('completionList', function(data) {
+          self.eventService.subscribeRegister(self.subscribers,'completionList', function(data) {
             let computeCaption = function(value, meta) {
               let metaLength = meta !== undefined ? meta.length : 0
               let length = 42
@@ -826,7 +831,7 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
     if (!self.revisionView) {
       self.websocketMsgSrv.getEditorSetting(paragraph.id, interpreterName)
       setTimeout(
-        self.eventService.subscribe('editorSetting', function (data) {
+        self.eventService.subscribeRegister(self.subscribers,'editorSetting', function (data) {
             if (paragraph.id === data.paragraphId) {
               deferred.resolve(data)
             }
@@ -1061,62 +1066,74 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
   /**************** 推送更新 *************/
 
   /**
-   * @returns {boolean} true if updated is needed
+   * 检测是否需要更新
+   * @param oldPara
+   * @param newPara
+   * @returns {boolean}
    */
   isUpdateRequired(oldPara, newPara) {
     return (newPara.id === oldPara.id &&
-      (newPara.dateCreated !== oldPara.dateCreated ||
-        newPara.text !== oldPara.text ||
-        newPara.dateFinished !== oldPara.dateFinished ||
-        newPara.dateStarted !== oldPara.dateStarted ||
-        newPara.dateUpdated !== oldPara.dateUpdated ||
-        newPara.status !== oldPara.status ||
-        newPara.jobName !== oldPara.jobName ||
-        newPara.title !== oldPara.title ||
-        this.isEmpty(newPara.results) !== this.isEmpty(oldPara.results) ||
-        newPara.errorMessage !== oldPara.errorMessage ||
-        newPara.settings !== oldPara.settings ||
-        newPara.config !== oldPara.config ||
-        newPara.runtimeInfos !== oldPara.runtimeInfos))
-
-    //return false
-    /*!angular.equals(newPara.settings, oldPara.settings) ||
-    !angular.equals(newPara.config, oldPara.config) ||
-    !angular.equals(newPara.runtimeInfos, oldPara.runtimeInfos)))*/
+      (!(newPara.dateCreated === oldPara.dateCreated) ||
+        !(newPara.text === oldPara.text) ||
+        !(newPara.dateFinished === oldPara.dateFinished) ||
+        !(newPara.dateStarted === oldPara.dateStarted) ||
+        !(newPara.dateUpdated === oldPara.dateUpdated) ||
+        !(newPara.status === oldPara.status) ||
+        !(newPara.jobName === oldPara.jobName) ||
+        !(newPara.title == oldPara.title) ||
+        !(this.isEmpty(newPara.results) === this.isEmpty(oldPara.results)) ||
+        !(newPara.errorMessage === oldPara.errorMessage) ||
+        !(newPara.settings === oldPara.settings) ||
+        !(newPara.config === oldPara.config) ||
+        !(newPara.runtimeInfos === oldPara.runtimeInfos)))
   }
 
-  updateAllScopeTexts(oldPara, newPara) {
+  updateParagraph(oldPara, newPara, updateCallback) {
     let self = this;
-    if (oldPara.text !== newPara.text) {
-      if (self.dirtyText) {         // check if editor has local update
-        if (self.dirtyText === newPara.text) {  // when local update is the same from remote, clear local update
-          self.paragraph.text = newPara.text
-          self.dirtyText = undefined
-          self.originalText = Object.assign("",newPara.text)
-          // TODO?
-          self.editor.setValue(self.originalText)
-        } else { // if there're local update, keep it.
-          // TODO 合并两个字段
-          self.paragraph.text = newPara.text
-          self.editor.setValue(newPara.text)
-        }
-      } else {
-        self.paragraph.text = newPara.text
-        self.originalText =  Object.assign("",newPara.text)
-        self.editor.setValue(self.originalText)
+    // 1. can't update on revision view
+    if (self.revisionView === true) {
+      return
+    }
+    // 2. get status, refreshed
+    const statusChanged = !(newPara.status === oldPara.status)
+    const resultRefreshed = !(newPara.dateFinished === oldPara.dateFinished) ||
+      !(self.isEmpty(newPara.results) === self.isEmpty(oldPara.results)) ||
+      newPara.status === ParagraphStatus.ERROR ||
+      (newPara.status === ParagraphStatus.FINISHED && statusChanged)
+    // 3. update texts managed by $scope
+    self.updateAllScopeTexts(oldPara, newPara)
+
+    // 4. execute callback to update result
+    updateCallback()
+
+    // 5. update remaining paragraph objects
+    self.updateParagraphObjectWhenUpdated(newPara)
+
+    // 6. handle scroll down by key properly if new paragraph is added
+    if (statusChanged || resultRefreshed) {
+      // when last paragraph runs, zeppelin automatically appends new paragraph.
+      // this broadcast will focus to the newly inserted paragraph
+
+      const paragraphs = self.jQuery('div[id$="_paragraphColumn_main"]')
+      if (paragraphs.length >= 2 && paragraphs[paragraphs.length - 2].id.indexOf(self.paragraph.id) === 0) {
+        // rendering output can took some time. So delay scrolling event firing for sometime.
+        /*setTimeout(() => {
+          self.eventService.broadcast('scrollToCursor')
+        }, 500)*/
       }
     }
   }
 
+  // 更新对象
   updateParagraphObjectWhenUpdated(newPara) {
     // resize col width
     let self = this;
-    if (self.paragraph.config.colWidth !== newPara.config.colWidth) {
+    if (self.paragraph.config.colWidth != newPara.config.colWidth) {
       //$scope.$broadcast('paragraphResized', $scope.paragraph.id)
       self.eventService.broadcast('paragraphResized', self.paragraph.id)
     }
 
-    if (self.paragraph.config.fontSize !== newPara.config.fontSize) {
+    if (self.paragraph.config.fontSize != newPara.config.fontSize) {
       //$rootScope.$broadcast('fontSizeChanged', newPara.config.fontSize)
       self.eventService.broadcast('fontSizeChanged', newPara.config.fontSize)
     }
@@ -1134,8 +1151,14 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
     self.paragraph.lineNumbers = newPara.lineNumbers
     self.paragraph.status = newPara.status
     self.paragraph.fontSize = newPara.fontSize
-    if (newPara.status !== ParagraphStatus.RUNNING) {
-      self.paragraph.results = newPara.results
+    if (newPara.status != ParagraphStatus.RUNNING) {
+      if(newPara.results && !ObjectEqual(self.paragraph.results, newPara.results)){
+        self.paragraph.results = newPara.results
+      }else{
+        self.paragraph.results = {
+          msg : []
+        }
+      }
     }
     self.paragraph.settings = newPara.settings
     self.paragraph.runtimeInfos = newPara.runtimeInfos
@@ -1153,45 +1176,28 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
     }
   }
 
-  updateParagraph(oldPara, newPara, updateCallback) {
+  // 更新编辑器中的代码
+  updateAllScopeTexts(oldPara, newPara) {
     let self = this;
-    // 1. can't update on revision view
-    if (self.revisionView === true) {
-      return
-    }
-
-    // 2. get status, refreshed
-    const statusChanged = (newPara.status !== oldPara.status)
-    const resultRefreshed = (newPara.dateFinished !== oldPara.dateFinished) ||
-      self.isEmpty(newPara.results) !== self.isEmpty(oldPara.results) ||
-      newPara.status === ParagraphStatus.ERROR ||
-      (newPara.status === ParagraphStatus.FINISHED && statusChanged)
-
-    // 3. update texts managed by $scope
-    self.updateAllScopeTexts(oldPara, newPara)
-
-    // 4. execute callback to update result
-    //updateCallback()
-
-    // 5. update remaining paragraph objects
-    //self.updateParagraphObjectWhenUpdated(newPara)
-
-    // 6. handle scroll down by key properly if new paragraph is added
-    /*if (statusChanged || resultRefreshed) {
-      // when last paragraph runs, zeppelin automatically appends new paragraph.
-      // this broadcast will focus to the newly inserted paragraph
-
-      const paragraphs = self.jQuery('div[id$="_paragraphColumn_main"]')
-      if (paragraphs.length >= 2 && paragraphs[paragraphs.length - 2].id.indexOf(self.paragraph.id) === 0) {
-        // rendering output can took some time. So delay scrolling event firing for sometime.
-        setTimeout(() => {
-          //$rootScope.$broadcast('scrollToCursor')
-          self.eventService.broadcast('scrollToCursor')
-        }, 500)
+    if (oldPara.text != newPara.text) {
+      if (self.dirtyText) {         // check if editor has local update
+        if (self.dirtyText === newPara.text) {  // when local update is the same from remote, clear local update
+          self.paragraph.text = newPara.text
+          self.dirtyText = undefined
+          self.originalText = Object.assign("",newPara.text)
+          self.editor.setValue(self.originalText)
+        } else { // if there're local update, keep it.
+          // TODO 合并两个字段
+          self.paragraph.text = newPara.text
+          self.editor.setValue(newPara.text)
+        }
+      } else {
+        self.paragraph.text = newPara.text
+        self.originalText =  Object.assign("",newPara.text)
+        self.editor.setValue(self.originalText)
       }
-    }*/
+    }
   }
-
 
   /**************** 公共的配置 *************/
 
@@ -1244,6 +1250,8 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
   //初始化片段
   init(newParagraph, note) {
     this.paragraph = newParagraph
+    //初始化都展示编辑器
+    this.paragraph.config.editorHide = false
     this.parentNote = note
     //this.originalText = Object.assign('', newParagraph.text)
     this.originalText = newParagraph.text? newParagraph.text:''
@@ -1465,6 +1473,9 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
     this.editorSetting = {}
   }
 
+  // 所有注册的监听
+  subscribers = []
+
   ngOnInit() {
     let self = this;
 
@@ -1472,12 +1483,12 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
     self.init(self.notebook.getParagraphById(self.paragraphid),self.notebook.note)
 
     // 绑定保存片段消息
-    this.eventService.subscribe("saveParagraph",function(data){
+    self.eventService.subscribeRegister(self.subscribers,"saveParagraph",function(){
       self.saveParagraph(self.paragraph)
     })
 
     // 绑定更新片段输出消息
-    this.eventService.subscribe('updateParagraphOutput', function (data) {
+    self.eventService.subscribeRegister(self.subscribers,'updateParagraphOutput', function (data) {
       if (self.paragraph.id === data.paragraphId) {
         if (!self.paragraph.results) {
           self.paragraph.results = {}
@@ -1494,21 +1505,13 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
         }
 
         if (update) {
-
-          let result = {
-            index:data.index,
-            paragraph:self.paragraph,
-            result:self.paragraph.config.results[data.index],
-            msg:self.paragraph.results.msg[data.index]
-          }
-
-          this.eventService.broadcast('updateResult',result)
+          self.eventService.broadcast('updateResult',self.paragraph.results.msg[data.index], self.paragraph.config.results[data.index], self.paragraph, data.index)
         }
       }
     })
 
     // 绑定更新angular对象消息
-    this.eventService.subscribe('angularObjectUpdate', function (data) {
+    self.eventService.subscribeRegister(self.subscribers,'angularObjectUpdate', function (data) {
       let noteId = self.parentNote.id
       /*if (!data.noteId || data.noteId === noteId) {
         let scope
@@ -1574,14 +1577,14 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
     })
 
     // 绑定更新片段消息
-    this.eventService.subscribe('updateParaInfos', function (data) {
+    self.eventService.subscribeRegister(self.subscribers,'updateParaInfos', function (data) {
       if (data.id === self.paragraph.id) {
         self.paragraph.runtimeInfos = data.infos
       }
     })
 
     // 绑定Angular对象删除消息
-    this.eventService.subscribe('angularObjectRemove', function (data) {
+    self.eventService.subscribeRegister(self.subscribers,'angularObjectRemove', function (data) {
       let noteId = self.parentNote.id
       /*if (!data.noteId || data.noteId === noteId) {
         let scope
@@ -1614,7 +1617,7 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
     })
 
     // 绑定使用Spell运行片段消息
-    this.eventService.subscribe('runParagraphUsingSpell', function (data) {
+    self.eventService.subscribeRegister(self.subscribers,'runParagraphUsingSpell', function (data) {
       const oldPara = self.paragraph
       let newPara = data.paragraph
       const updateCallback = () => {
@@ -1629,18 +1632,18 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
     })
 
     // 绑定更新片段消息
-    this.eventService.subscribe('updateParagraph', function (data) {
+    self.eventService.subscribeRegister(self.subscribers,'updateParagraph', function (data) {
+
       const oldPara = self.paragraph
       const newPara = data.paragraph
-
       if(newPara.id != oldPara.id){
         return
       }
-
       if (!self.isUpdateRequired(oldPara, newPara)) {
         return
       }
 
+      //更新结果
       const updateCallback = () => {
         // broadcast `updateResult` message to trigger result update
         if (newPara.results && newPara.results.msg) {
@@ -1650,9 +1653,7 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
               ? oldPara.results.msg[i] : {}
             const newConfig = newPara.config.results ? newPara.config.results[i] : {}
             const oldConfig = oldPara.config.results ? oldPara.config.results[i] : {}
-
-            if (newResult != oldResult || newConfig != oldConfig) {
-              //$rootScope.$broadcast('updateResult', newResult, newConfig, newPara, parseInt(i))
+            if (!(newResult === oldResult) || !(newConfig === oldConfig)) {
               self.eventService.broadcast('updateResult', newResult, newConfig, newPara, parseInt(i))
             }
           }
@@ -1663,14 +1664,14 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
     })
 
     // 绑定更新进度消息
-    this.eventService.subscribe('updateProgress', function (data) {
-      if (data.id === this.paragraph.id) {
-        this.currentProgress = data.progress
+    self.eventService.subscribeRegister(self.subscribers,'updateProgress', function (data) {
+      if (data.id === self.paragraph.id) {
+        self.currentProgress = data.progress
       }
     })
 
     // 绑定键盘点击事件消息
-    this.eventService.subscribe('keyEvent', function (keyEvent) {
+    self.eventService.subscribeRegister(self.subscribers,'keyEvent', function (keyEvent) {
       if (self.paragraphFocused) {
         let paragraphId = self.paragraph.id
         let keyCode = keyEvent.keyCode
@@ -1740,7 +1741,7 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
     })
 
     // 绑定聚焦片段消息
-    this.eventService.subscribe('focusParagraph', function (event) {
+    self.eventService.subscribeRegister(self.subscribers,'focusParagraph', function (event) {
       if (self.paragraph.id === event.paragraphId) {
         // focus editor
         if (!self.paragraph.config.editorHide) {
@@ -1769,7 +1770,7 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
     })
 
     // 绑定保存解析器消息
-    this.eventService.subscribe('saveInterpreterBindings', function (paragraphId) {
+    self.eventService.subscribeRegister(self.subscribers,'saveInterpreterBindings', function (paragraphId) {
       if (self.paragraph.id === paragraphId && self.editor) {
         self.setInterpreterBindings = true
         self.setParagraphMode(self.editor.getSession(), self.editor.getSession().getValue())
@@ -1777,13 +1778,13 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
     })
 
     // 绑定双击打开片段消息
-    this.eventService.subscribe('doubleClickParagraph', function (paragraphId) {
-      if (self.paragraph.id === paragraphId && self.paragraph.config.editorHide &&
+    self.eventService.subscribeRegister(self.subscribers,'doubleClickParagraph', function (paragraphId) {
+      /*if (self.paragraph.id === paragraphId && self.paragraph.config.editorHide &&
         self.paragraph.config.editorSetting.editOnDblClick && self.revisionView !== true) {
         let deferred = Q.defer()
         self.openEditorAndCloseTable(self.paragraph)
         setTimeout(
-          self.eventService.subscribe('updateParagraph', function (event, data) {
+          self.eventService.subscribeRegister(self.subscribers,'updateParagraph', function (data) {
               deferred.resolve(data)
             }
           ), 1000)
@@ -1794,31 +1795,31 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
             self.goToEnd(self.editor)
           }
         })
-      }
+      }*/
     })
 
     // 绑定打开编辑器消息
-    this.eventService.subscribe('openEditor', function (event) {
+    self.eventService.subscribeRegister(self.subscribers,'openEditor', function (event) {
       self.openEditor(self.paragraph)
     })
 
     // 绑定关闭编辑器消息
-    this.eventService.subscribe('closeEditor', function (event) {
+    self.eventService.subscribeRegister(self.subscribers,'closeEditor', function (event) {
       self.closeEditor(self.paragraph)
     })
 
     // 绑定打开结果消息
-    this.eventService.subscribe('openTable', function (event) {
+    self.eventService.subscribeRegister(self.subscribers,'openTable', function (event) {
       self.openTable(self.paragraph)
     })
 
     // 绑定关闭结果消息
-    this.eventService.subscribe('closeTable', function (event) {
+    self.eventService.subscribeRegister(self.subscribers,'closeTable', function (event) {
       self.closeTable(self.paragraph)
     })
 
     // 绑定结果渲染消息
-    this.eventService.subscribe('resultRendered', function (paragraphId) {
+    self.eventService.subscribeRegister(self.subscribers,'resultRendered', function (paragraphId) {
       if (self.paragraph.id !== paragraphId) {
         return
       }
@@ -1832,7 +1833,7 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
     })
 
     // 绑定字体更改消息
-    this.eventService.subscribe('fontSizeChanged', function (fontSize) {
+    self.eventService.subscribeRegister(self.subscribers,'fontSizeChanged', function (fontSize) {
       if (self.editor) {
         self.editor.setOptions({
           fontSize: fontSize + 'pt'
@@ -1841,12 +1842,12 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
     })
 
     // 绑定查询UmarkAll消息
-    this.eventService.subscribe('unmarkAll', function() {
+    self.eventService.subscribeRegister(self.subscribers,'unmarkAll', function() {
       self.clearSearchSelection()
     })
 
     // 绑定查询markAll消息
-    this.eventService.subscribe('markAllOccurrences', function(text) {
+    self.eventService.subscribeRegister(self.subscribers,'markAllOccurrences', function(text) {
       self.markAllOccurrences(text)
       if (this.searchRanges.length > 0) {
         self.eventService.broadcast('occurrencesExists', this.searchRanges.length)
@@ -1854,7 +1855,7 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
     })
 
     // 绑定查询下一个匹配值消息
-    this.eventService.subscribe('nextOccurrence', function(paragraphId) {
+    self.eventService.subscribeRegister(self.subscribers,'nextOccurrence', function(paragraphId) {
       if (self.paragraph.id !== paragraphId) {
         return
       }
@@ -1874,7 +1875,7 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
     })
 
     // 绑定查询上一个匹配值消息
-    this.eventService.subscribe('prevOccurrence', function(paragraphId) {
+    self.eventService.subscribeRegister(self.subscribers,'prevOccurrence', function(paragraphId) {
       if (this.paragraph.id !== paragraphId) {
         return
       }
@@ -1896,7 +1897,7 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
     })
 
     // 绑定替换当前查询消息
-    this.eventService.subscribe('replaceCurrent', function(event, from, to) {
+    self.eventService.subscribeRegister(self.subscribers,'replaceCurrent', function(event, from, to) {
       if (this.currentRange.id === -1) {
         return
       }
@@ -1918,13 +1919,13 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
     })
 
     // 绑定全部替换消息
-    this.eventService.subscribe('replaceAll', function(event, from, to) {
+    self.eventService.subscribeRegister(self.subscribers,'replaceAll', function(event, from, to) {
       this.clearSearchSelection()
       this.editor.replaceAll(to, {needle: from})
     })
 
     // 绑定检查消息
-    this.eventService.subscribe('checkOccurrences', function() {
+    self.eventService.subscribeRegister(self.subscribers,'checkOccurrences', function() {
       if (this.searchRanges.length > 0) {
         //$scope.$emit('occurrencesExists', this.searchRanges.length)
       }
@@ -1945,6 +1946,10 @@ export class ParagraphComponent implements OnInit,AfterViewInit {
 
     //取消选择
     editor.clearSelection()
+  }
+
+  ngOnDestroy(): void {
+    this.eventService.unsubscribeSubscriptions(this.subscribers)
   }
 
 

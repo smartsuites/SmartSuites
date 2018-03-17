@@ -228,10 +228,6 @@ export class AppComponent implements OnInit,AfterViewInit, OnDestroy {
     this.layoutMode = MenuOrientation.SLIM;
   }
 
-  ngOnDestroy() {
-    //jQuery(this.layoutMenuScroller).nanoScroller({flash: true});
-  }
-
   //************ BUSSINESS **************
 
   //用户的Token
@@ -269,24 +265,26 @@ export class AppComponent implements OnInit,AfterViewInit, OnDestroy {
     }*/
   }
 
+  subscribers = []
+
   ngOnInit(): void {
     let self = this;
 
     this.getPlatfromVersion()
 
     // 监听Websocket的连接状态
-    this.eventService.subscribe('setConnectedStatus', function (msg) {
+    self.eventService.subscribeRegister(self.subscribers,'setConnectedStatus', function (msg) {
       self.connected = msg
     })
 
     // 用于监听笔记加载消息，异步加载Notes
-    this.eventService.subscribe('setNoteMenu', function (notes) {
+    self.eventService.subscribeRegister(self.subscribers,'setNoteMenu', function (notes) {
       self.noteListFactory.setNotes(notes)
       self.eventService.broadcast("noteComplete",notes)
     })
 
     // 监听登录状态
-    this.eventService.subscribe('loginSuccess', function (msg) {
+    self.eventService.subscribeRegister(self.subscribers,'loginSuccess', function (msg) {
 
       /**/
 
@@ -310,14 +308,14 @@ export class AppComponent implements OnInit,AfterViewInit, OnDestroy {
 
     })
 
-    this.eventService.subscribe('setIframe', function (data) {
+    self.eventService.subscribeRegister(self.subscribers,'setIframe', function (data) {
       if (!event.defaultPrevented) {
         self.asIframe = data
         event.preventDefault()
       }
     })
 
-    this.eventService.subscribe('setLookAndFeel', function (data) {
+    self.eventService.subscribeRegister(self.subscribers,'setLookAndFeel', function (data) {
       if (!event.defaultPrevented && data && data !== '' && data !== self.looknfeel) {
         self.looknfeel = data
         event.preventDefault()
@@ -325,7 +323,7 @@ export class AppComponent implements OnInit,AfterViewInit, OnDestroy {
     })
 
     // Set The lookAndFeel to default on every page
-    this.eventService.subscribe('$routeChangeStart', function (event, next, current) {
+    self.eventService.subscribeRegister(self.subscribers,'$routeChangeStart', function (event, next, current) {
       self.eventService.broadcast('setLookAndFeel', 'default')
     })
 
@@ -344,5 +342,11 @@ export class AppComponent implements OnInit,AfterViewInit, OnDestroy {
   getHomeNote () {
     this.websocketMsgSrv.getHomeNote()
   }
+
+  ngOnDestroy(): void {
+    //jQuery(this.layoutMenuScroller).nanoScroller({flash: true});
+    this.eventService.unsubscribeSubscriptions(this.subscribers)
+  }
+
 
 }

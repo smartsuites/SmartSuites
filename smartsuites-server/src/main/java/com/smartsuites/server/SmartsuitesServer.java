@@ -148,20 +148,21 @@ public class SmartsuitesServer extends Application {
   }
 
   private static void getSystemConfigs(){
-    LOG.info("**************************************");
-    LOG.info("*********    System Env    ***********");
-    LOG.info("**************************************");
+    Formatter formatter = new Formatter(System.out);
+    System.out.println("**************************************");
+    System.out.println("*********    System Env    ***********");
+    System.out.println("**************************************");
 
     for(String key : System.getenv().keySet()){
-      LOG.info(key + " : " + System.getenv(key));
+      formatter.format("%-30s : %s\n", key, System.getenv(key));
     }
 
-    LOG.info("**************************************");
-    LOG.info("*******  System Properties ***********");
-    LOG.info("**************************************");
+    System.out.println("**************************************");
+    System.out.println("*******  System Properties ***********");
+    System.out.println("**************************************");
 
     for(Object key : System.getProperties().keySet()){
-      LOG.info(key + " : " + System.getProperty((String) key));
+      formatter.format("%-30s : %s\n", key, System.getProperty((String) key));
     }
   }
 

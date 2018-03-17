@@ -20,7 +20,7 @@ import java.io.ByteArrayOutputStream
 
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.zeppelin.spark.utils.{DisplayRDDFunctions, DisplayTraversableFunctions, DisplayUtils, SparkMaxResult}
+import org.apache.zeppelin.spark.utils.SparkMaxResult
 import org.scalatest._
 import org.scalatest.BeforeAndAfter
 

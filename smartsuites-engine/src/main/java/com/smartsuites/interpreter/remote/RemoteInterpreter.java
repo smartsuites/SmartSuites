@@ -39,7 +39,7 @@ import java.util.Properties;
 
 /**
  * Proxy for Interpreter instance that runs on separate process
- * 远程进程
+ * 远程进程代表
  */
 public class RemoteInterpreter extends Interpreter {
   private static final Logger LOGGER = LoggerFactory.getLogger(RemoteInterpreter.class);

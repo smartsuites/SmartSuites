@@ -1,43 +1,12 @@
 <?xml version="1.0"?>
 <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
 <!--
-   Licensed to the Apache Software Foundation (ASF) under one or more
-   contributor license agreements.  See the NOTICE file distributed with
-   this work for additional information regarding copyright ownership.
-   The ASF licenses this file to You under the Apache License, Version 2.0
-   (the "License"); you may not use this file except in compliance with
-   the License.  You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
--->
+  ~ Copyright (c) 2018. 联思智云（北京）科技有限公司. All rights reserved.
+  -->
 
 <configuration>
 
     <!-- For Develop -->
-
-    <!--<property>
-        <name>zeppelin.interpreter.dir</name>
-        <value>smartsuites-interpreters/interpreter</value>
-        <description>develop interpreters dir</description>
-    </property>-->
-
-    <!--<property>
-        <name>zeppelin.conf.dir</name>
-        <value>smartsuites-distribution/distribution/conf</value>
-        <description>develop conf dir</description>
-    </property>-->
-
-    <!--<property>
-        <name>zeppelin.notebook.dir</name>
-        <value>smartsuites-distribution/distribution/notebook</value>
-        <description>develop conf dir</description>
-    </property>-->
 
     <property>
         <name>zeppelin.home</name>
@@ -51,12 +20,6 @@
         <description>develop web dist dir</description>
     </property>
 
-    <!--<property>
-        <name>zeppelin.interpreter.remoterunner</name>
-        <value>smartsuites-distribution/distribution/bin/interpreter.sh</value>
-        <description>develop remote runner</description>
-    </property>-->
-
     <!-- End Develop -->
 
     <property>
@@ -67,7 +30,7 @@
 
     <property>
         <name>zeppelin.server.port</name>
-        <value>8081</value>
+        <value>8080</value>
         <description>Server port.</description>
     </property>
 

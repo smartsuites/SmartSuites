@@ -59,7 +59,6 @@ export class WebsocketEventService {
           // 启动加载Notes
           vm.eventService.broadcast('setNoteMenu', data.notes)
         } else if (op === 'LIST_NOTE_JOBS') {
-          // TODO $rootScope.$emit('jobmanager:set-jobs', data.noteJobs)
           vm.eventService.broadcast('jobmanager:set-jobs', data.noteJobs)
         } else if (op === 'LIST_UPDATE_NOTE_JOBS') {
           // TODO $rootScope.$emit('jobmanager:update-jobs', data.noteRunningJobs)
@@ -163,16 +162,13 @@ export class WebsocketEventService {
         } else if (op === 'INTERPRETER_SETTINGS') {
           vm.eventService.broadcast('interpreterSettings', data)
         } else if (op === 'PARAGRAPH_ADDED') {
-          //vm.eventService.broadcast('addParagraph', data.paragraph, data.index)
-          vm.eventService.broadcast('addParagraph', data)
+          vm.eventService.broadcast('addParagraph', data.paragraph, data.index)
         } else if (op === 'PARAGRAPH_REMOVED') {
-          vm.eventService.broadcast('removeParagraph', data)
+          vm.eventService.broadcast('removeParagraph', data.id)
         } else if (op === 'PARAGRAPH_MOVED') {
-          //vm.eventService.broadcast('moveParagraph', data.id, data.index)
-          vm.eventService.broadcast('moveParagraph', data)
+          vm.eventService.broadcast('moveParagraph', data.id, data.index)
         } else if (op === 'NOTE_UPDATED') {
-          //vm.eventService.broadcast('updateNote', data.name, data.config, data.info)
-          vm.eventService.broadcast('updateNote', data)
+          vm.eventService.broadcast('updateNote',  data.name, data.config, data.info)
         } else if (op === 'SET_NOTE_REVISION') {
           vm.eventService.broadcast('setNoteRevisionResult', data)
         } else if (op === 'PARAS_INFO') {

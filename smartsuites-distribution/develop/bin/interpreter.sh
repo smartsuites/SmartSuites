@@ -85,7 +85,7 @@ fi
 if [[ "${INTERPRETER_ID}" == "spark" ]]; then
   if [[ -n "${SPARK_HOME}" ]]; then
     export SPARK_SUBMIT="${SPARK_HOME}/bin/spark-submit"
-    SPARK_APP_JAR="$(ls ${SMARTSUITES_HOME}/interpreter/spark/smartsuites-spark*.jar)"
+    SPARK_APP_JAR="$(ls ${SMARTSUITES_HOME}/interpreter/spark/zeppelin-spark*.jar)"
     # This will evantually passes SPARK_APP_JAR to classpath of SparkIMain
     SMARTSUITES_INTP_CLASSPATH+=":${SPARK_APP_JAR}"
 

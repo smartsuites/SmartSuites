@@ -25,14 +25,14 @@ export class AnalysisDashboardComponent implements OnInit {
 
   constructor(private carService: CarService,
               private eventService: EventService1,
-              public appCom: AppComponent,
+              public noteListFactory:NoteListService,
               private commonService:CommonService) {
     let self = this;
-    self.notesList = self.appCom.notes ? self.appCom.notes.flatList[0] : []
-    self.eventService.subscribe('setNoteMenu', function (notes) {
+    //self.notesList = self.appCom.notes ? self.appCom.notes.flatList[0] : []
+    /*self.eventService.subscribe('setNoteMenu', function (notes) {
       self.notesList = notes
     })
-
+*/
     self.echarts = commonService._echarts
     self.nv = commonService._nv
     self.d3 = commonService._d3

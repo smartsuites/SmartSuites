@@ -515,40 +515,6 @@
         </p-fieldset>
         <p-fieldset legend="解析器属性" [toggleable]="true" [style]="{'margin-bottom': '10px'}">
 
-          <!--<p-dataTable [value]="setting.propertiesArray" [editable]="true">
-            <p-column field="key" header="配置项"></p-column>
-            <p-column field="value" header="配置值" [editable]="isCurrentEdit(setting.id)"></p-column>
-            <p-column header="动作" [style]="{'width':'50px','text-align':'center'}" [hidden]="!isCurrentEdit(setting.id)">
-              <ng-template let-pro="rowData" pTemplate="body">
-                <button type="button" pButton (click)="removeInterpreterProperty(pro.key, setting.id)" icon="fa-remove"></button>
-              </ng-template>
-            </p-column>
-            <p-footer *ngIf="isCurrentEdit(setting.id)">
-              <button pButton type="button" icon="fa-plus" label="添加新属性" class="ui-button-info" (click)="showAddNewPro=true"></button>
-            </p-footer>
-          </p-dataTable>-->
-
-          <!--<div class="ui-g">
-            <table class="interPro ui-g-12">
-              <thead>
-              <tr>
-                <th style="width:40%">配置项</th>
-                <th [ngStyle]="{'width': isCurrentEdit(setting.id)? '50%':'60%'}">配置值</th>
-                <th style="width:10%;text-align: center" [hidden]="!isCurrentEdit(setting.id)">动作</th>
-              </tr>
-              </thead>
-              <tbody>
-              <tr *ngFor="let pro of setting.propertiesArray">
-                <td>{{pro.key}}</td>
-                <td *ngIf="!isCurrentEdit(setting.id)">{{pro.value}}</td>
-                <td *ngIf="isCurrentEdit(setting.id)"><input type="text" style="width: 100%;" pInputText [(ngModel)]="pro.value"></td>
-                <td style="text-align: center" [hidden]="!isCurrentEdit(setting.id)"><button type="button" pButton (click)="removeInterpreterProperty(pro.key, setting.id)" icon="fa-remove"></button></td>
-              </tr>
-              </tbody>
-
-            </table>
-          </div>-->
-
           <div class="ui-g">
             <table class="interPro ui-g-12">
               <thead>
@@ -560,9 +526,9 @@
               </thead>
               <tbody>
               <tr *ngFor="let key of getKeys(setting.properties)">
-                <td>{{key}}</td>
-                <td *ngIf="!isCurrentEdit(setting.id)">{{setting.properties[key]}}</td>
-                <td *ngIf="isCurrentEdit(setting.id)"><input type="text" style="width: 100%;" pInputText [(ngModel)]="setting.properties[key]"></td>
+                <td>{{setting.properties[key].name}}</td>
+                <td *ngIf="!isCurrentEdit(setting.id)">{{setting.properties[key].value}}</td>
+                <td *ngIf="isCurrentEdit(setting.id)"><input type="text" style="width: 100%;" pInputText [(ngModel)]="setting.properties[key].value"></td>
                 <td style="text-align: center" [hidden]="!isCurrentEdit(setting.id)"><button type="button" pButton (click)="removeInterpreterProperty(key, setting.id)" icon="fa-remove"></button></td>
               </tr>
               </tbody>
@@ -574,19 +540,6 @@
 
         </p-fieldset>
         <p-fieldset legend="类路径依赖" [toggleable]="true">
-
-          <!--<p-dataTable [value]="setting.dependencies" selectionMode="single" [responsive]="true" [editable]="true">
-            <p-column field="groupArtifactVersion" header="依赖Jar包" [sortable]="false" [editable]="isCurrentEdit(setting.id)"></p-column>
-            <p-column field="exclusions" header="移除包（逗号分隔）" [sortable]="false" [editable]="isCurrentEdit(setting.id)"></p-column>
-            <p-column header="动作" [style]="{'width':'50px','text-align':'center'}" [hidden]="!isCurrentEdit(setting.id)">
-              <ng-template let-dep="rowData" pTemplate="body">
-                <button type="button" pButton (click)="removeInterpreterDependency(dep.groupArtifactVersion, setting.id)" icon="fa-remove"></button>
-              </ng-template>
-            </p-column>
-            <p-footer *ngIf="isCurrentEdit(setting.id)">
-              <button pButton type="button" icon="fa-plus" label="添加新依赖" class="ui-button-info" (click)="showAddNewDep=true"></button>
-            </p-footer>
-          </p-dataTable>-->
 
           <div class="ui-g">
             <table class="interPro ui-g-12">

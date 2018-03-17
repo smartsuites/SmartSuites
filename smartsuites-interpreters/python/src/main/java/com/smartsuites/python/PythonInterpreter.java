@@ -146,9 +146,9 @@ public class PythonInterpreter extends Interpreter implements ExecuteResultHandl
   private void createGatewayServerAndStartScript()
       throws UnknownHostException, InterpreterException {
     createPythonScript();
-    if (System.getenv("ZEPPELIN_HOME") != null) {
-      py4jLibPath = System.getenv("ZEPPELIN_HOME") + File.separator + ZEPPELIN_PY4JPATH;
-      pythonLibPath = System.getenv("ZEPPELIN_HOME") + File.separator + ZEPPELIN_PYTHON_LIBS;
+    if (System.getenv("SMARTSUITES_HOME") != null) {
+      py4jLibPath = System.getenv("SMARTSUITES_HOME") + File.separator + ZEPPELIN_PY4JPATH;
+      pythonLibPath = System.getenv("SMARTSUITES_HOME") + File.separator + ZEPPELIN_PYTHON_LIBS;
     } else {
       Path workingPath = Paths.get("..").toAbsolutePath();
       py4jLibPath = workingPath + File.separator + ZEPPELIN_PY4JPATH;
