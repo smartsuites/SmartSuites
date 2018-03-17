@@ -879,7 +879,7 @@
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/../../../smartsuites-interpreters/interpreter/spark/dep</outputDirectory>
+                            <outputDirectory>${basedir}/../../smartsuites-distribution/develop/interpreter/spark/dep</outputDirectory>
                             <overWriteReleases>false</overWriteReleases>
                             <overWriteSnapshots>false</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>
@@ -892,7 +892,7 @@
                             <goal>copy</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/../../../smartsuites-interpreters/interpreter/spark/dep</outputDirectory>
+                            <outputDirectory>${basedir}/../../smartsuites-distribution/develop/interpreter/spark/dep</outputDirectory>
                             <overWriteReleases>false</overWriteReleases>
                             <overWriteSnapshots>false</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>
@@ -954,10 +954,10 @@
                         </goals>
                         <configuration>
                             <target>
-                                <delete dir="../../smartsuites-interpreters/interpreter/spark/pyspark"/>
-                                <copy todir="../../smartsuites-interpreters/interpreter/spark/pyspark"
+                                <delete dir="../../smartsuites-distribution/develop/interpreter/spark/pyspark"/>
+                                <copy todir="../../smartsuites-distribution/develop/interpreter/spark/pyspark"
                                       file="${project.build.directory}/${spark.archive}/python/lib/py4j-${spark.py4j.version}-src.zip"/>
-                                <zip destfile="${project.build.directory}/../../../smartsuites-interpreters/interpreter/spark/pyspark/pyspark.zip"
+                                <zip destfile="${basedir}/../../smartsuites-distribution/develop/interpreter/spark/pyspark/pyspark.zip"
                                      basedir="${project.build.directory}/${spark.archive}/python"
                                      includes="pyspark/*.py,pyspark/**/*.py"/>
                             </target>
@@ -998,7 +998,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/../../../smartsuites-interpreters/interpreter/spark/R/lib</outputDirectory>
+                            <outputDirectory>${basedir}/../../smartsuites-distribution/develop/interpreter/spark/R/lib</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>

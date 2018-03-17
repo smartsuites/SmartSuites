@@ -124,7 +124,7 @@ class PyZeppelinContext(dict):
       return
     
     # Make sure custom backends are available in the PYTHONPATH
-    rootdir = os.environ.get('ZEPPELIN_HOME', os.getcwd())
+    rootdir = os.environ.get('SMARTSUITES_HOME', os.getcwd())
     mpl_path = os.path.join(rootdir, 'interpreter', 'lib', 'python')
     if mpl_path not in sys.path:
       sys.path.append(mpl_path)

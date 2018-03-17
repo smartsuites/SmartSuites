@@ -360,7 +360,7 @@
                         <!-- local pyspark execution needs PYTHONPATH otherwise python daemon in executor side will fail
                         e.g. sc.range(1,10).sum()
                         -->
-                        <PYTHONPATH>../../smartsuites-interpreters/interpreter/spark/pyspark/pyspark.zip:../../smartsuites-interpreters/interpreter/spark/pyspark/py4j-${spark.py4j.version}-src.zip:../../smartsuites-interpreters/interpreter/lib/python</PYTHONPATH>
+                        <PYTHONPATH>../../smartsuites-distribution/develop/interpreter/spark/pyspark/pyspark.zip:../../smartsuites-distribution/develop/interpreter/spark/pyspark/py4j-${spark.py4j.version}-src.zip:../../smartsuites-distribution/develop/interpreter/lib/python</PYTHONPATH>
                     </environmentVariables>
                 </configuration>
             </plugin>
@@ -391,12 +391,12 @@
                         <!-- shade guava and proto-buf, because it might conflict with those of spark -->
                         <relocation>
                             <pattern>com.google</pattern>
-                            <shadedPattern>org.apache.zeppelin.com.google</shadedPattern>
+                            <shadedPattern>com.smartsuites..com.google</shadedPattern>
                         </relocation>
                         <!-- shade netty, because it might conflict with that of spark-->
                         <relocation>
                             <pattern>io.netty</pattern>
-                            <shadedPattern>org.apache.zeppelin.io.netty</shadedPattern>
+                            <shadedPattern>com.smartsuites.io.netty</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>
@@ -420,11 +420,11 @@
                             <goal>copy</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/../../../smartsuites-interpreters/interpreter/spark</outputDirectory>
+                            <outputDirectory>${basedir}/../../smartsuites-distribution/develop/interpreter/spark</outputDirectory>
                             <overWriteReleases>false</overWriteReleases>
                             <overWriteSnapshots>false</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>
-                            <!--<includeScope>runtime</includeScope>-->
+                            <includeScope>runtime</includeScope>
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>${project.groupId}</groupId>
@@ -530,6 +530,7 @@
                     </excludes>
                 </configuration>
             </plugin>
+
         </plugins>
     </build>
 

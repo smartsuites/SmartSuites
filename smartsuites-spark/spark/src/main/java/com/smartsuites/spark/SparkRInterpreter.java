@@ -17,7 +17,7 @@
 
 package com.smartsuites.spark;
 
-import static com.smartsuites.spark.ZeppelinRDisplay.render;
+import static com.smartsuites.spark.utils.ZeppelinRDisplay.render;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -62,9 +62,9 @@ public class SparkRInterpreter extends Interpreter {
     if (System.getenv("SPARK_HOME") != null) {
       sparkRLibPath = System.getenv("SPARK_HOME") + "/R/lib";
     } else {
-      sparkRLibPath = System.getenv("ZEPPELIN_HOME") + "/interpreter/spark/R/lib";
+      sparkRLibPath = System.getenv("SMARTSUITES_HOME") + "/interpreter/spark/R/lib";
       // workaround to make sparkr work without SPARK_HOME
-      System.setProperty("spark.test.home", System.getenv("ZEPPELIN_HOME") + "/interpreter/spark");
+      System.setProperty("spark.test.home", System.getenv("SMARTSUITES_HOME") + "/interpreter/spark");
     }
     synchronized (SparkRBackend.backend()) {
       if (!SparkRBackend.isStarted()) {

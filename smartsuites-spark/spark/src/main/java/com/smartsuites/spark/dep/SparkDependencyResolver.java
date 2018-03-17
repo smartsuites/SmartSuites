@@ -66,9 +66,9 @@ public class SparkDependencyResolver extends AbstractDependencyResolver {
                                                     "org.scala-lang:scala-compiler",
                                                     "org.scala-lang:scala-reflect",
                                                     "org.scala-lang:scalap",
-                                                    "org.apache.zeppelin:zeppelin-zengine",
-                                                    "org.apache.zeppelin:zeppelin-spark",
-                                                    "org.apache.zeppelin:zeppelin-server"};
+                                                    "com.smartsuites:smartsuites-engine",
+                                                    /*"com.smartsuites:smartsuites-spark",*/
+                                                    "com.smartsuites:smartsuites-server"};
 
   public SparkDependencyResolver(Global global,
                                  ClassLoader runtimeClassLoader,

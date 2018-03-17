@@ -584,7 +584,7 @@
             </exclusions>
         </dependency>
 
-        <!--<dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>spark</artifactId>
             <version>${project.version}</version>
@@ -607,7 +607,7 @@
                     <artifactId>grpc-context</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>-->
+        </dependency>
     </dependencies>
 
     <build>

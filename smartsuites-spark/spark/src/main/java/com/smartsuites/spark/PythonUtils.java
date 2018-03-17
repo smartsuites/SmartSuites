@@ -40,7 +40,7 @@ public class PythonUtils {
   public static String sparkPythonPath() {
     List<String> pythonPath = new ArrayList<String>();
     String sparkHome = System.getenv("SPARK_HOME");
-    String zeppelinHome = System.getenv("ZEPPELIN_HOME");
+    String zeppelinHome = System.getenv("SMARTSUITES_HOME");
     if (zeppelinHome == null) {
       zeppelinHome = new File("..").getAbsolutePath();
     }
