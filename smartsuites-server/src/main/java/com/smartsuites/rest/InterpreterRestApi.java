@@ -193,7 +193,7 @@ public class InterpreterRestApi {
    */
   @GET
   @ZeppelinApi
-  public Response listInterpreter(String message) {
+  public Response listInterpreter() {
     Map<String, InterpreterSetting> m = interpreterSettingManager.getInterpreterSettingTemplates();
     return new JsonResponse<>(Status.OK, "", m).build();
   }

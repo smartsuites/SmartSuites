@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {EventService1} from "../../service/event/event.service";
+import {EventService} from "../../service/event/event.service";
 import {LoginService} from "../../service/login/login.service";
 
 export enum FormType {
@@ -27,7 +27,7 @@ export class LoginComponent implements OnInit {
   // 选择的角色
   selectedRole = "analyst";
 
-  constructor(private eventService: EventService1,
+  constructor(private eventService: EventService,
               private loginService: LoginService) {
     this.formType = FormType.Login
   }

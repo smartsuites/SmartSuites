@@ -3,7 +3,7 @@ import {HttpClient} from "@angular/common/http";
 import {BaseUrlService} from "../../service/base-url/base-url.service";
 import {Router} from "@angular/router";
 import {GlobalService} from "../../service/global/global.service";
-import {EventService1} from "../../service/event/event.service";
+import {EventService} from "../../service/event/event.service";
 import {MessageService} from "primeng/components/common/messageservice";
 import {ConfirmationService} from "primeng/primeng";
 import {ParagraphStatus} from "../notebook/paragraph/paragraph.status";
@@ -88,7 +88,7 @@ export class InterpreterComponent implements OnInit {
               public baseUrlSrv:BaseUrlService,
               public router:Router,
               public globalService:GlobalService,
-              public eventService:EventService1,
+              public eventService:EventService,
               public messageService:MessageService,
               public confirmationService:ConfirmationService) {
   }

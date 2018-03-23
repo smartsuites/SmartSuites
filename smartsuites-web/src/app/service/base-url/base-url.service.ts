@@ -20,13 +20,13 @@ export class BaseUrlService {
     // 4200 is for angularjs develop
     let port = this.getPort() == 4200? 8080 : this.getPort()
     let wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:'
-    return wsProtocol + '//' + location.hostname + ':'+ port + this.skipTrailingSlash(location.pathname) + '/ws'
+    return wsProtocol + '//' + location.hostname + ':'+ port + '/ws'
   }
 
   getBase():string {
     // 4200 is for angularjs develop
     let port = this.getPort() == 4200? 8080 : this.getPort()
-    return location.protocol + '//' + location.hostname + ':'+ port + location.pathname
+    return location.protocol + '//' + location.hostname + ':'+ port
   }
 
   getRestApiBase():string {

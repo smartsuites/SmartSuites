@@ -16,3 +16,7 @@
   font-family: Monaco, Menlo, "Ubuntu Mono", Consolas, source-code-pro, monospace;
   font-size: 12px !important;
 }
+
+.resize{
+  border: 2px solid #0C0213;
+}

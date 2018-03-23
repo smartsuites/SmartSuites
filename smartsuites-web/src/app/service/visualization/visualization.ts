@@ -38,11 +38,8 @@ export default class Visualization {
   _scope
   _prevSettingScope
 
-
   _createNewScope
   _templateRequest
-
-
 
   constructor (targetElId, config, renderer, emitter, jitCompiler, commonService) {
     this.targetElId = targetElId
@@ -161,7 +158,7 @@ export default class Visualization {
    * Emit config. config will sent to server and saved.
    */
   emitConfig (config) {
-    this._emitter(config)
+    //this._emitter(config)
   }
 
   /**

@@ -1,8 +1,7 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {MessageService} from "primeng/components/common/messageservice";
 import {JobmanagerService} from "../../service/job/jobmanager.service";
-import {EventService1} from "../../service/event/event.service";
-import {Car} from "../../demo/domain/car";
+import {EventService} from "../../service/event/event.service";
 import * as moment from "moment";
 import {ParagraphStatus} from "../notebook/paragraph/paragraph.status";
 import {ConfirmationService} from "primeng/primeng";
@@ -68,7 +67,7 @@ export class JobmanagerComponent implements OnInit, OnDestroy {
 
   constructor(private messageService: MessageService,
               private jobManagerService:JobmanagerService,
-              private eventService:EventService1,
+              private eventService:EventService,
               public confirmationService:ConfirmationService) { }
 
   ngOnInit() {

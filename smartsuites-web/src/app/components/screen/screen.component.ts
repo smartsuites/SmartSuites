@@ -1,6 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import {Car} from "../../demo/domain/car";
-import {CarService} from "../../demo/service/carservice";
 import {MenuItem, SelectItem} from "primeng/primeng";
 
 @Component({

@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import {EventService1} from "../event/event.service";
+import {EventService} from "../event/event.service";
 
 @Injectable()
 export class NoteRenameService {
 
-  constructor(public eventService:EventService1) { }
+  constructor(public eventService:EventService) { }
 
   /**
    * <options schema>

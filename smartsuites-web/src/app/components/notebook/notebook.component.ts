@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, ElementRef, OnDestroy, OnInit, Renderer2, ViewChild} from '@angular/core';
-import {EventService1} from "../../service/event/event.service";
+import {EventService} from "../../service/event/event.service";
 import {WebsocketMessageService} from "../../service/websocket/websocket-message.service";
 import {ActivatedRoute, Params, Router} from "@angular/router";
 import {NoteVarShareService} from "../../service/note-var-share/note-var-share.service";
@@ -11,7 +11,6 @@ import {NoteActionService} from "../../service/note-action/note-action.service";
 import {SaveAsService} from "../../service/save-as/save-as.service";
 import {isParagraphRunning} from "./paragraph/paragraph.status";
 import {ArrayOrderingService} from "../../service/array-ordering/array-ordering.service";
-import {Car} from "../../demo/domain/car";
 import * as moment from "moment";
 import {Constants} from "../../model/Constants";
 import {MessageService} from "primeng/components/common/messageservice";
@@ -1226,7 +1225,7 @@ export class NotebookComponent implements OnInit,OnDestroy{
   })*/
 
   // 构造函数
-  constructor(private eventService:EventService1,
+  constructor(private eventService:EventService,
               private websocketMsgSrv:WebsocketMessageService,
               private route:ActivatedRoute,
               private noteVarShareService:NoteVarShareService,

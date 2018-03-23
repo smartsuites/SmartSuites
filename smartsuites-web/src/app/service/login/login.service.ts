@@ -4,7 +4,7 @@ import {HttpClient} from "@angular/common/http";
 import {GlobalService} from "../global/global.service";
 import {BaseUrlService} from "../base-url/base-url.service";
 import {Ticket} from "../../model/Ticket";
-import {EventService1} from "../event/event.service";
+import {EventService} from "../event/event.service";
 import {AnalysisDashboardComponent} from "../../components/analysis-dashboard/analysis-dashboard.component";
 import {AdminDashboardComponent} from "../../components/admin-dashboard/admin-dashboard.component";
 import {BussDashboardComponent} from "../../components/buss-dashboard/buss-dashboard.component";
@@ -16,7 +16,7 @@ export class LoginService {
               private httpClient:HttpClient,
               private globalService:GlobalService,
               private baseUrlSrv:BaseUrlService,
-              private eventService:EventService1) {
+              private eventService:EventService) {
 
     let vm = this;
     //如果没有登录则返回到login

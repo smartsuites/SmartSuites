@@ -1,7 +1,7 @@
 import {AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {WebsocketMessageService} from "../../../service/websocket/websocket-message.service";
 import {NoteVarShareService} from "../../../service/note-var-share/note-var-share.service";
-import {EventService1} from "../../../service/event/event.service";
+import {EventService} from "../../../service/event/event.service";
 import {isParagraphRunning, ParagraphStatus} from "./paragraph.status";
 import {NotebookComponent} from "../notebook.component";
 import {ConfirmationService} from "primeng/primeng";
@@ -1154,11 +1154,12 @@ export class ParagraphComponent implements OnInit,AfterViewInit,OnDestroy {
     if (newPara.status != ParagraphStatus.RUNNING) {
       if(newPara.results && !ObjectEqual(self.paragraph.results, newPara.results)){
         self.paragraph.results = newPara.results
-      }else{
+      }
+      /*else{
         self.paragraph.results = {
           msg : []
         }
-      }
+      }*/
     }
     self.paragraph.settings = newPara.settings
     self.paragraph.runtimeInfos = newPara.runtimeInfos
@@ -1316,8 +1317,9 @@ export class ParagraphComponent implements OnInit,AfterViewInit,OnDestroy {
     if (!config.editorSetting) {
       config.editorSetting = {}
     } else if (config.editorSetting.editOnDblClick) {
-      //this.editorSetting.isOutputHidden = config.editorSetting.editOnDblClick
+      this.editorSetting.isOutputHidden = config.editorSetting.editOnDblClick
     }
+
   }
 
   isTabCompletion() {
@@ -1461,7 +1463,7 @@ export class ParagraphComponent implements OnInit,AfterViewInit,OnDestroy {
   constructor(public notebook:NotebookComponent,
               private websocketMsgSrv:WebsocketMessageService,
               private noteVarShareService:NoteVarShareService,
-              private eventService:EventService1,
+              private eventService:EventService,
               private globalService:GlobalService,
               private commonService:CommonService,
               private messageService:MessageService,
@@ -1653,7 +1655,7 @@ export class ParagraphComponent implements OnInit,AfterViewInit,OnDestroy {
               ? oldPara.results.msg[i] : {}
             const newConfig = newPara.config.results ? newPara.config.results[i] : {}
             const oldConfig = oldPara.config.results ? oldPara.config.results[i] : {}
-            if (!(newResult === oldResult) || !(newConfig === oldConfig)) {
+            if (!ObjectEqual(newResult,oldResult) || !ObjectEqual(newConfig,oldConfig)) {
               self.eventService.broadcast('updateResult', newResult, newConfig, newPara, parseInt(i))
             }
           }

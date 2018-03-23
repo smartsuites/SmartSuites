@@ -1,6 +1,5 @@
 import {Component, OnInit} from '@angular/core';
 import {MenuItem, SelectItem, TreeNode} from "primeng/primeng";
-import {NodeService} from "../../demo/service/nodeservice";
 
 @Component({
   selector: 'app-catalog',

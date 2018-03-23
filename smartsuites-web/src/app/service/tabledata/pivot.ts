@@ -68,8 +68,26 @@ export default class PivotTransformation extends Transformation {
     let config = this.config.common.pivot
     let firstTime = (!config.keys && !config.groups && !config.values)
 
+    let transformObjectToArray = function(object){
+      let tmp = []
+      for(let item in object)
+        tmp.push(object[item])
+      return tmp;
+    }
+
+    if(config.keys && typeof config.keys == 'object'){
+      config.keys = transformObjectToArray(config.keys)
+    }
     config.keys = config.keys || []
+
+    if(config.groups && typeof config.groups == 'object'){
+      config.groups = transformObjectToArray(config.groups)
+    }
     config.groups = config.groups || []
+
+    if(config.values && typeof config.values == 'object'){
+      config.values = transformObjectToArray(config.values)
+    }
     config.values = config.values || []
 
     this.removeUnknown()

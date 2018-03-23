@@ -13,17 +13,15 @@ export default class Nvd3ChartVisualization extends Visualization {
 
   constructor (targetEl, config, renderer, emitter, jitCompiler, commonService) {
     super(targetEl, config, renderer, emitter, jitCompiler, commonService)
-
-    /*const svg = this._renderer.createElement('svg');
-    this._renderer.appendChild(this.targetEl.element.nativeElement, svg);*/
-
+    this._commonService._jQuery('#'+targetEl).append('<svg></svg>');
   }
 
   refresh () {
     if (this.chart) {
-      this.chart.update()
+      //this.chart.update()
     }
   }
+
 
   render (data) {
     let self = this;
@@ -40,21 +38,18 @@ export default class Nvd3ChartVisualization extends Visualization {
     let animationDuration = 300
     let numberOfDataThreshold = 150
     let height = self.jQuery('#'+self.targetElId).height()
-    height = 300
 
     // turn off animation when dataset is too large. (for performance issue)
     // still, since dataset is large, the chart content sequentially appears like animated
     try {
-      if (d3g[0].values.length > numberOfDataThreshold) {
+      if (d3g.length > numberOfDataThreshold) {
         animationDuration = 0
       }
     } catch (err) {
       console.log(err)
     }
 
-    self.d3.select('#' + self.targetElId)
-      .append("svg")
-      .attr('height', height)
+    self.d3.select('#' + self.targetElId + ' svg')
       .datum(d3g)
       .transition()
       .duration(animationDuration)
@@ -103,8 +98,7 @@ export default class Nvd3ChartVisualization extends Visualization {
     return this.groupedThousandsWith3DigitsFormatter(d)
   }
 
-  d3DataFromPivot (
-    schema, rows, keys, groups, values, allowTextXAxis, fillMissingValues, multiBarChart) {
+  d3DataFromPivot (schema, rows, keys, groups, values, allowTextXAxis, fillMissingValues, multiBarChart) {
     let self = this
     // construct table data
     let d3g = []

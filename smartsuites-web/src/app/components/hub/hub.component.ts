@@ -1,6 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import {Car} from "../../demo/domain/car";
-import {CarService} from "../../demo/service/carservice";
 
 @Component({
   selector: 'app-hub',
@@ -11,7 +9,7 @@ export class HubComponent implements OnInit {
 
   cars = [];
 
-  constructor(private carService: CarService) { }
+  constructor() { }
 
   ngOnInit() {
 

@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {AppComponent} from "../../app.component";
 import {LoginService} from "../../service/login/login.service";
 import {GlobalService} from "../../service/global/global.service";
-import {EventService1} from "../../service/event/event.service";
+import {EventService} from "../../service/event/event.service";
 import {Constants} from "../../model/Constants";
 import {MessageService} from "primeng/components/common/messageservice";
 import {Message} from "primeng/primeng";
@@ -24,7 +24,7 @@ export class AppTopbarComponent implements OnInit{
 
   constructor(public app: AppComponent,
               public loginService: LoginService,
-              public eventService:EventService1,
+              public eventService:EventService,
               public globalService:GlobalService,
               private messageService: MessageService,
               public notifyService:NotifyService) {

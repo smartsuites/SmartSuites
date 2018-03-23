@@ -1,12 +1,12 @@
 <div>
   <!-- selector -->
   <div>
-
     <div id="{{id}}_switch"
          *ngIf="(type == 'TABLE' || type == 'NETWORK' || apps.length > 0 || suggestion.available && suggestion.available.length > 0) && !asIframe && !viewOnly"
          class="result-chart-selector">
 
-      <div *ngIf="type == 'TABLE' || type == 'NETWORK'" style="margin-top: 5px; float: left;">
+      <!--<div *ngIf="type == 'TABLE' || type == 'NETWORK'" style="margin-top: 5px; float: left;">-->
+      <div style="margin-top: 5px; float: left;">
         <button pButton type="button" class="ui-button-secondary"
                 *ngFor="let viz of builtInTableDataVisualizationList; let idex= index"
                 ng_Class="{'active' : viz.id == graphMode && !config.helium.activeApp}"
@@ -84,12 +84,7 @@
 
   <!-- selector end -->
 
-  <div
-    (mouseout)="onMouseOut()"
-    (mouseover)="onMouseOver()"
-    id="p{{id}}_resize"
-    ng_If="!config.helium.activeApp"
-    style="padding-bottom: 5px;">
+  <div id="p{{id}}_resize" style="padding-bottom: 5px;">
 
     <!--resize='{"allowresize": "{{!asIframe && !viewOnly}}", "graphType": "{{type}}"}'
     resizable on-resize="resize(width, height);"
@@ -137,7 +132,7 @@
            [ngClass]="{'noOverflow': graphMode=='table'}">
         <div *ngFor="let viz of builtInTableDataVisualizationList; let i = index"
              id="p{{id}}_{{viz.id}}"
-             ng-show="graphMode == viz.id">
+             [hidden]="graphMode != viz.id">
         </div>
       </div>
 

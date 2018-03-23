@@ -4,7 +4,7 @@ import {Location} from '@angular/common';
 import {Router} from '@angular/router';
 import {MenuItem, SelectItem} from 'primeng/primeng';
 import {AppComponent} from '../../app.component';
-import {EventService1} from "../../service/event/event.service";
+import {EventService} from "../../service/event/event.service";
 import {Constants} from "../../model/Constants";
 import {NoteCreateComponent} from "../../components/note-create/note-create.component";
 
@@ -47,7 +47,7 @@ export class AppMenuComponent implements OnInit,OnDestroy {
   }
 
   constructor(public app: AppComponent,
-              private eventService: EventService1) {
+              private eventService: EventService) {
   }
 
   subscribers = []

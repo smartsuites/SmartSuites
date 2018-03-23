@@ -352,7 +352,7 @@
 
   <div class="ui-g-12" style="min-height: 800px">
 
-    <p-panel [style]="{'margin-bottom':'10px'}"
+    <p-panel [ngStyle]="{'margin-bottom':'10px'}"
              *ngFor="let setting of interpreterSettings | filter: {name:searchInterpreter}"
              id="{{setting.name | lowercase}}">
       <p-header>

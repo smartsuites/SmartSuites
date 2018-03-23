@@ -1,8 +1,8 @@
-;
-import { FilterPipe } from './pipe/filter.pipe'/*
+/*
  * Copyright (c) 2017. 联思智云（北京）科技有限公司. All rights reserved.
  */
 
+import { FilterPipe } from './pipe/filter.pipe';
 import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
@@ -87,7 +87,7 @@ import {ConfigurationComponent} from './components/configuration/configuration.c
 import {CredentialComponent} from './components/credential/credential.component';
 import {SearchService} from "./service/search/search.service";
 import {GlobalService} from "./service/global/global.service";
-import {EventService1} from "./service/event/event.service";
+import {EventService} from "./service/event/event.service";
 import {AppRoutingModule} from "./route/app-routing.module";
 import {NoteActionService} from "./service/note-action/note-action.service";
 import {NoteRenameService} from "./service/note-rename/note-rename.service";
@@ -104,25 +104,7 @@ import {AppProfileComponent} from './common/profile/app.profile.component';
 import {AppFooterComponent} from './common/footer/app.footer.component';
 import {AppMenuComponent, AppSubMenuComponent} from './common/menu/app.menu.component';
 import {AppTopbarComponent} from './common/topbar/app.topbar.component';
-// DEMO ONLY
-import {DashboardDemoComponent} from './demo/view/dashboarddemo.component';
-import {SampleDemoComponent} from './demo/view/sampledemo.component';
-import {FormsDemoComponent} from './demo/view/formsdemo.component';
-import {DataDemoComponent} from './demo/view/datademo.component';
-import {PanelsDemoComponent} from './demo/view/panelsdemo.component';
-import {OverlaysDemoComponent} from './demo/view/overlaysdemo.component';
-import {MenusDemoComponent} from './demo/view/menusdemo.component';
-import {MessagesDemoComponent} from './demo/view/messagesdemo.component';
-import {MiscDemoComponent} from './demo/view/miscdemo.component';
-import {EmptyDemoComponent} from './demo/view/emptydemo.component';
-import {ChartsDemoComponent} from './demo/view/chartsdemo.component';
-import {FileDemoComponent} from './demo/view/filedemo.component';
-import {UtilsDemoComponent} from './demo/view/utilsdemo.component';
-import {DocumentationComponent} from './demo/view/documentation.component';
-import {CarService} from './demo/service/carservice';
-import {CountryService} from './demo/service/countryservice';
-import {EventService} from './demo/service/eventservice';
-import {NodeService} from './demo/service/nodeservice';
+
 import {ScreenComponent} from './components/screen/screen.component';
 import {MessageService} from "primeng/components/common/messageservice";
 import {HubComponent} from "./components/hub/hub.component";
@@ -159,47 +141,27 @@ import { PersonalComponent } from './common/personal/personal.component';
     NotebookRepositoryComponent,
     HeliumComponent,
     /*
-
-
     JobComponent,
-
-
-    SearchComponent,*/
+    SearchComponent,
+    */
     AppProfileComponent,
     AppFooterComponent,
     AppMenuComponent,
     AppSubMenuComponent,
     AppTopbarComponent,
-
-    //DEMO ONLY
-    DashboardDemoComponent,
-    SampleDemoComponent,
-    FormsDemoComponent,
-    DataDemoComponent,
-    PanelsDemoComponent,
-    OverlaysDemoComponent,
-    MenusDemoComponent,
-    MessagesDemoComponent,
-    MessagesDemoComponent,
-    MiscDemoComponent,
-    ChartsDemoComponent,
-    EmptyDemoComponent,
-    FileDemoComponent,
-    UtilsDemoComponent,
     ScreenComponent,
     HubComponent,
     AdminDashboardComponent,
-    BussDashboardComponent,
     AnalysisDashboardComponent,
-    ResultComponent,
+    BussDashboardComponent,
     DocumentComponent,
     CatalogComponent,
     CustomComponent,
-    NoteCreateComponent,
     NotifyComponent,
+    NoteCreateComponent,
+    ResultComponent,
     PersonalComponent,
-    FilterPipe,
-    DocumentationComponent,
+    FilterPipe
   ],
   imports: [
     BrowserModule,
@@ -289,7 +251,7 @@ import { PersonalComponent } from './common/personal/personal.component';
     WebsocketEventService,
     SearchService,
     NoteListService,
-    EventService1,
+    EventService,
     GlobalService,
     NoteRenameService,
     NoteActionService,
@@ -302,11 +264,7 @@ import { PersonalComponent } from './common/personal/personal.component';
     HighlightJsService,
     JobmanagerService,
     NotifyService,
-    HeliumService,
-
-    //DEMO ONLY
-    {provide: LocationStrategy, useClass: HashLocationStrategy},
-    CarService, CountryService, EventService, NodeService
+    HeliumService
   ],
   bootstrap: [AppComponent]
 })

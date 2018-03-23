@@ -1,9 +1,7 @@
 import {Component, OnInit, ViewContainerRef} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {BaseUrlService} from "../../service/base-url/base-url.service";
-import {Car} from "../../demo/domain/car";
-import {CarService} from "../../demo/service/carservice";
-import {MenuItem, SelectItem, TreeNode} from "primeng/primeng";
+import {SelectItem, TreeNode} from "primeng/primeng";
 
 @Component({
   selector: 'app-credential',
@@ -17,66 +15,338 @@ export class CredentialComponent implements OnInit {
   showAddNewUser = false;
   showEditUser = false;
   showAddDirectory = false;
+  showEditDirectory = false;
 
-  visionTree: TreeNode[] = [
-    {
-      label: "根目录",
-      data: "root",
-      expandedIcon: "fa-folder-open",
-      collapsedIcon: "fa-folder",
-      expanded:true,
-      children:[]
+  //**************** Directory *****************//
+
+  loading = true;
+
+  directory
+  visionTree: TreeNode[] = [];
+
+  selectedTreeNode
+
+  createNewDir(parentNode,newDirName){
+    let self = this;
+    this.httpClient.post(this.baseUrlSrv.getRestApiBase() + '/directory/'+parentNode.data+'/'+newDirName,null)
+      .subscribe(
+        response => {
+          console.log('Success %o', response)
+          self.createTree(self.visionTree,response['body'])
+        },
+        errorResponse => {
+          console.log('Error %o', errorResponse)
+        }
+      );
+  }
+
+  updateDirName(parentNode,newDirName){
+    let self = this;
+    this.httpClient.put(this.baseUrlSrv.getRestApiBase() + '/directory/'+parentNode.data+'/'+newDirName,null)
+      .subscribe(
+        response => {
+          console.log('Success %o', response)
+          self.findNode(self.visionTree[0],response['body'],function(parent,index,item){
+            item.label = response['body'].directory_name
+          })
+        },
+        errorResponse => {
+          console.log('Error %o', errorResponse)
+        }
+      );
+  }
+
+  deleteDir(node){
+    let self = this;
+    this.httpClient.delete(this.baseUrlSrv.getRestApiBase() + '/directory/'+node.data)
+      .subscribe(
+        response => {
+          console.log('Success %o', response)
+          self.findNode(self.visionTree[0],response['body'],function(parent,index,item){
+            parent.children.splice(index,1)
+          })
+        },
+        errorResponse => {
+          console.log('Error %o', errorResponse)
+        }
+      );
+  }
+
+  createTree(children, item):boolean{
+
+    if(children.length == 0 && item.parent_directory == -1){
+      children.push({
+        label: item.directory_name,
+        data: item.id,
+        expandedIcon: "fa-folder-open",
+        collapsedIcon: "fa-folder",
+        expanded:true,
+        children:[]
+      })
+      return true;
     }
-  ];
-  loading:boolean = true;
-  selectedTreeNode;
 
-  selectedUserTreeNodes;
-
-  addNewVisionDir(pid,dirname){
-
+    for(let child of children){
+      if(child.data == item.parent_directory){
+        child.children.push({
+          label: item.directory_name,
+          data: item.id,
+          expandedIcon: "fa-folder-open",
+          collapsedIcon: "fa-folder",
+          expanded:true,
+          children:[]
+        })
+        return true;
+      }else{
+        this.createTree(child.children, item)
+      }
+    }
+    return false;
   }
 
-  removeVisionDir(id){
+  findNode(node, item,callback):boolean{
+    if(node.data == item.id){
+      callback(null, node)
+    }
 
+    node.children.forEach((child, index, array) =>{
+      if(child.data == item.id){
+        callback(node, index, child)
+        return true;
+      }else{
+        this.findNode(child,item,callback)
+      }
+    })
+
+    for(let child of node.children){
+
+    }
+    return false;
   }
 
-  renameVisionDir(id,dirname){
+  // 获取所有的目录
+  getAllDirectories(){
+    let self = this;
+    this.httpClient.get(this.baseUrlSrv.getRestApiBase() + '/directory')
+      .subscribe(
+        response => {
+          console.log('Success %o', response)
+          self.directory = response['body']
 
+          self.directory.forEach((item, index, array) => {
+            self.createTree(self.visionTree, item);
+          })
+          self.loading = false;
+        },
+        errorResponse => {
+          console.log('Error %o', errorResponse)
+        }
+      );
   }
+
+  //******************  User *******************//
 
   // 用户的类型
   users = [{
-    username:'admin',
-    password:'admin',
-    email:'test@123.com',
-    role:'manager',
-    timestamp:123243224,
-    interpreters:'all',
-    visions:'all'
+    "data":{
+      "username":"管理人员",
+      "data":"MANAGER",
+      "type":"Folder",
+      "icon":"fa fa-user"
+    },
+    "children":[]
+  },{
+    "data":{
+      "username":"分析人员",
+      "size":"ANALYST",
+      "type":"Folder"
+    },
+    "children":[]
+  },{
+    "data":{
+      "username":"业务人员",
+      "size":"BUSINESS",
+      "type":"Folder"
+    },
+    "children":[]
   }]
 
-  types: SelectItem[];
-  userType;
+  types : SelectItem[] = [{label: '管理人员', value: 'MANAGER'},
+    {label: '分析人员', value: 'ANALYST'},
+    {label: '业务人员', value: 'BUSINESS'}];
 
   selectUser;
+  userLoading = true;
 
-  createNewUser(){
+  userType;
 
+  getAllUsers(){
+    let self = this;
+    this.httpClient.get(this.baseUrlSrv.getRestApiBase() + '/users')
+      .subscribe(
+        response => {
+          console.log('Success %o', response)
+          response['body'].elements.forEach((item, index, array) => {
+            item.type = "Document";
+            if(item.roles.startsWith("MANAGER")){
+              self.users[0].children.push({
+                data:item
+              })
+            }else if(item.roles.startsWith("ANALYST")){
+              self.users[1].children.push({
+                data:item
+              })
+            }else if(item.roles.startsWith("BUSINESS")){
+              self.users[2].children.push({
+                data:item
+              })
+            }
+          })
+          //self.users = response['body'].elements
+          self.userLoading = false
+        },
+        errorResponse => {
+          console.log('Error %o', errorResponse)
+        }
+      );
   }
 
-  removeUser(){
-
+  createNewUser(username,password,email,role){
+    let self = this;
+    let payload = {
+      password:password,
+      email:email,
+      role: role
+    }
+    this.httpClient.post(this.baseUrlSrv.getRestApiBase() + '/users/'+ username,payload)
+      .subscribe(
+        response => {
+          console.log('Success %o', response)
+          if(role.startsWith("MANAGER")){
+            self.users[0].children.push({
+              data:response['body'].members
+            })
+          }else if(role.startsWith("ANALYST")){
+            self.users[1].children.push({
+              data:response['body'].members
+            })
+          }else if(role.startsWith("BUSINESS")){
+            self.users[2].children.push({
+              data:response['body'].members
+            })
+          }
+        },
+        errorResponse => {
+          console.log('Error %o', errorResponse)
+        }
+      );
   }
 
-  editUser(){
+  removeUser(user){
+    if(user.data.type == "Folder")
+      return;
+    let self = this;
+    this.httpClient.delete(this.baseUrlSrv.getRestApiBase() + '/users/' + user.data.username)
+      .subscribe(
+        response => {
+          console.log('Success %o', response)
+          if(user.data.roles.startsWith("MANAGER")){
+            let idx
+            self.users[0].children.forEach((item, index, array) => {
+              if(item.username === user.data.username)
+                idx = index;
+            })
+            self.users[0].children.splice(idx,1)
+          }else if(user.data.roles.startsWith("ANALYST")){
+            let idx
+            self.users[1].children.forEach((item, index, array) => {
+              if(item.username === user.data.username)
+                idx = index;
+            })
+            self.users[1].children.splice(idx,1)
+          }else if(user.data.roles.startsWith("BUSINESS")){
+            let idx
+            self.users[2].children.forEach((item, index, array) => {
+              if(item.username === user.data.username)
+                idx = index;
+            })
+            self.users[2].children.splice(idx,1)
+          }
+        },
+        errorResponse => {
+          console.log('Error %o', errorResponse)
+        }
+      );
+  }
 
+  updateUser(username,password,email,role){
+    let self = this;
+    let payload = {
+      password:password,
+      email:email
+    }
+    this.httpClient.put(this.baseUrlSrv.getRestApiBase() + '/users/'+ username,payload)
+      .subscribe(
+        response => {
+          console.log('Success %o', response)
+          if(role.startsWith("MANAGER")){
+            self.users[0].children.push({
+              data:response['body'].members
+            })
+          }else if(role.startsWith("ANALYST")){
+            self.users[1].children.push({
+              data:response['body'].members
+            })
+          }else if(role.startsWith("BUSINESS")){
+            self.users[2].children.push({
+              data:response['body'].members
+            })
+          }
+        },
+        errorResponse => {
+          console.log('Error %o', errorResponse)
+        }
+      );
   }
 
 
+  //************** 目录配比  ****************//
+
+  showEditDir = false;
+  selectedUserTreeNodes;
+
+  saveUserDirs(){
+    if(this.selectUser.data.type == "Folder")
+      return;
+    let list = []
+    this.selectedUserTreeNodes.forEach((item,index,array) => {
+      list.push(item.data)
+    })
+    this.httpClient.post(this.baseUrlSrv.getRestApiBase() + '/users/'+ this.selectUser.data.username + '/dir',list)
+      .subscribe(
+        response => {
+          console.log('Success %o', response)
+        },
+        errorResponse => {
+          console.log('Error %o', errorResponse)
+        }
+      );
+  }
+
+
+
+
+  constructor(public httpClient:HttpClient,
+              public baseUrlSrv:BaseUrlService) {
+  }
+
+  ngOnInit() {
+    this.getAllDirectories()
+    this.getAllUsers()
+  }
 
   // 认证信息
-  credentialInfo = []
+  /*credentialInfo = []
 
   // 是否展示添加认证信息窗口
   showAddNewCredentialInfo = false
@@ -90,30 +360,6 @@ export class CredentialComponent implements OnInit {
   entity = ''
   password = ''
   username = ''
-
-  cars1: Car[];
-
-  constructor(public httpClient:HttpClient,
-              public baseUrlSrv:BaseUrlService,
-              private carService: CarService,
-              /*public alertService: NzNotificationService*/) {
-    // TODO
-    //ngToast.dismiss()
-    //this.toastService.toastr.success('You are awesome!', 'Success!');
-  }
-
-  ngOnInit() {
-    this.carService.getCarsMedium().then(cars => this.cars1 = cars);
-
-    /*this.getAvailableInterpreters()
-    this.getCredentialInfo()*/
-
-    this.types = [];
-    this.types.push({label: '管理人员', value: 'manager'});
-    this.types.push({label: '分析人员', value: 'analyst'});
-    this.types.push({label: '业务人员', value: 'business'});
-
-  }
 
   hasCredential(){
     return Array.isArray(this.credentialInfo) && this.credentialInfo.length > 0
@@ -132,13 +378,13 @@ export class CredentialComponent implements OnInit {
 
           console.log('Success %o', this.availableInterpreters)
           // TODO
-          /*angular.element('#entityname').autocomplete({
+          /!*angular.element('#entityname').autocomplete({
             source: this.availableInterpreters,
             select: function (event, selected) {
               this.entity = selected.item.value
               return false
             }
-          })*/
+          })*!/
         },
         errorResponse => {
           //this.showToast(data.message, 'danger')
@@ -167,7 +413,7 @@ export class CredentialComponent implements OnInit {
         },
         errorResponse => {
           console.log('Error %o', errorResponse)
-          /*if (status === 401) {
+          /!*if (status === 401) {
             ngToast.danger({
               content: 'You don\'t have permission on this page',
               verticalPosition: 'bottom',
@@ -177,7 +423,7 @@ export class CredentialComponent implements OnInit {
               window.location = this.baseUrlSrv.getBase()
             }, 3000)
           }
-          console.log('Error %o %o', status, data.message)*/
+          console.log('Error %o %o', status, data.message)*!/
 
         }
       );
@@ -267,7 +513,7 @@ export class CredentialComponent implements OnInit {
 
   removeCredentialInfo = function (entity) {
     // TODO
-    /*BootstrapDialog.confirm({
+    /!*BootstrapDialog.confirm({
       closable: false,
       closeByBackdrop: false,
       closeByKeyboard: false,
@@ -287,7 +533,7 @@ export class CredentialComponent implements OnInit {
             })
         }
       }
-    })*/
+    })*!/
   }
 
   showToast(message, type) {
@@ -295,13 +541,13 @@ export class CredentialComponent implements OnInit {
     const timeout = '3000'
 
     // TODO
-    /*if (type === 'success') {
+    /!*if (type === 'success') {
       ngToast.success({ content: message, verticalPosition: verticalPosition, timeout: timeout, })
     } else if (type === 'info') {
       ngToast.info({ content: message, verticalPosition: verticalPosition, timeout: timeout, })
     } else {
       ngToast.danger({ content: message, verticalPosition: verticalPosition, timeout: timeout, })
-    }*/
-  }
+    }*!/
+  }*/
 
 }

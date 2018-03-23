@@ -19,3 +19,9 @@ export function ObjectEqual(object1, object2):boolean {
   else
     return false;
 }
+
+export function DeepClone(obj){
+  if(!obj)
+    return undefined
+  return JSON.parse(JSON.stringify(obj))
+}

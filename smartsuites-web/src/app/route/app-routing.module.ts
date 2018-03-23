@@ -10,23 +10,6 @@ import {HeliumComponent} from "../components/helium/helium.component";
 import {JobmanagerComponent} from "../components/jobmanager/jobmanager.component";
 import {SearchComponent} from "../components/search/search.component";
 import {NotebookComponent} from "../components/notebook/notebook.component";
-
-
-// DEMO ONLY
-import {DashboardDemoComponent} from "../demo/view/dashboarddemo.component";
-import {SampleDemoComponent} from "../demo/view/sampledemo.component";
-import {FormsDemoComponent} from "../demo/view/formsdemo.component";
-import {DataDemoComponent} from "../demo/view/datademo.component";
-import {PanelsDemoComponent} from "../demo/view/panelsdemo.component";
-import {OverlaysDemoComponent} from "../demo/view/overlaysdemo.component";
-import {MenusDemoComponent} from "../demo/view/menusdemo.component";
-import {MessagesDemoComponent} from "../demo/view/messagesdemo.component";
-import {MiscDemoComponent} from "../demo/view/miscdemo.component";
-import {EmptyDemoComponent} from "../demo/view/emptydemo.component";
-import {ChartsDemoComponent} from "../demo/view/chartsdemo.component";
-import {FileDemoComponent} from "../demo/view/filedemo.component";
-import {UtilsDemoComponent} from "../demo/view/utilsdemo.component";
-import {DocumentationComponent} from "../demo/view/documentation.component";
 import {ScreenComponent} from "../components/screen/screen.component";
 import {HubComponent} from "../components/hub/hub.component";
 import {AdminDashboardComponent} from "../components/admin-dashboard/admin-dashboard.component";
@@ -73,22 +56,7 @@ const routes: Routes = [
   {path: 'interpreter', component: InterpreterComponent},
   {path: 'notebookRepos', component: NotebookRepositoryComponent},
   {path: 'helium', component: HeliumComponent},
-  {path: 'notify', component: NotifyComponent},
-
-  {path: 'home', component: DashboardDemoComponent},
-  {path: 'sample', component: SampleDemoComponent},
-  {path: 'forms', component: FormsDemoComponent},
-  {path: 'data', component: DataDemoComponent},
-  {path: 'panels', component: PanelsDemoComponent},
-  {path: 'overlays', component: OverlaysDemoComponent},
-  {path: 'menus', component: MenusDemoComponent},
-  {path: 'messages', component: MessagesDemoComponent},
-  {path: 'misc', component: MiscDemoComponent},
-  {path: 'empty', component: EmptyDemoComponent},
-  {path: 'charts', component: ChartsDemoComponent},
-  {path: 'file', component: FileDemoComponent},
-  {path: 'utils', component: UtilsDemoComponent},
-  {path: 'documentation', component: DocumentationComponent}
+  {path: 'notify', component: NotifyComponent}
 
 ];
 

@@ -36,6 +36,8 @@
         <plugin.failsafe.version>2.16</plugin.failsafe.version>
         <plugin.scala.version>2.15.2</plugin.scala.version>
         <plugin.scalatest.version>1.0</plugin.scalatest.version>
+        <h2.version>1.4.197</h2.version>
+        <ant.version>1.10.2</ant.version>
     </properties>
 
     <dependencyManagement>
@@ -106,6 +108,19 @@
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>${h2.version}</version>
+        </dependency>
+        <!-- For run SQL Script -->
+        <dependency>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant</artifactId>
+            <version>${ant.version}</version>
+        </dependency>
+
 
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>

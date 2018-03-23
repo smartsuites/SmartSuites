@@ -10,7 +10,10 @@ import java.util.*;
 import javax.servlet.DispatcherType;
 import javax.ws.rs.core.Application;
 
+import com.smartsuites.rest.*;
 import com.smartsuites.socket.NotebookServer;
+import com.smartsuites.user.UserService;
+import com.smartsuites.utils.EmbedDataBaseUtils;
 import com.smartsuites.utils.SecurityUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.web.env.EnvironmentLoaderListener;
@@ -26,15 +29,6 @@ import com.smartsuites.interpreter.InterpreterSettingManager;
 import com.smartsuites.notebook.Notebook;
 import com.smartsuites.notebook.NotebookAuthorization;
 import com.smartsuites.notebook.repo.NotebookRepoSync;
-import com.smartsuites.rest.ConfigurationsRestApi;
-import com.smartsuites.rest.CredentialRestApi;
-import com.smartsuites.rest.HeliumRestApi;
-import com.smartsuites.rest.InterpreterRestApi;
-import com.smartsuites.rest.LoginRestApi;
-import com.smartsuites.rest.NotebookRepoRestApi;
-import com.smartsuites.rest.NotebookRestApi;
-import com.smartsuites.rest.SecurityRestApi;
-import com.smartsuites.rest.ZeppelinRestApi;
 import com.smartsuites.scheduler.SchedulerFactory;
 import com.smartsuites.search.LuceneSearch;
 import com.smartsuites.search.SearchService;
@@ -190,6 +184,9 @@ public class SmartsuitesServer extends Application {
     //Below is commented since zeppelin-docs module is removed.
     //final WebAppContext webAppSwagg = setupWebAppSwagger(conf);
 
+    // EmbedDataBase
+    setupEmdedDataBase(conf);
+
     LOG.info("Starting smartsuites server");
     try {
       jettyWebServer.start(); //Instantiates SmartsuitesServer
@@ -206,6 +203,7 @@ public class SmartsuitesServer extends Application {
       @Override public void run() {
         LOG.info("Shutting down smartsuites Server ... ");
         try {
+          UserService.closeConnection();
           jettyWebServer.stop();
           notebook.getInterpreterSettingManager().close();
           notebook.close();
@@ -232,6 +230,11 @@ public class SmartsuitesServer extends Application {
 
     jettyWebServer.join();
     SmartsuitesServer.notebook.getInterpreterSettingManager().close();
+  }
+
+  private static void setupEmdedDataBase(SmartsuitesConfiguration conf) {
+    if(!UserService.isDatabaseExist())
+      UserService.initDatabase();
   }
 
   private static Server setupJettyServer(SmartsuitesConfiguration conf) {
@@ -409,6 +412,12 @@ public class SmartsuitesServer extends Application {
 
     ConfigurationsRestApi settingsApi = new ConfigurationsRestApi(notebook);
     singletons.add(settingsApi);
+
+    DirectoryRestApi directoryRestApi = new DirectoryRestApi();
+    singletons.add(directoryRestApi);
+
+    UserRestApi userRestApi = new UserRestApi();
+    singletons.add(userRestApi);
 
     return singletons;
   }

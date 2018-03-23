@@ -1,7 +1,7 @@
 import {EventEmitter, Injectable, OnInit} from '@angular/core';
 import {BaseUrlService} from "../base-url/base-url.service";
 import {Router} from "@angular/router";
-import {EventService1} from "../event/event.service";
+import {EventService} from "../event/event.service";
 import {GlobalService} from "../global/global.service";
 import {$WebSocket, WebSocketSendMode} from "angular2-websocket/angular2-websocket";
 
@@ -17,7 +17,7 @@ export class WebsocketEventService {
   // 平台初始启动
   platformFirstLoad = true;
 
-  constructor(public baseUrlSrv: BaseUrlService, public router: Router, public eventService: EventService1, public globalService: GlobalService) {
+  constructor(public baseUrlSrv: BaseUrlService, public router: Router, public eventService: EventService, public globalService: GlobalService) {
     let vm = this;
     this.websocket = new $WebSocket(this.baseUrlSrv.getWebsocketUrl())
 

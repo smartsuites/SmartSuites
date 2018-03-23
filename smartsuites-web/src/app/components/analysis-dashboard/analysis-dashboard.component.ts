@@ -1,11 +1,9 @@
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {SelectItem} from "primeng/primeng";
-import {Car} from "../../demo/domain/car";
-import {CarService} from "../../demo/service/carservice";
 import {AppComponent} from "../../app.component";
 import {CommonService} from "../../service/common/common.service";
 import {NoteListService} from "../../service/note-list/note-list.service";
-import {EventService1} from "../../service/event/event.service";
+import {EventService} from "../../service/event/event.service";
 import {MessageService} from "primeng/components/common/messageservice";
 
 @Component({
@@ -23,16 +21,11 @@ export class AnalysisDashboardComponent implements OnInit {
   // 所有的NotesList
   notesList = []
 
-  constructor(private carService: CarService,
-              private eventService: EventService1,
+  constructor(private eventService: EventService,
               public noteListFactory:NoteListService,
               private commonService:CommonService) {
     let self = this;
-    //self.notesList = self.appCom.notes ? self.appCom.notes.flatList[0] : []
-    /*self.eventService.subscribe('setNoteMenu', function (notes) {
-      self.notesList = notes
-    })
-*/
+
     self.echarts = commonService._echarts
     self.nv = commonService._nv
     self.d3 = commonService._d3

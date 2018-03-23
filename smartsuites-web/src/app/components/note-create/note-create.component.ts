@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {WebsocketMessageService} from "../../service/websocket/websocket-message.service";
 import {NoteListService} from "../../service/note-list/note-list.service";
-import {EventService1} from "../../service/event/event.service";
+import {EventService} from "../../service/event/event.service";
 import {SelectItem} from "primeng/primeng";
 
 @Component({
@@ -134,7 +134,7 @@ export class NoteCreateComponent implements OnInit {
 
   constructor(private noteListFactory:NoteListService,
               private websocketMsgSrv:WebsocketMessageService,
-              private eventService:EventService1) {
+              private eventService:EventService) {
     this.notes = noteListFactory.notes
   }
 

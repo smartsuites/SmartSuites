@@ -15,6 +15,10 @@
 # limitations under the License.
 #
 
+[main]
+jdbcRealm=com.smartsuites.realm.SmartRealm
+securityManager.realms=$jdbcRealm
+
 [users]
 # List of users with their password allowed to access Zeppelin.
 # To use a different strategy (LDAP / Database / ...) check the shiro doc at http://shiro.apache.org/configuration.html#Configuration-INISections

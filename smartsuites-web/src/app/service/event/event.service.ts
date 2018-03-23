@@ -3,7 +3,7 @@ import * as Rx from "rxjs/Rx"
 import {Subscription} from "rxjs/src/Subscription";
 
 @Injectable()
-export class EventService1 {
+export class EventService {
 
   private subjects = []
 

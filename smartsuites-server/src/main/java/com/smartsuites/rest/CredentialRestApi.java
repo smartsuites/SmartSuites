@@ -78,7 +78,7 @@ public class CredentialRestApi {
    * @throws IOException, IllegalArgumentException
    */
   @GET
-  public Response getCredentials(String message) throws
+  public Response getCredentials() throws
       IOException, IllegalArgumentException {
     String user = SecurityUtils.getPrincipal();
     logger.info("getCredentials credentials for user {} ", user);

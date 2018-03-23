@@ -1,9 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {SelectItem} from "primeng/primeng";
-import {CarService} from "../../demo/service/carservice";
-import {EventService} from "../../demo/service/eventservice";
-import {Car} from "../../demo/domain/car";
-import {EventService1} from "../../service/event/event.service";
+import {EventService} from "../../service/event/event.service";
 import {AppComponent} from "../../app.component";
 import {CommonService} from "../../service/common/common.service";
 
@@ -20,8 +16,7 @@ export class AdminDashboardComponent implements OnInit {
 
   interpreters = [];
 
-  constructor(private carService: CarService,
-              private eventService: EventService1,
+  constructor(private eventService: EventService,
               public appCom: AppComponent,
               private commonService:CommonService) {
     let self = this;

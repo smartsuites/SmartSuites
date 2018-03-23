@@ -7,7 +7,7 @@ import {GlobalService} from "./service/global/global.service";
 import {LoginService} from "./service/login/login.service";
 import {WebsocketMessageService} from "./service/websocket/websocket-message.service";
 import {SearchService} from "./service/search/search.service";
-import {EventService1} from "./service/event/event.service";
+import {EventService} from "./service/event/event.service";
 import {BaseUrlService} from "./service/base-url/base-url.service";
 import {HttpClient} from "@angular/common/http";
 import {Router} from "@angular/router";
@@ -74,7 +74,7 @@ export class AppComponent implements OnInit,AfterViewInit, OnDestroy {
               private loginService:LoginService,
               private websocketMsgSrv:WebsocketMessageService,
               private searchForm:SearchService,
-              private eventService:EventService1,
+              private eventService:EventService,
               private baseUrlService:BaseUrlService,
               private httpClient:HttpClient,
               private router:Router,

@@ -12,13 +12,14 @@ import {HttpClient} from "@angular/common/http";
 import {BaseUrlService} from "../../../../service/base-url/base-url.service";
 import {JitCompileService} from "../../../../service/jitcompile/jitcompile.service";
 import {MenuItem} from "primeng/primeng";
-import {EventService1} from "../../../../service/event/event.service";
+import {EventService} from "../../../../service/event/event.service";
 import {CommonService} from "../../../../service/common/common.service";
 import PiechartVisualization from "../../../../service/visualization/builtins/visualization-piechart";
 import LinechartVisualization from "../../../../service/visualization/builtins/visualization-linechart";
 import ScatterchartVisualization from "../../../../service/visualization/builtins/visualization-scatterchart";
 import {HighlightJsService} from "angular2-highlight-js";
-import {ObjectEqual} from "../../../../utils/Utils";
+import {DeepClone, ObjectEqual} from "../../../../utils/Utils";
+import {ParagraphStatus} from "../paragraph.status";
 /*import {AnsiUp} from "ansi_up/ansi_up"*/
 
 @Component({
@@ -28,15 +29,55 @@ import {ObjectEqual} from "../../../../utils/Utils";
   styleUrls: ['./result.component.css'],
   providers:[JitCompileService]
 })
-export class ResultComponent implements OnInit,AfterViewInit,OnDestroy {
+export class ResultComponent implements OnInit,OnDestroy {
 
-  paragraphid
-  index
-  noteid
+  //**************** 导出数据按钮 *******************//
 
-  /**
-   * Built-in visualizations
-   */
+  //导出数据按钮
+  items: MenuItem[] = [
+    {label: 'CSV', command: () => {
+        this.exportToDSV(',');
+      }},
+    {label: 'TSV', command: () => {
+        this.exportToDSV('\t');
+      }}
+  ];
+
+  //导出数据方法
+  exportToDSV(delimiter) {
+    /*let dsv = ''
+    let dateFinished = moment(paragraph.dateFinished).format('YYYY-MM-DD hh:mm:ss A')
+    let exportedFileName = paragraph.title ? paragraph.title + '_' + dateFinished : 'data_' + dateFinished
+
+    for (let titleIndex in tableData.columns) {
+      dsv += tableData.columns[titleIndex].name + delimiter
+    }
+    dsv = dsv.substring(0, dsv.length - 1) + '\n'
+    for (let r in tableData.rows) {
+      let row = tableData.rows[r]
+      let dsvRow = ''
+      for (let index in row) {
+        let stringValue = (row[index]).toString()
+        if (stringValue.indexOf(delimiter) > -1) {
+          dsvRow += '"' + stringValue + '"' + delimiter
+        } else {
+          dsvRow += row[index] + delimiter
+        }
+      }
+      dsv += dsvRow.substring(0, dsvRow.length - 1) + '\n'
+    }
+    let extension = ''
+    if (delimiter === '\t') {
+      extension = 'tsv'
+    } else if (delimiter === ',') {
+      extension = 'csv'
+    }
+    saveAsService.saveAs(dsv, exportedFileName, extension)*/
+  }
+
+  //**************** 内置可视化配置 *******************//
+
+  //内置的可视化
   builtInTableDataVisualizationList = [
     {
       id: 'table',   // paragraph.config.graph.mode
@@ -86,9 +127,7 @@ export class ResultComponent implements OnInit,AfterViewInit,OnDestroy {
     }
   ]
 
-  /**
-   * Holds class and actual runtime instance and related infos of built-in visualizations
-   */
+  //内置的可视化实例信息
   builtInVisualizations = {
     /*'table': {
       class: TableVisualization,
@@ -120,202 +159,36 @@ export class ResultComponent implements OnInit,AfterViewInit,OnDestroy {
     }*/
   }
 
-  // 保存按钮
-  items: MenuItem[];
 
-  // type
-  type = null
+  //*************** 渲染显示结果 *******************//
 
-  // Data of the result
-  data
+  //内置可视化渲染切换
+  switchViz(newMode) {
+    // 注意
+    let newConfig = DeepClone(this.config)
+    let newParams = DeepClone(this.paragraph.settings.params)
 
-  // config
-  config = null
+    // graph options
+    newConfig.graph.mode = newMode
 
-  // resultId = paragraph.id + index
-  id = null
+    // see switchApp()
+    //newConfig.set('helium.activeApp', undefined)
+    newConfig.helium.activeApp = undefined
 
-  // referece to paragraph
-  paragraph
-
-  // index of the result
-  resultIndex
-
-  // TableData instance
-  tableData
-
-  // available columns in tabledata
-  tableDataColumns = []
-
-  tableDataComment
-
-
-  networkNodes
-  networkRelationships
-  networkProperties
-
-
-  // enable helium
-  enableHelium = false
-
-  // graphMode
-  graphMode = null
-
-  // image data
-  imageData = null
-
-  // queue for append output
-  textResultQueueForAppend = []
-
-  revisionView
-
-  result
-
-  // prevent body area scrollbar from blocking due to scroll in paragraph results
-  mouseOver = false
-  onMouseOver = function() { this.mouseOver = true }
-  onMouseOut = function() { this.mouseOver = false }
-
-  getPointerEvent() {
-    return (this.mouseOver) ? {'pointer-events': 'auto' }
-      : {'pointer-events': 'none' }
+    this.commitParagraphResult(this.paragraph.title, this.paragraph.text, newConfig, newParams)
   }
 
-  init(result, config, paragraph, index) {
-    // register helium plugin vis packages
-    let self = this;
+  //App可视化渲染切换
+  switchApp(appId) {
+    //let newConfig = Object.assign({}, this.config)
+    let newConfig = this.config
+    //let newParams = Object.assign({}, this.paragraph.settings.params)
+    let newParams = this.paragraph.settings.params
 
-    //let visPackages = heliumService.getVisualizationCachedPackages()
-    //const visPackageOrder = heliumService.getVisualizationCachedPackageOrder()
+    // 'helium.activeApp' can be cleared by switchViz()
+    newConfig.set('helium.activeApp', appId)
 
-    // push the helium vis packages following the order
-    /*visPackageOrder.map(visName => {
-      visPackages.map(vis => {
-        if (vis.name !== visName) { return }
-        self.builtInTableDataVisualizationList.push({
-          id: vis.id,
-          name: vis.name,
-          icon: $sce.trustAsHtml(vis.icon),
-          supports: [DefaultDisplayType.TABLE, DefaultDisplayType.NETWORK]
-        })
-        self.builtInVisualizations[vis.id] = {
-          class: vis.class
-        }
-      })
-    })*/
-
-    self.updateData(result, config, paragraph, index)
-    self.renderResult(self.type,false)
-  }
-
-  isDOMLoaded(targetElemId) {
-    const elem = this.elementRef.nativeElement.querySelector(`#${targetElemId}`)
-    return elem != null
-  }
-
-  getDomById(targetElemId){
-    return this.elementRef.nativeElement.querySelector(`${targetElemId}`)
-  }
-
-  retryUntilElemIsLoaded (targetElemId, callback) {
-    let self = this;
-    function retry () {
-      if (!self.isDOMLoaded(targetElemId)) {
-        setTimeout(retry, 10)
-        return
-      }
-
-      /*const elem = self.elementRef.nativeElement.querySelector(`#${targetElemId}`)
-      callback(elem)*/
-      callback(targetElemId)
-    }
-    setTimeout(retry,10)
-  }
-
-  /*
-
-  $scope.$on('appendParagraphOutput', function (event, data) {
-    /!* It has been observed that append events
-     * can be errorneously called even if paragraph
-     * execution has ended, and in that case, no append
-     * should be made. Also, it was observed that between PENDING
-     * and RUNNING states, append-events can be called and we can't
-     * miss those, else during the length of paragraph run, few
-     * initial output line/s will be missing.
-     *!/
-    if (paragraph.id === data.paragraphId &&
-      resultIndex === data.index &&
-      (paragraph.status === ParagraphStatus.PENDING || paragraph.status === ParagraphStatus.RUNNING)) {
-      if (DefaultDisplayType.TEXT !== $scope.type) {
-        $scope.type = DefaultDisplayType.TEXT
-      }
-      appendTextOutput(data.data)
-    }
-  })*/
-
-  //*************** 更新结果 *******************//
-
-  createDisplayDOMId(baseDOMId, type) {
-    if (type === DefaultDisplayType.TABLE || type === DefaultDisplayType.NETWORK) {
-      return `${baseDOMId}_graph`
-    } else if (type === DefaultDisplayType.HTML) {
-      return `${baseDOMId}_html`
-    } else if (type === DefaultDisplayType.ANGULAR) {
-      return `${baseDOMId}_angular`
-    } else if (type === DefaultDisplayType.TEXT) {
-      return `${baseDOMId}_text`
-    } else if (type === DefaultDisplayType.ELEMENT) {
-      return `${baseDOMId}_elem`
-    } else {
-      console.error(`Cannot create display DOM Id due to unknown display type: ${type}`)
-    }
-  }
-
-  updateData(result, config, paragraphRef, index) {
-    this.data = result.data
-    this.paragraph = paragraphRef
-    this.resultIndex = parseInt(index)
-
-    this.id = this.paragraph.id + '_' + index
-    this.type = result.type
-    this.config = config ? config : {}
-
-    // initialize default config values
-    if (!this.config.graph) {
-      this.config.graph = {}
-    }
-
-    if (!this.config.graph.mode) {
-      this.config.graph.mode = 'table'
-    }
-
-    if (!this.config.graph.height) {
-      this.config.graph.height = 300
-    }
-
-    if (!this.config.graph.optionOpen) {
-      this.config.graph.optionOpen = false
-    }
-
-    this.graphMode = this.config.graph.mode
-    this.config = Object.assign({},config)
-
-    // enable only when it is last result
-    this.enableHelium = (index === paragraphRef.results.msg.length - 1)
-
-    if (this.type === 'TABLE' || this.type === 'NETWORK') {
-      this.tableData = new DatasetFactory().createDataset(this.type)
-      this.tableData.loadParagraphResult({type: this.type, msg: this.data})
-      this.tableDataColumns = this.tableData.columns
-      this.tableDataComment = this.tableData.comment
-      if (this.type === 'NETWORK') {
-        this.networkNodes = this.tableData.networkNodes
-        this.networkRelationships = this.tableData.networkRelationships
-        this.networkProperties = this.tableData.networkProperties
-      }
-    } else if (this.type === 'IMG') {
-      this.imageData = this.data
-    }
+    //this.commitConfig(newConfig, newParams)
   }
 
   // 渲染结果数据
@@ -327,12 +200,15 @@ export class ResultComponent implements OnInit,AfterViewInit,OnDestroy {
     }
 
     if (activeApp) {
+      //插件式Spell渲染方式
       /*const appState = _.find($scope.apps, {id: activeApp})
       renderApp(`p${appState.id}`, appState)*/
     } else {
       if (!DefaultDisplayType[type]) {
+        //渲染自定义方式
         //this.renderCustomDisplay(type, this.data)
       } else {
+        //渲染内置的结果
         const targetElemId = this.createDisplayDOMId(`p${this.id}`, type)
         this.renderDefaultDisplay(targetElemId, type, this.data, refresh)
       }
@@ -364,47 +240,19 @@ export class ResultComponent implements OnInit,AfterViewInit,OnDestroy {
     this.eventService.broadcast('resultRendered', paragraphId)
   }
 
-  isDefaultDisplay() {
-    return DefaultDisplayType[this.type]
-  }
-
-  /**
-   * generates actually object which will be consumed from `data` property
-   * feed it to the success callback.
-   * if error occurs, the error is passed to the failure callback
-   *
-   * @param data {Object or Function}
-   * @param type {string} Display Type
-   * @param successCallback
-   * @param failureCallback
-   */
-  handleData(data, type, successCallback, failureCallback) {
-    if (SpellResult.isFunction(data)) {
-      try {
-        successCallback(data())
-      } catch (error) {
-        failureCallback(error)
-        console.error(`Failed to handle ${type} type, function data\n`, error)
-      }
-    } else if (SpellResult.isObject(data)) {
-      try {
-        successCallback(data)
-      } catch (error) {
-        console.error(`Failed to handle ${type} type, object data\n`, error)
-      }
-    }
-  }
-
   // 渲染图表
   renderGraph(graphElemId, graphMode, refresh) {
     // set graph height
     let self = this;
-    const height = self.config.graph.height
-    const graphElem = self.getDomById(`#${graphElemId}`)
-    //console.log(graphElem)
-    //graphElem.style.height = height
+    let height = self.config.graph.height
+    if(!height){
+      height = 350
+    }
+    //TODO height统一为350
+    height = 350
 
-    //this.renderer2.setStyle(this.visualizationTargetEl.element.nativeElement,"height",height+"px")
+    const graphElem = self.getDomById(`#${graphElemId}`)
+    self.commonService._jQuery(`#${graphElemId}`).height(height)
 
     if (!graphMode) { graphMode = 'table' }
 
@@ -435,9 +283,7 @@ export class ResultComponent implements OnInit,AfterViewInit,OnDestroy {
           //const transformationSettingTargetEl = self.getTrSettingElem(self.id, graphMode)
           //const visualizationSettingTargetEl = self.getVizSettingElem(self.id, graphMode)
           // set height
-          //loadedElem.style.height = height
-
-          //self.renderer2.setStyle(self.visualizationTargetEl.element.nativeElement,"height",height+"px")
+          self.commonService._jQuery(`#${loadedElem}`).height(height)
 
           // instantiate visualization
           const config = self.getVizConfig(graphMode)
@@ -475,14 +321,15 @@ export class ResultComponent implements OnInit,AfterViewInit,OnDestroy {
           //transformation._compile = $compile
           //transformation._createNewScope = createNewScope
 
-
+          // 渲染数据配置
+          //transformation.renderSetting(self.transformationSettingTargetEl)
 
           // render
           const transformed = transformation.transform(self.tableData)
-          // 渲染数据配置
-          //transformation.renderSetting(self.transformationSettingTargetEl)
+
           // 渲染图表配置
           //builtInViz.instance.renderSetting(self.visualizationSettingTargetEl)
+
           // 渲染图标
           builtInViz.instance.render(transformed)
 
@@ -499,24 +346,28 @@ export class ResultComponent implements OnInit,AfterViewInit,OnDestroy {
       // when graph options or data are changed
       console.log('Refresh data %o', self.tableData)
 
-      /*afterLoaded = function (loadedElem) {
-        const transformationSettingTargetEl = getTrSettingElem($scope.id, graphMode)
-        const visualizationSettingTargetEl = getVizSettingElem($scope.id, graphMode)
-        const config = getVizConfig(graphMode)
-        loadedElem.height(height)
+      afterLoaded = function (loadedElem) {
+        const transformationSettingTargetEl = self.getTrSettingElem(self.id, graphMode)
+        const visualizationSettingTargetEl = self.getVizSettingElem(self.id, graphMode)
+        const config = self.getVizConfig(graphMode)
+        self.commonService._jQuery(`#${loadedElem}`).height(height)
         const transformation = builtInViz.instance.getTransformation()
         transformation.setConfig(config)
-        const transformed = transformation.transform(tableData)
-        transformation.renderSetting(transformationSettingTargetEl)
+        const transformed = transformation.transform(self.tableData)
+
+        //transformation.renderSetting(transformationSettingTargetEl)
+
         builtInViz.instance.setConfig(config)
         builtInViz.instance.render(transformed)
-        builtInViz.instance.renderSetting(visualizationSettingTargetEl)
-      }*/
+
+        //builtInViz.instance.renderSetting(visualizationSettingTargetEl)
+      }
     } else {
-      /*afterLoaded = function (loadedElem) {
-        loadedElem.height(height)
+      afterLoaded = function (loadedElem) {
+        //loadedElem.height(height)
+        self.commonService._jQuery(`#${loadedElem}`).height(height)
         builtInViz.instance.activate()
-      }*/
+      }
     }
 
     const tableElemId = `p${self.id}_${self.graphMode}`
@@ -592,20 +443,19 @@ export class ResultComponent implements OnInit,AfterViewInit,OnDestroy {
     )
   }
 
-  /**
-   * Render multiple sub results for custom display
-   */
-  /*$scope.renderCustomDisplay = function (type, data) {
+  //定制化渲染
+  renderCustomDisplay(type, data) {
+    let self = this;
     // get result from intp
-    if (!heliumService.getSpellByMagic(type)) {
+    /*if (!self.heliumService.getSpellByMagic(type)) {
       console.error(`Can't execute spell due to unknown display type: ${type}`)
       return
-    }
+    }*/
 
     // custom display result can include multiple subset results
-    heliumService.executeSpellAsDisplaySystem(type, data)
+    /*self.heliumService.executeSpellAsDisplaySystem(type, data)
       .then(dataWithTypes => {
-        const containerDOMId = `p${$scope.id}_custom`
+        const containerDOMId = `p${self.id}_custom`
         const afterLoaded = () => {
           const containerDOM = angular.element(`#${containerDOMId}`)
           // Spell.interpret() can create multiple outputs
@@ -624,82 +474,66 @@ export class ResultComponent implements OnInit,AfterViewInit,OnDestroy {
           }
         }
 
-        retryUntilElemIsLoaded(containerDOMId, afterLoaded)
+        self.retryUntilElemIsLoaded(containerDOMId, afterLoaded)
       })
       .catch(error => {
-        console.error(`Failed to render custom display: ${$scope.type}\n` + error)
-      })
-  }*/
-
-  getTextResultElemId(resultId) {
-    return `p${resultId}_text`
+        console.error(`Failed to render custom display: ${self.type}\n` + error)
+      })*/
   }
 
-
-
-  removeChildrenDOM(targetElemId) {
-    const elem = this.commonService._jQuery(`#${targetElemId}`)
-    if (elem.length) {
-      elem.children().remove()
-    }
-  }
-
-  appendTextOutput(data) {
-    /*const elemId = getTextResultElemId($scope.id)
-    textResultQueueForAppend.push(data)
-
-    // if DOM is not loaded, just push data and return
-    if (!isDOMLoaded(elemId)) {
-      return
-    }
-
-    const elem = angular.element(`#${elemId}`)
-
-    // pop all stacked data and append to the DOM
-    while (textResultQueueForAppend.length > 0) {
-      const line = textResultQueueForAppend.pop()
-      elem.append(angular.element('<div></div>').text(line))
-
-      if ($scope.keepScrollDown) {
-        const doc = angular.element(`#${elemId}`)
-        doc[0].scrollTop = doc[0].scrollHeight
+  /**
+   * generates actually object which will be consumed from `data` property
+   * feed it to the success callback.
+   * if error occurs, the error is passed to the failure callback
+   *
+   * @param data {Object or Function}
+   * @param type {string} Display Type
+   * @param successCallback
+   * @param failureCallback
+   */
+  handleData(data, type, successCallback, failureCallback) {
+    if (SpellResult.isFunction(data)) {
+      try {
+        successCallback(data())
+      } catch (error) {
+        failureCallback(error)
+        console.error(`Failed to handle ${type} type, function data\n`, error)
       }
-    }*/
+    } else if (SpellResult.isObject(data)) {
+      try {
+        successCallback(data)
+      } catch (error) {
+        console.error(`Failed to handle ${type} type, object data\n`, error)
+      }
+    }
   }
 
-  getTrSettingElem(scopeId, graphMode) {
-    return this.getDomById('#trsetting' + scopeId + '_' + graphMode)
+  isDefaultDisplay() {
+    return DefaultDisplayType[this.type]
   }
 
-  getVizSettingElem(scopeId, graphMode) {
-    return this.getDomById('#vizsetting' + scopeId + '_' + graphMode)
+  //渲染Spell方法
+  renderApp(targetElemId, appState) {
+    /*const afterLoaded = (loadedElem) => {
+      try {
+        console.log('renderApp %o', appState)
+        loadedElem.html(appState.output)
+        $compile(loadedElem.contents())(getAppScope(appState))
+      } catch (err) {
+        console.log('App rendering error %o', err)
+      }
+    }
+    this.retryUntilElemIsLoaded(targetElemId, afterLoaded)*/
   }
 
-  @ViewChild('trsetting', {read: ViewContainerRef})
-  transformationSettingTargetEl: ViewContainerRef;
 
-  @ViewChild('vizsetting', {read: ViewContainerRef})
-  visualizationSettingTargetEl: ViewContainerRef;
+  //**************** 提交保存配置 *******************//
 
-
-
-  switchViz(newMode) {
-    let newConfig = this.config
-    let newParams = this.paragraph.settings.params
-
-    // graph options
-    newConfig.graph.mode = newMode
-
-    // see switchApp()
-    newConfig.set('helium.activeApp', undefined)
-
-    this.commitParagraphResult(this.paragraph.title, this.paragraph.text, newConfig, newParams)
-  }
-
+  //提交配置变更
   commitParagraphResult(title, text, config, params) {
     let self = this;
     //let newParagraphConfig = angular.copy(paragraph.config)
-    let newParagraphConfig = self.paragraph.config
+    let newParagraphConfig = DeepClone(self.paragraph.config)
     newParagraphConfig.results = newParagraphConfig.results || []
     newParagraphConfig.results[self.resultIndex] = config
     if (self.revisionView === true) {
@@ -710,9 +544,187 @@ export class ResultComponent implements OnInit,AfterViewInit,OnDestroy {
       }, newParagraphConfig.results[self.resultIndex], self.paragraph, self.resultIndex)
       self.renderResult(self.type, true)
     } else {
-      //return self.websocketMsgSrv.commitParagraph(self.paragraphid, title, text, newParagraphConfig, params)
+      return self.websocketMsgSrv.commitParagraph(self.paragraphid, title, text, newParagraphConfig, params,self.noteid)
     }
   }
+
+  //提交配置变更
+  commitConfig(config, params) {
+    this.commitParagraphResult(this.paragraph.title, this.paragraph.text, config, params)
+  }
+
+  //提交可视化配置变更
+  commitVizConfigChange(config, vizId) {
+    let self = this;
+    //let newConfig = angular.copy($scope.config)
+    let newConfig = self.config
+    if (!newConfig.graph) {
+      newConfig.graph = {}
+    }
+
+    // copy setting for vizId
+    if (!newConfig.graph.setting) {
+      newConfig.graph.setting = {}
+    }
+    //newConfig.graph.setting[vizId] = angular.copy(config)
+    newConfig.graph.setting[vizId] = Object.assign(config)
+
+    // copy common setting
+    if (newConfig.graph.setting[vizId]) {
+      newConfig.graph.commonSetting = newConfig.graph.setting[vizId].common
+      delete newConfig.graph.setting[vizId].common
+    }
+
+    // copy pivot setting
+    if (newConfig.graph.commonSetting && newConfig.graph.commonSetting.pivot) {
+      newConfig.graph.keys = newConfig.graph.commonSetting.pivot.keys
+      newConfig.graph.groups = newConfig.graph.commonSetting.pivot.groups
+      newConfig.graph.values = newConfig.graph.commonSetting.pivot.values
+      delete newConfig.graph.commonSetting.pivot
+    }
+    console.debug('committVizConfig', newConfig)
+    //let newParams = angular.copy(paragraph.settings.params)
+    let newParams = Object.assign({},self.paragraph.settings.params)
+
+    self.commitParagraphResult(self.paragraph.title, self.paragraph.text, newConfig, newParams)
+  }
+
+  //*************** App可视化插件管理 *******************//
+
+  // app states
+  apps = []
+
+  // suggested apps
+  suggestion = {
+    available:[]
+  }
+
+  getSuggestions() {
+    // Get suggested apps
+    let self = this;
+    let noteId = this.notebookCom.noteId
+    if (!noteId) {
+      return
+    }
+    this.httpCient.get(this.baseUrlSrv.getRestApiBase() + '/helium/suggest/' + noteId + '/' + this.paragraph.id)
+      .subscribe(
+        response => {
+          self.suggestion = response['body']
+        },
+        errorResponse => {
+          console.log('Error %o', errorResponse)
+        }
+      )
+  }
+
+  loadApp(heliumPackage) {
+    /*let noteId = $route.current.pathParams.noteId
+    $http.post(baseUrlSrv.getRestApiBase() + '/helium/load/' + noteId + '/' + paragraph.id, heliumPackage)
+      .success(function (data, status, headers, config) {
+        console.log('Load app %o', data)
+      })
+      .error(function (err, status, headers, config) {
+        console.log('Error %o', err)
+      })*/
+  }
+
+  getApplicationStates() {
+    let appStates = []
+
+    // Display ApplicationState
+    /*if (this.paragraph.apps) {
+      forEach(this.paragraph.apps, function (app) {
+        appStates.push({
+          id: app.id,
+          pkg: app.pkg,
+          status: app.status,
+          output: app.output
+        })
+      })
+    }*/
+
+    // update or remove app states no longer exists
+    /*forEach(this.apps, function (currentAppState, idx) {
+      let newAppState = appStates.find({id: currentAppState.id})
+      if (newAppState) {
+        angular.extend($scope.apps[idx], newAppState)
+      } else {
+        $scope.apps.splice(idx, 1)
+      }
+    })
+
+    // add new app states
+    _.forEach(appStates, function (app, idx) {
+      if ($scope.apps.length <= idx || $scope.apps[idx].id !== app.id) {
+        $scope.apps.splice(idx, 0, app)
+      }
+    })*/
+  }
+
+  getAppRegistry(appState) {
+    if (!appState.registry) {
+      appState.registry = {}
+    }
+
+    return appState.registry
+  }
+
+  getAppScope(appState) {
+    if (!appState.scope) {
+      //appState.scope = $rootScope.$new(true, $rootScope)
+    }
+    return appState.scope
+  }
+
+  //*************** 改变图表大小 *******************//
+
+  resizeTimer
+
+  mouseDown = false
+  onMouseDown(){ this.mouseDown = true}
+  onMouseUp(){ this.mouseDown = false}
+
+  mouseOver = false
+  onMouseOver(){ this.mouseOver = true }
+  onMouseOut(){ this.mouseOver = false }
+
+  test(e){
+    if(this.mouseDown && this.mouseOver){
+      console.log(">>>>>>>>>>>>>>>")
+      console.log(e)
+      //this.startResizeTimer(800,500)
+    }
+  }
+
+  killResizeTimer() {
+    let self = this;
+    if (self.resizeTimer) {
+      clearTimeout(self.resizeTimer)
+      self.resizeTimer = null
+    }
+  }
+
+  // 启动保存
+  startResizeTimer(width, height) {
+    let self = this;
+    self.killResizeTimer()
+    self.resizeTimer = setTimeout(function () {
+      console.log("resize start")
+      self.changeHeight(width, height)
+    }, 2000)
+  }
+
+  changeHeight(width, height) {
+    let newParams = this.paragraph.settings.params
+    let newConfig = DeepClone(this.config)
+
+    newConfig.graph.height = height
+    //this.paragraph.config.colWidth = width
+
+    this.commitParagraphResult(this.paragraph.title, this.paragraph.text, newConfig, newParams)
+  }
+
+  //*************** 展示图表配置 *******************//
 
   toggleGraphSetting() {
     //let newConfig = angular.copy($scope.config)
@@ -766,221 +778,186 @@ export class ResultComponent implements OnInit,AfterViewInit,OnDestroy {
     return config
   }
 
-  commitVizConfigChange(config, vizId) {
-    let self = this;
-    //let newConfig = angular.copy($scope.config)
-    let newConfig = self.config
-    if (!newConfig.graph) {
-      newConfig.graph = {}
-    }
 
-    // copy setting for vizId
-    if (!newConfig.graph.setting) {
-      newConfig.graph.setting = {}
-    }
-    //newConfig.graph.setting[vizId] = angular.copy(config)
-    Object.assign(newConfig.graph.setting[vizId], config)
 
-    // copy common setting
-    if (newConfig.graph.setting[vizId]) {
-      newConfig.graph.commonSetting = newConfig.graph.setting[vizId].common
-      delete newConfig.graph.setting[vizId].common
-    }
 
-    // copy pivot setting
-    if (newConfig.graph.commonSetting && newConfig.graph.commonSetting.pivot) {
-      newConfig.graph.keys = newConfig.graph.commonSetting.pivot.keys
-      newConfig.graph.groups = newConfig.graph.commonSetting.pivot.groups
-      newConfig.graph.values = newConfig.graph.commonSetting.pivot.values
-      delete newConfig.graph.commonSetting.pivot
-    }
-    console.debug('committVizConfig', newConfig)
-    //let newParams = angular.copy(paragraph.settings.params)
-    let newParams = Object.assign({},self.paragraph.settings.params)
 
-    self.commitParagraphResult(self.paragraph.title, self.paragraph.text, newConfig, newParams)
+
+
+
+  // prevent body area scrollbar from blocking due to scroll in paragraph results
+
+
+  getPointerEvent() {
+    return (this.mouseOver) ? {'pointer-events': 'auto' }
+      : {'pointer-events': 'none' }
   }
 
-  /*$scope.$on('paragraphResized', function (event, paragraphId) {
-    // paragraph col width changed
-    if (paragraphId === paragraph.id) {
-      let builtInViz = builtInVisualizations[$scope.graphMode]
-      if (builtInViz && builtInViz.instance) {
-        builtInViz.instance.resize()
-      }
+  getTextResultElemId(resultId) {
+    return `p${resultId}_text`
+  }
+
+  removeChildrenDOM(targetElemId) {
+    const elem = this.commonService._jQuery(`#${targetElemId}`)
+    if (elem.length) {
+      elem.children().remove()
     }
-  })*/
-
-  resize(width, height) {
-    setTimeout(function () {
-      this.changeHeight(width, height)
-    }, 200)
   }
 
-  changeHeight(width, height) {
-    let newParams = this.paragraph.settings.params
-    //let newConfig = angular.copy($scope.config)
-    let newConfig = this.config
+  appendTextOutput(data) {
+    /*const elemId = getTextResultElemId($scope.id)
+    textResultQueueForAppend.push(data)
 
-    newConfig.graph.height = height
-    this.paragraph.config.colWidth = width
-
-    this.commitParagraphResult(this.paragraph.title, this.paragraph.text, newConfig, newParams)
-  }
-
-  // app states
-  apps = []
-
-  // suggested apps
-  suggestion = {
-    available:[]
-  }
-
-  getSuggestions() {
-    // Get suggested apps
-    let self = this;
-    let noteId = this.notebookCom.noteId
-    if (!noteId) {
+    // if DOM is not loaded, just push data and return
+    if (!isDOMLoaded(elemId)) {
       return
     }
-    this.httpCient.get(this.baseUrlSrv.getRestApiBase() + '/helium/suggest/' + noteId + '/' + this.paragraph.id)
-      .subscribe(
-        response => {
-          self.suggestion = response['body']
-        },
-        errorResponse => {
-          console.log('Error %o', errorResponse)
-        }
-      )
-  }
 
-  exportToDSV(delimiter) {
-    /*let dsv = ''
-    let dateFinished = moment(paragraph.dateFinished).format('YYYY-MM-DD hh:mm:ss A')
-    let exportedFileName = paragraph.title ? paragraph.title + '_' + dateFinished : 'data_' + dateFinished
+    const elem = angular.element(`#${elemId}`)
 
-    for (let titleIndex in tableData.columns) {
-      dsv += tableData.columns[titleIndex].name + delimiter
-    }
-    dsv = dsv.substring(0, dsv.length - 1) + '\n'
-    for (let r in tableData.rows) {
-      let row = tableData.rows[r]
-      let dsvRow = ''
-      for (let index in row) {
-        let stringValue = (row[index]).toString()
-        if (stringValue.indexOf(delimiter) > -1) {
-          dsvRow += '"' + stringValue + '"' + delimiter
-        } else {
-          dsvRow += row[index] + delimiter
-        }
+    // pop all stacked data and append to the DOM
+    while (textResultQueueForAppend.length > 0) {
+      const line = textResultQueueForAppend.pop()
+      elem.append(angular.element('<div></div>').text(line))
+
+      if ($scope.keepScrollDown) {
+        const doc = angular.element(`#${elemId}`)
+        doc[0].scrollTop = doc[0].scrollHeight
       }
-      dsv += dsvRow.substring(0, dsvRow.length - 1) + '\n'
-    }
-    let extension = ''
-    if (delimiter === '\t') {
-      extension = 'tsv'
-    } else if (delimiter === ',') {
-      extension = 'csv'
-    }
-    saveAsService.saveAs(dsv, exportedFileName, extension)*/
-  }
-
-
-
-  getBase64ImageSrc(base64Data) {
-    return 'data:image/png;base64,' + base64Data
-  }
-
-  switchApp(appId) {
-    //let newConfig = Object.assign({}, this.config)
-    let newConfig = this.config
-    //let newParams = Object.assign({}, this.paragraph.settings.params)
-    let newParams = this.paragraph.settings.params
-
-    // 'helium.activeApp' can be cleared by switchViz()
-    newConfig.set('helium.activeApp', appId)
-
-    //this.commitConfig(newConfig, newParams)
-  }
-
-  loadApp(heliumPackage) {
-    /*let noteId = $route.current.pathParams.noteId
-    $http.post(baseUrlSrv.getRestApiBase() + '/helium/load/' + noteId + '/' + paragraph.id, heliumPackage)
-      .success(function (data, status, headers, config) {
-        console.log('Load app %o', data)
-      })
-      .error(function (err, status, headers, config) {
-        console.log('Error %o', err)
-      })*/
-  }
-
-  commitConfig(config, params) {
-    this.commitParagraphResult(this.paragraph.title, this.paragraph.text, config, params)
-  }
-
-  getApplicationStates() {
-    let appStates = []
-
-    // Display ApplicationState
-    /*if (this.paragraph.apps) {
-      forEach(this.paragraph.apps, function (app) {
-        appStates.push({
-          id: app.id,
-          pkg: app.pkg,
-          status: app.status,
-          output: app.output
-        })
-      })
     }*/
+  }
 
-    // update or remove app states no longer exists
-    /*forEach(this.apps, function (currentAppState, idx) {
-      let newAppState = appStates.find({id: currentAppState.id})
-      if (newAppState) {
-        angular.extend($scope.apps[idx], newAppState)
-      } else {
-        $scope.apps.splice(idx, 1)
-      }
-    })
 
-    // add new app states
-    _.forEach(appStates, function (app, idx) {
-      if ($scope.apps.length <= idx || $scope.apps[idx].id !== app.id) {
-        $scope.apps.splice(idx, 0, app)
-      }
+  //********************* 公用数据 ********************//
+
+  //外部传入字段
+  paragraphid
+  index
+  noteid
+
+  //结果的类型 TABLE NETWORK
+  type = null
+
+  //结果数据
+  data
+
+  //结果的配置
+  config = null
+
+  //resultId = paragraph.id + index
+  id = null
+
+  //片段对象
+  paragraph
+
+  //结果的索引【第几个结果】
+  resultIndex
+
+  //Table结果的实例
+  tableData
+
+  // available columns in tabledata
+  tableDataColumns = []
+
+  tableDataComment
+
+
+  networkNodes
+  networkRelationships
+  networkProperties
+
+
+  // enable helium
+  enableHelium = false
+
+  //图表的类型
+  graphMode = null
+
+  // image data
+  imageData = null
+
+  // queue for append output
+  textResultQueueForAppend = []
+
+  revisionView
+
+  result
+
+  //当初次加载时的初始化方法
+  init(result, config, paragraph, index) {
+    // register helium plugin vis packages
+    let self = this;
+
+    //let visPackages = heliumService.getVisualizationCachedPackages()
+    //const visPackageOrder = heliumService.getVisualizationCachedPackageOrder()
+
+    // push the helium vis packages following the order
+    /*visPackageOrder.map(visName => {
+      visPackages.map(vis => {
+        if (vis.name !== visName) { return }
+        self.builtInTableDataVisualizationList.push({
+          id: vis.id,
+          name: vis.name,
+          icon: $sce.trustAsHtml(vis.icon),
+          supports: [DefaultDisplayType.TABLE, DefaultDisplayType.NETWORK]
+        })
+        self.builtInVisualizations[vis.id] = {
+          class: vis.class
+        }
+      })
     })*/
+
+    self.updateData(result, config, paragraph, index)
+    self.renderResult(self.type,false)
   }
 
-  renderApp(targetElemId, appState) {
-    /*const afterLoaded = (loadedElem) => {
-      try {
-        console.log('renderApp %o', appState)
-        loadedElem.html(appState.output)
-        $compile(loadedElem.contents())(getAppScope(appState))
-      } catch (err) {
-        console.log('App rendering error %o', err)
+  // 更新组件内部数据
+  updateData(result, config, paragraphRef, index) {
+    this.data = result.data
+    this.paragraph = paragraphRef
+    this.resultIndex = parseInt(index)
+
+    this.id = this.paragraph.id + '_' + index
+    this.type = result.type
+    this.config = config ? config : {}
+
+    // initialize default config values
+    if (!this.config.graph) {
+      this.config.graph = {}
+    }
+
+    if (!this.config.graph.mode) {
+      this.config.graph.mode = 'table'
+    }
+
+    if (!this.config.graph.height) {
+      this.config.graph.height = 300
+    }
+
+    if (!this.config.graph.optionOpen) {
+      this.config.graph.optionOpen = false
+    }
+
+    this.graphMode = this.config.graph.mode
+    this.config = Object.assign({},config)
+
+    // enable only when it is last result
+    this.enableHelium = (index === paragraphRef.results.msg.length - 1)
+
+    if (this.type === 'TABLE' || this.type === 'NETWORK') {
+      this.tableData = new DatasetFactory().createDataset(this.type)
+      this.tableData.loadParagraphResult({type: this.type, msg: this.data})
+      this.tableDataColumns = this.tableData.columns
+      this.tableDataComment = this.tableData.comment
+      if (this.type === 'NETWORK') {
+        this.networkNodes = this.tableData.networkNodes
+        this.networkRelationships = this.tableData.networkRelationships
+        this.networkProperties = this.tableData.networkProperties
       }
+    } else if (this.type === 'IMG') {
+      this.imageData = this.data
     }
-    this.retryUntilElemIsLoaded(targetElemId, afterLoaded)*/
   }
-
-  getAppRegistry(appState) {
-    if (!appState.registry) {
-      appState.registry = {}
-    }
-
-    return appState.registry
-  }
-
-  getAppScope(appState) {
-    if (!appState.scope) {
-      //appState.scope = $rootScope.$new(true, $rootScope)
-    }
-    return appState.scope
-  }
-
-
-
 
   constructor(private websocketMsgSrv:WebsocketMessageService,
               private elementRef: ElementRef,
@@ -990,18 +967,8 @@ export class ResultComponent implements OnInit,AfterViewInit,OnDestroy {
               private jitCompile:JitCompileService,
               private renderer2:Renderer2,
               private commonService:CommonService,
-              private eventService:EventService1,
+              private eventService:EventService,
               private highlightJsService : HighlightJsService) {
-
-    this.items = [
-      {label: 'CSV', command: () => {
-          this.exportToDSV(',');
-        }},
-      {label: 'TSV', command: () => {
-          this.exportToDSV('\t');
-        }}
-    ];
-
   }
 
   subscribers = []
@@ -1197,7 +1164,7 @@ export class ResultComponent implements OnInit,AfterViewInit,OnDestroy {
     // 监听片段更改结果
     self.eventService.subscribeRegister(self.subscribers,'paragraphResized', function (paragraphId) {
       // paragraph col width changed
-      if (paragraphId === paragraph.id) {
+      if (paragraphId === self.paragraph.id) {
         let builtInViz = self.builtInVisualizations[self.graphMode]
         if (builtInViz && builtInViz.instance) {
           builtInViz.instance.resize()
@@ -1205,21 +1172,85 @@ export class ResultComponent implements OnInit,AfterViewInit,OnDestroy {
       }
     })
 
-  }
+    self.eventService.subscribeRegister(self.subscribers,'appendParagraphOutput', function (data) {
+      /* It has been observed that append events
+       * can be errorneously called even if paragraph
+       * execution has ended, and in that case, no append
+       * should be made. Also, it was observed that between PENDING
+       * and RUNNING states, append-events can be called and we can't
+       * miss those, else during the length of paragraph run, few
+       * initial output line/s will be missing.
+       */
+      if (self.paragraph.id === data.paragraphId &&
+        self.resultIndex === data.index &&
+        (self.paragraph.status === ParagraphStatus.PENDING || paragraph.status === ParagraphStatus.RUNNING)) {
+        if (DefaultDisplayType.TEXT !== self.type) {
+          self.type = DefaultDisplayType.TEXT
+        }
+        self.appendTextOutput(data.data)
+      }
+    })
 
-  ngAfterViewInit(): void {
-
-    //console.log(this.TrSettingElem)
-
-    /*let self = this;
-    let paragraph = self.notebookCom.getParagraphById(self.paragraphid);
-
-    this.init(paragraph.results.msg[self.index],paragraph.config.results[self.index],paragraph,self.index)*/
   }
 
   ngOnDestroy(): void {
     this.eventService.unsubscribeSubscriptions(this.subscribers)
   }
 
+  //***************** Utils ******************//
+
+  //当DOM准备好的时候调用方法
+  retryUntilElemIsLoaded (targetElemId, callback) {
+    let self = this;
+    function retry () {
+      if (!self.isDOMLoaded(targetElemId)) {
+        setTimeout(retry, 10)
+        return
+      }
+      callback(targetElemId)
+    }
+    setTimeout(retry,10)
+  }
+
+  //检测DOM是否已经加载
+  isDOMLoaded(targetElemId) {
+    return this.commonService._jQuery(`#${targetElemId}`).length > 0
+  }
+
+  //获取展示结果ID
+  createDisplayDOMId(baseDOMId, type) {
+    if (type === DefaultDisplayType.TABLE || type === DefaultDisplayType.NETWORK) {
+      return `${baseDOMId}_graph`
+    } else if (type === DefaultDisplayType.HTML) {
+      return `${baseDOMId}_html`
+    } else if (type === DefaultDisplayType.ANGULAR) {
+      return `${baseDOMId}_angular`
+    } else if (type === DefaultDisplayType.TEXT) {
+      return `${baseDOMId}_text`
+    } else if (type === DefaultDisplayType.ELEMENT) {
+      return `${baseDOMId}_elem`
+    } else {
+      console.error(`Cannot create display DOM Id due to unknown display type: ${type}`)
+    }
+  }
+
+  //获取展示数据转换设置的Elem
+  getTrSettingElem(scopeId, graphMode) {
+    return this.getDomById('#trsetting' + scopeId + '_' + graphMode)
+  }
+
+  //获取展示数据可视化设置的Elem
+  getVizSettingElem(scopeId, graphMode) {
+    return this.getDomById('#vizsetting' + scopeId + '_' + graphMode)
+  }
+
+  getDomById(targetElemId){
+    return this.elementRef.nativeElement.querySelector(`${targetElemId}`)
+  }
+
+  //获取图片Base64地址
+  getBase64ImageSrc(base64Data) {
+    return 'data:image/png;base64,' + base64Data
+  }
 
 }

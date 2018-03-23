@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {CarService} from "../../demo/service/carservice";
-import {EventService1} from "../../service/event/event.service";
+import {EventService} from "../../service/event/event.service";
 import {CommonService} from "../../service/common/common.service";
 import {AppComponent} from "../../app.component";
 
@@ -19,8 +18,7 @@ export class BussDashboardComponent implements OnInit {
   // 所有的NotesList
   notesList = []
 
-  constructor(private carService: CarService,
-              private eventService: EventService1,
+  constructor(private eventService: EventService,
               public appCom: AppComponent,
               private commonService:CommonService) {
     let self = this;

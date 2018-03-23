@@ -391,7 +391,7 @@
                         <!-- shade guava and proto-buf, because it might conflict with those of spark -->
                         <relocation>
                             <pattern>com.google</pattern>
-                            <shadedPattern>com.smartsuites..com.google</shadedPattern>
+                            <shadedPattern>com.smartsuites.com.google</shadedPattern>
                         </relocation>
                         <!-- shade netty, because it might conflict with that of spark-->
                         <relocation>

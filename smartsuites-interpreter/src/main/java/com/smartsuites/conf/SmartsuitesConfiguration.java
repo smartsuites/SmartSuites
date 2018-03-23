@@ -459,6 +459,15 @@ public class SmartsuitesConfiguration extends XMLConfiguration {
     return new File(shiroPath).exists() ? shiroPath : StringUtils.EMPTY;
   }
 
+  public String getDataBasePath(){
+    String dbPath = getRelativeDir(String.format("%s/database/", getConfDir()));
+    return new File(dbPath).exists() ? dbPath : StringUtils.EMPTY;
+  }
+
+  public String getDataBaseName(){
+    return "smart";
+  }
+
   public String getInterpreterRemoteRunnerPath() {
     return getRelativeDir(ConfVars.SMARTSUITES_INTERPRETER_REMOTE_RUNNER);
   }
