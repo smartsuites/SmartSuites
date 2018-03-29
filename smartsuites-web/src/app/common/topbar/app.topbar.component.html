@@ -19,9 +19,9 @@
       <li #profile class="profile-item" *ngIf="app.profileMode==='top'||app.isHorizontal()"
           [ngClass]="{'active-top-menu':app.activeTopbarItem === profile}">
 
-        <a href="#" (click)="app.onTopbarItemClick($event,profile)">
+        <a href="#" (click)="app.onTopbarItemClick($event,profile)" style="min-width: 100px;">
           <img class="profile-image" src="assets/layout/images/avatar5.png"/>
-          <span class="topbar-item-name">{{this.loginService.getLoginUsername()}}</span>
+          <span class="topbar-item-name">{{this.loginService.getLoginUsername()}}</span><br/>
           <span class="topbar-item-role" style="font-size: 11px">{{this.loginService.getRole()}}</span>
         </a>
 
@@ -71,14 +71,15 @@
             <a class="topbar-message">
               <i class="fa fa-fw fa-book"></i>
               <span>{{note.name}}</span>
-              <i class="fa fa-fw fa-reply-all" style="float: right; cursor: pointer; color: red"></i>
+              <i class="fa fa-fw fa-reply-all" style="float: right; cursor: pointer; color: red" (click)="restoreNote(note.id)"></i>
             </a>
           </li>
           <li role="menuitem">
             &nbsp;
           </li>
           <li role="menuitem">
-            <button pButton type="button" icon="fa-recycle" label="清空回收站" style="width: 100%;-webkit-border-radius: 0px;border-radius: 0px;" class="ui-button-secondary"></button>
+            <button pButton type="button" icon="fa-recycle" label="清空回收站" (click)="clearTheTrash()"
+                    style="width: 100%;-webkit-border-radius: 0px;border-radius: 0px;" class="ui-button-secondary"></button>
           </li>
         </ul>
       </li>
@@ -137,7 +138,7 @@
     <p>A web-based notebook that enables interactive data analytics. You can make beautiful<br/> data-driven, interactive and collaborative documents with SQL, Scala and more.</p>
   </div>
   <p-footer>
-    CopyRight @2017 联思智云(北京)科技有限公司
+    CopyRight @2018 联思智云(北京)科技有限公司
   </p-footer>
 
 </p-dialog>

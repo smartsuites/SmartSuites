@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 @Injectable()
 export class NoteListService {
 
-  TRASH_FOLDER_ID
+  TRASH_FOLDER_ID = "~Trash"
 
   notes = {
     root: {children: []},

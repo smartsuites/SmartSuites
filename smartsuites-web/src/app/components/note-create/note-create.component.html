@@ -16,7 +16,7 @@
   </div>
 
   <p-footer>
-    <button type="button" pButton icon="fa-plus-circle" (click)="createNote()" label="{{clone? '克隆':'创建'}}笔记"></button>
+    <button type="button" pButton icon="fa-plus-circle" (click)="createNote();dialogDisplay=false" label="{{clone? '克隆':'创建'}}笔记"></button>
   </p-footer>
 
 </p-dialog>

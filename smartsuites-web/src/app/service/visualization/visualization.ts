@@ -3,7 +3,7 @@
  */
 
 /**
- * Base class for visualization.
+ * 可视化基类
  */
 export default class Visualization {
 
@@ -12,9 +12,6 @@ export default class Visualization {
 
   //整体配置
   config
-
-  //Angularjs5 渲染引擎
-  _renderer
 
   //提交变更方法
   _emitter
@@ -41,11 +38,11 @@ export default class Visualization {
   _createNewScope
   _templateRequest
 
-  constructor (targetElId, config, renderer, emitter, jitCompiler, commonService) {
+  // 初始化方法
+  constructor (targetElId, config, emitter, jitCompiler, commonService) {
     this.targetElId = targetElId
     this.config = config
     this._emitter = emitter
-    this._renderer = renderer
     this._jitCompiler = jitCompiler
     this._commonService = commonService
     this._dirty = false
@@ -56,41 +53,30 @@ export default class Visualization {
     this.echarts = commonService._echarts
   }
 
-  /**
-   * Get transformation.
-   * @abstract
-   * @return {Transformation}
-   */
+  // 获取对应的数据转换器
   getTransformation () {
     // override this
     throw new TypeError('Visualization.getTransformation() should be overrided')
   }
 
-  /**
-   * Method will be invoked when data or configuration changed.
-   * @abstract
-   */
+  // 渲染数据
   render (tableData) {
     // override this
     throw new TypeError('Visualization.render() should be overrided')
   }
 
-  /**
-   * Refresh visualization.
-   */
+  // 刷新可视化
   refresh () {
     // override this
   }
 
-  /**
-   * Method will be invoked when visualization need to be destroyed.
-   * Don't need to destroy this.targetEl.
-   */
+  // 移除可视化，Don't need to destroy this.targetEl.
   destroy () {
     // override this
   }
 
   /**
+   * 返回配置片段信息
    * return {
    *   template : angular template string or url (url should end with .html),
    *   scope : an object to bind to template scope
@@ -106,9 +92,7 @@ export default class Visualization {
     }
   }
 
-  /**
-   * Activate. Invoked when visualization is selected.
-   */
+  // 当图表被选择的时候会调用
   activate () {
     if (!this._active || this._dirty) {
       this.refresh()
@@ -117,23 +101,17 @@ export default class Visualization {
     this._active = true
   }
 
-  /**
-   * Deactivate. Invoked when visualization is de selected.
-   */
+  // 钝化图表
   deactivate () {
     this._active = false
   }
 
-  /**
-   * Is active.
-   */
+  // 当前可视化是否激活
   isActive () {
     return this._active
   }
 
-  /**
-   * When window or paragraph is resized.
-   */
+  // 当窗口或者片段被重新缩放时调用
   resize () {
     if (this.isActive()) {
       this.refresh()
@@ -142,9 +120,7 @@ export default class Visualization {
     }
   }
 
-  /**
-   * Set new config.
-   */
+  // 设置图表配置
   setConfig (config) {
     this.config = config
     if (this.isActive()) {
@@ -154,16 +130,12 @@ export default class Visualization {
     }
   }
 
-  /**
-   * Emit config. config will sent to server and saved.
-   */
+  // 提交图表配置保存
   emitConfig (config) {
     //this._emitter(config)
   }
 
-  /**
-   * Render setting.
-   */
+  // 渲染图表配置界面
   renderSetting (targetEl) {
     let self = this
     let setting = this.getSetting()

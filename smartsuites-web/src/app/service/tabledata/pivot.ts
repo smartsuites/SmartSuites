@@ -90,6 +90,41 @@ export default class PivotTransformation extends Transformation {
     }
     config.values = config.values || []
 
+    // TODO 需要提供可以拖拽的网页
+    //************* Auto Add Other Values **************//
+    let leftValues = []
+    for(let columns of this.tableDataColumns){
+      let brek = false
+      for(let key of config.keys){
+        if(key.name === columns.name){
+          brek = true;
+          continue;
+        }
+      }
+
+      for(let value of config.values){
+        if(value.name === columns.name){
+          brek = true;
+          continue;
+        }
+      }
+      if(!brek)
+        leftValues.push(columns)
+    }
+
+    // 默认将第一个作为维度
+    if(config.keys.length == 0){
+      config.keys.push(leftValues[0])
+      leftValues.splice(0,1)
+    }
+
+    leftValues.forEach((item,index,arr) => {
+      config.values.push(item)
+    })
+
+
+    //*************    END   *********************//
+
     this.removeUnknown()
     if (firstTime) {
       this.selectDefault()

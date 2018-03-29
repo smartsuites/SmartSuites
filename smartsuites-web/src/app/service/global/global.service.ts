@@ -11,8 +11,6 @@ export class GlobalService {
 
   login:boolean
 
-  role:string
-
   isMac:boolean
 
   constructor() {

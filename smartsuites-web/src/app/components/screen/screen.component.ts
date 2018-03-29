@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import {MenuItem, SelectItem} from "primeng/primeng";
+import {HttpClient} from "@angular/common/http";
+import {BaseUrlService} from "../../service/base-url/base-url.service";
+import {GlobalService} from "../../service/global/global.service";
 
 @Component({
   selector: 'app-screen',
@@ -8,23 +11,21 @@ import {MenuItem, SelectItem} from "primeng/primeng";
 })
 export class ScreenComponent implements OnInit {
 
-  items: MenuItem[];
+  directory
+  tmpItems = []
+  // 可视化树目录
+  items: MenuItem[] = [];
 
   stepsItems: MenuItem[];
 
-  //********** Create Note ***********//
-  createNoteDialogDisplay: boolean = false;
+  // 当页的可视化数组
+  visions = []
 
-  showCreateNoteDialog() {
-    this.createNoteDialogDisplay = true;
-  }
+  selectedDirId
 
-  cities1: SelectItem[];
-
-  noteName
-  defaultInter
-
-  constructor() { }
+  constructor(public httpClient:HttpClient,
+              public baseUrlSrv:BaseUrlService,
+              public globalService:GlobalService) { }
 
   ngOnInit() {
 
@@ -40,79 +41,94 @@ export class ScreenComponent implements OnInit {
       }
     ];
 
-    this.items = [
-      {
-        label: 'File',
-        icon: 'fa-file-o',
-        badge: '5',
-        items: [{
-          label: 'New',
-          icon: 'fa-plus',
-          items: [
-            {label: 'Project',badge: '5'},
-            {label: 'Other'},
-          ]
+    this.getVisionTree()
+  }
+
+  getVisionTree(){
+    let self = this;
+    this.httpClient.get(this.baseUrlSrv.getRestApiBase() + '/directory')
+      .subscribe(
+        response => {
+          console.log('Success %o', response)
+          self.directory = response['body']
+
+          self.directory.forEach((item, index, array) => {
+            self.createTree(self.tmpItems, item);
+          })
+          self.items = self.tmpItems[0].items
         },
-          {label: 'Open'},
-          {label: 'Quit'}
-        ]
-      },
-      {
-        label: 'Edit',
-        icon: 'fa-edit',
+        errorResponse => {
+          console.log('Error %o', errorResponse)
+        }
+      );
+  }
+
+  deleteVisionNotes(dirid,noteid){
+    let self = this;
+    self.visions = []
+    this.httpClient.delete(self.baseUrlSrv.getRestApiBase() + '/directory/'+dirid+"/" + self.globalService.ticket.principal +"/"+noteid)
+      .subscribe(
+        response => {
+          console.log('Success %o', response)
+          //self.fetchVisionNotes(dirid);
+        },
+        errorResponse => {
+          console.log('Error %o', errorResponse)
+        }
+      );
+  }
+
+  fetchVisionNotes(dirid){
+    let self = this;
+    self.visions = []
+    this.httpClient.get(self.baseUrlSrv.getRestApiBase() + '/directory/'+dirid+"/"+self.globalService.ticket.principal)
+      .subscribe(
+        response => {
+          console.log('Success %o', response)
+          self.visions = response['body']
+          self.selectedDirId = dirid;
+        },
+        errorResponse => {
+          console.log('Error %o', errorResponse)
+        }
+      );
+  }
+
+  createTree(children, item):boolean{
+    let self = this
+    if(children.length == 0 && item.parent_directory == -1){
+      children.push({
+        label: item.directory_name,
+        icon: 'fa-pie-chart',
         badge: '5',
-        items: [
-          {label: 'Undo', icon: 'fa-mail-forward'},
-          {label: 'Redo', icon: 'fa-mail-reply'}
-        ]
-      },
-      {
-        label: 'Help',
-        icon: 'fa-question',
-        items: [
-          {
-            label: 'Contents'
+        command: (event) => {
+          self.fetchVisionNotes(event.item.id)
+        },
+        id: item.id
+      })
+      return true;
+    }
+
+    for(let child of children){
+      if(child.id == item.parent_directory){
+        if(!child.items)
+          child.items = []
+        child.items.push({
+          label: item.directory_name,
+          icon: 'fa-pie-chart',
+          badge: '5',
+          command: (event) => {
+            self.fetchVisionNotes(event.item.id)
           },
-          {
-            label: 'Search',
-            icon: 'fa-search',
-            items: [
-              {
-                label: 'Text',
-                items: [
-                  {
-                    label: 'Workspace'
-                  }
-                ]
-              },
-              {
-                label: 'File'
-              }
-            ]}
-        ]
-      },
-      {
-        label: 'Actions',
-        icon: 'fa-gear',
-        items: [
-          {
-            label: 'Edit',
-            icon: 'fa-refresh',
-            items: [
-              {label: 'Save', icon: 'fa-save'},
-              {label: 'Update', icon: 'fa-save'},
-            ]
-          },
-          {
-            label: 'Other',
-            icon: 'fa-phone',
-            items: [
-              {label: 'Delete', icon: 'fa-minus'}
-            ]
-          }
-        ]
+          id: item.id
+        })
+        return true;
+      }else{
+        if(child.items)
+          this.createTree(child.items, item)
       }
-    ];
+    }
+    return false;
   }
 
 }

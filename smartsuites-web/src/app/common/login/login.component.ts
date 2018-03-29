@@ -25,10 +25,10 @@ export class LoginComponent implements OnInit {
   formType: FormType
 
   // 选择的角色
-  selectedRole = "analyst";
+  //selectedRole = "analyst";
 
   constructor(private eventService: EventService,
-              private loginService: LoginService) {
+              public loginService: LoginService) {
     this.formType = FormType.Login
   }
 
@@ -44,13 +44,6 @@ export class LoginComponent implements OnInit {
     this.eventService.subscribe('session_logout', function (event, data) {
       self.loginService.logout()
     })
-
-    /*
-     ** $scope.$on functions below  TODO 暂时不知道干么
-     */
-    this.eventService.subscribe('initLoginValues', function () {
-      this.initValues()
-    })
   }
 
   showRegisterForm() {
@@ -65,10 +58,25 @@ export class LoginComponent implements OnInit {
     this.formType = FormType.Login
   }
 
-  _submitLoginForm() {
-    this.loginService.setRole(this.selectedRole)
-    this.loginService.login()
+  _submitLoginForm(username, password) {
+    let self = this;
+    if(username == '' || password == ''){
+      this.loginService.message= "请输入用户名和密码！";
+      setTimeout(function(){
+        self.loginService.message= "";
+      },2000)
+      return;
+    }
+    this.loginService.login(username, password)
+  }
 
+  KeyDown(event,username, password){
+    if (event.keyCode == 13)
+    {
+      event.returnValue=false;
+      event.cancel = true;
+      this._submitLoginForm(username, password);
+    }
   }
 
   _submitRegisterForm() {

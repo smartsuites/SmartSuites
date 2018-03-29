@@ -396,23 +396,23 @@
               The interpreter will be instantiated
 
               <select #instance (change)="onInstanceModeChange(instance.value,setting)" [disabled]="!isCurrentEdit(setting.id)">
-                <option value="Globally" [selected]="getInterpreterRunningOption(setting) == 'Globally'">Globally</option>
-                <option value="Per Note" [selected]="getInterpreterRunningOption(setting) == 'Per Note'">Per Note</option>
-                <option value="Per User" [selected]="getInterpreterRunningOption(setting) == 'Per User'" *ngIf="this.globalService.ticket.principal !== 'anonymous'">Per User</option>
+                <option value="Globally" [selected]="getInterpreterRunningOption(setting.id) == 'Globally'">Globally</option>
+                <option value="Per Note" [selected]="getInterpreterRunningOption(setting.id) == 'Per Note'">Per Note</option>
+                <option value="Per User" [selected]="getInterpreterRunningOption(setting.id) == 'Per User'" *ngIf="this.globalService.ticket.principal !== 'anonymous'">Per User</option>
               </select>
 
               in
 
               <select #option (change)="onOptionModeChange(option.value,setting)" [disabled]="!isCurrentEdit(setting.id)">
-                <option value="shared per note" *ngIf="getInterpreterRunningOption(setting) === 'Globally'" [selected]="getOption(setting) === 'shared per note'"
+                <option value="shared per note" *ngIf="getInterpreterRunningOption(setting.id) === 'Globally'" [selected]="getOption(setting.id) === 'shared per note'"
                         pTooltip="Single interpreter instance are shared across notes">shared per note</option>
-                <option value="scoped per note" *ngIf="getInterpreterRunningOption(setting) === 'Per Note'"  [selected]="getOption(setting) === 'scoped per note'"
+                <option value="scoped per note" *ngIf="getInterpreterRunningOption(setting.id) === 'Per Note'"  [selected]="getOption(setting.id) === 'scoped per note'"
                         pTooltip="Separate Interpreter instance for each note">scoped per note</option>
-                <option value="scoped per user" *ngIf="getInterpreterRunningOption(setting) === 'Per User'"  [selected]="getOption(setting) === 'scoped per user'"
+                <option value="scoped per user" *ngIf="getInterpreterRunningOption(setting.id) === 'Per User'"  [selected]="getOption(setting.id) === 'scoped per user'"
                         pTooltip="Separate Interpreter instance for each note">scoped per user</option>
-                <option value="isolated per note" *ngIf="getInterpreterRunningOption(setting) === 'Per Note'"  [selected]="getOption(setting) === 'isolated per note'"
+                <option value="isolated per note" *ngIf="getInterpreterRunningOption(setting.id) === 'Per Note'"  [selected]="getOption(setting.id) === 'isolated per note'"
                         pTooltip="Separate Interpreter process for each note">isolated per note</option>
-                <option value="isolated per user" *ngIf="getInterpreterRunningOption(setting) === 'Per User'"  [selected]="getOption(setting) === 'isolated per user'"
+                <option value="isolated per user" *ngIf="getInterpreterRunningOption(setting.id) === 'Per User'"  [selected]="getOption(setting.id) === 'isolated per user'"
                         pTooltip="Separate Interpreter process for each note">isolated per user</option>
               </select>
 
@@ -422,7 +422,7 @@
                  ptooltip="Can manage interpreter sessions differently by setting this option. Click this button to learn more"
                  href="{{getInterpreterBindingModeDocsLink()}}" target="_blank"></a>
 
-              <span *ngIf="getInterpreterRunningOption(setting) === 'Per User' && this.globalService.ticket.principal !== 'anonymous'">
+              <span *ngIf="getInterpreterRunningOption(setting.id) === 'Per User' && this.globalService.ticket.principal !== 'anonymous'">
                 <span *ngIf="getPerNoteOption(setting) === 'shared'">
                   <button type="button" class="btn btn-default btn-xs"
                           (click)="setPerNoteOption('scoped',setting)"
@@ -434,7 +434,7 @@
 
               <div class="row interpreter"
                    style="margin-top: 6px;"
-                   *ngIf="getInterpreterRunningOption(setting) === 'Per User' && this.globalService.ticket.principal != 'anonymous' && getPerNoteOption(setting) !== 'shared'">
+                   *ngIf="getInterpreterRunningOption(setting.id) === 'Per User' && this.globalService.ticket.principal != 'anonymous' && getPerNoteOption(setting) !== 'shared'">
                 <div class="col-md-12">
                   <span>
                     <span class="hidden-xs" style="padding-left: 190px;">And </span>
@@ -470,7 +470,7 @@
 
             </div>
 
-            <div class="ui-g-12" *ngIf="getInterpreterRunningOption(setting)=='Per User' && getPerUserOption(setting)=='isolated'">
+            <div class="ui-g-12" *ngIf="getInterpreterRunningOption(setting.id)=='Per User' && getPerUserOption(setting)=='isolated'">
               <p-checkbox label="User Impersonate" binary="true" [(ngModel)]="setting.option.isUserImpersonate" [disabled]="!isCurrentEdit(setting.id)"></p-checkbox>
             </div>
 

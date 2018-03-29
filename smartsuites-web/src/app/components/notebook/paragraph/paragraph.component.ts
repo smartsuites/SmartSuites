@@ -435,7 +435,14 @@ export class ParagraphComponent implements OnInit,AfterViewInit,OnDestroy {
     self.unBindBeforeUnload()
   }
 
-  /**************  设置当前的片段模式 ***************/
+  /**************  设置当前的片段是否在report模式展示 ***************/
+
+  toggleReportShow(paragraph) {
+    paragraph.config.reportShow = !paragraph.config.reportShow
+    this.commitParagraph(paragraph)
+  }
+
+  /************** 设置当前的片段模式 ***************/
 
   toggleEnableDisable(paragraph) {
     paragraph.config.enabled = !paragraph.config.enabled
@@ -1283,6 +1290,10 @@ export class ParagraphComponent implements OnInit,AfterViewInit,OnDestroy {
     this.initializeDefault(this.paragraph.config)
   }
 
+  getKeys(object){
+    return Object.keys(object)
+  }
+
   initializeDefault(config) {
     let forms = this.paragraph.settings.forms
 
@@ -1296,6 +1307,10 @@ export class ParagraphComponent implements OnInit,AfterViewInit,OnDestroy {
 
     if (config.enabled === undefined) {
       config.enabled = true
+    }
+
+    if (config.reportShow === undefined) {
+      config.reportShow = true
     }
 
     for (let idx of forms) {
@@ -1948,6 +1963,7 @@ export class ParagraphComponent implements OnInit,AfterViewInit,OnDestroy {
 
     //取消选择
     editor.clearSelection()
+
   }
 
   ngOnDestroy(): void {

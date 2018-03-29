@@ -27,8 +27,8 @@ export default class ScatterchartVisualization extends Nvd3ChartVisualization {
   xLabels
   yLabels
 
-  constructor (targetEl, config, renderer, emitter, jitCompiler, commonService) {
-    super(targetEl, config, renderer, emitter, jitCompiler, commonService)
+  constructor (targetElId, config, emitter, jitCompiler, commonService) {
+    super(targetElId, config, emitter, jitCompiler, commonService)
 
     this.columnselectorProps = [
       {

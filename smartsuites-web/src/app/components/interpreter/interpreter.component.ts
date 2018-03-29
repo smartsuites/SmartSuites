@@ -332,17 +332,17 @@ export class InterpreterComponent implements OnInit {
     });
 
     let newSetting = this.newInterpreterSetting
-    /*if (newSetting.propertyKey !== '' || newSetting.propertyKey) {
+    if (newSetting.propertyKey && newSetting.propertyKey != '') {
       self.addNewInterpreterProperty()
     }
-    if (newSetting.depArtifact !== '' || newSetting.depArtifact) {
+    if (newSetting.depArtifact && newSetting.depArtifact != '') {
       self.addNewInterpreterDependency()
-    }*/
+    }
     if (newSetting.option.setPermission === undefined) {
       newSetting.option.setPermission = false
     }
 
-    newSetting.option.owners = self.selectedUsers.length>0? self.selectedUsers.reduce((previousValue, currentValue, currentIndex, array) => previousValue + ','+currentValue):'';
+    newSetting.option.owners = self.selectedUsers.length>0? self.selectedUsers:[];
     /*newSetting.option.owners = angular.element('#newInterpreterOwners').val()*/
 
     let request = Object.assign(this.newInterpreterSetting)
@@ -576,20 +576,25 @@ export class InterpreterComponent implements OnInit {
   }
 
   // 获取Option模式
-  getOption(setting?){
-    if(this.getInterpreterRunningOption(setting) != 'Per User')
-      return this.getPerNoteOption(setting)
+  getOption(settingid?){
+    if(this.getInterpreterRunningOption(settingid) != 'Per User')
+      return this.getPerNoteOption(settingid)
     else
-      return this.getPerUserOption(setting)
+      return this.getPerUserOption(settingid)
   }
 
   // 获取笔记的模式
-  getPerNoteOption(setting?) {
+  getPerNoteOption(settingid?) {
     let option
-    if (setting === undefined) {
+    if (settingid === undefined) {
       option = this.newInterpreterSetting.option
     } else {
-      option = setting.option
+      for(let interpreterSetting of this.interpreterSettings){
+        if(interpreterSetting.id === settingid){
+          option = interpreterSetting.option
+        }
+      }
+      //option = setting.option
     }
 
     if (option.perNote === 'scoped') {
@@ -602,12 +607,16 @@ export class InterpreterComponent implements OnInit {
   }
 
   // 获取每一个用户的模式
-  getPerUserOption(setting) {
+  getPerUserOption(settingid) {
     let option
-    if (setting === undefined) {
+    if (settingid === undefined) {
       option = this.newInterpreterSetting.option
     } else {
-      option = setting.option
+      for(let interpreterSetting of this.interpreterSettings){
+        if(interpreterSetting.id === settingid){
+          option = interpreterSetting.option
+        }
+      }
     }
     if (option.perUser === 'scoped') {
       return 'scoped'
@@ -619,7 +628,7 @@ export class InterpreterComponent implements OnInit {
   }
 
   // 获取解析器的运行模式
-  getInterpreterRunningOption(setting) {
+  getInterpreterRunningOption(settingid) {
     let sharedModeName = 'shared'
 
     let globallyModeName = 'Globally'
@@ -627,10 +636,20 @@ export class InterpreterComponent implements OnInit {
     let perUserModeName = 'Per User'
 
     let option
-    if (setting === undefined) {
+    if (settingid === undefined) {
       option = this.newInterpreterSetting.option
     } else {
+      for(let interpreterSetting of this.interpreterSettings){
+        if(interpreterSetting.id === settingid){
+          option = interpreterSetting.option
+        }
+      }
+
+      /*let index = _.findIndex($scope.interpreterSettings, {'id': settingid})
+      let setting = $scope.interpreterSettings[index]
       option = setting.option
+
+      option = setting.option*/
     }
 
     let perNote = option.perNote
@@ -752,11 +771,11 @@ export class InterpreterComponent implements OnInit {
           }
         });
 
-        if (setting.propertyKey !== '' || setting.propertyKey) {
-          self.addNewInterpreterProperty(settingId)
+        if (setting.propertyKey != '' || setting.propertyKey) {
+          //self.addNewInterpreterProperty(settingId)
         }
-        if (setting.depArtifact !== '' || setting.depArtifact) {
-          self.addNewInterpreterDependency(settingId)
+        if (setting.depArtifact != '' || setting.depArtifact) {
+          //self.addNewInterpreterDependency(settingId)
         }
         // add missing field of option
         if (!setting.option) {
@@ -780,7 +799,7 @@ export class InterpreterComponent implements OnInit {
           setting.option.remote = true
         }
         // 保存权限
-        setting.option.owners = self.selectedUsers.length>0? self.selectedUsers.reduce((previousValue, currentValue, currentIndex, array) => previousValue + ','+currentValue):'';
+        setting.option.owners = self.selectedUsers.length>0? self.selectedUsers:[];
 
         //转换setting
         //let newSetting = this.transformArrayToPropertiesForSingle(setting)

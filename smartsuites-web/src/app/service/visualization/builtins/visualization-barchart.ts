@@ -22,8 +22,8 @@ export default class BarchartVisualization extends Nvd3ChartVisualization {
 
   pivot
 
-  constructor (targetEl, config, renderer, emitter, jitCompiler, commonService) {
-    super(targetEl, config, renderer, emitter, jitCompiler, commonService)
+  constructor (targetElId, config, emitter, jitCompiler, commonService) {
+    super(targetElId, config, emitter, jitCompiler, commonService)
 
     this.pivot = new PivotTransformation(config,emitter, jitCompiler)
 

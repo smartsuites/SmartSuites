@@ -1,16 +1,31 @@
-<div class="ui-g" class="notebook">
+<p-dialog header="发布可视化" [(visible)]="createVisionDialogDisplay" [modal]=true >
+  <div class="ui-g">
+
+    <p-tree [value]="visionTree" selectionMode="single" [loading]="visionTreeLoading" [(selection)]="selectedTreeNode" [style]="{'width': '100%'}"></p-tree>
+
+  </div>
+
+  <p-footer>
+    <button type="button" pButton icon="fa-plus-circle" (click)="publishNote();createVisionDialogDisplay=false;visionTreeLoading=true" label="发布可视化"></button>
+  </p-footer>
+</p-dialog>
+
+<div class="ui-g" class="notebook" [ngStyle]="{'min-height': min_height}">
 
   <!-- 工具栏 -->
 
   <div class="ui-g-12" style="margin-bottom: 6px; padding-right: 3px; padding-left: 3px" *ngIf="noteId && !paragraphUrl">
 
     <!--NoteBook名称-->
-    <div (dblclick)="this.editNoteTitle()">
-      <input type="text" pInputText placeholder="Name" [(ngModel)]="this.noteName" [ngClass]="{'showmodel':!titleEditor, 'editmodel':titleEditor}" [disabled]="!titleEditor" (blur)="this.showNoteTitle();this.updateNoteName(this.noteName)">
+    <div (dblclick)="this.editNoteTitle()" *ngIf="!viewOnly">
+      <input type="text" pInputText placeholder="加载中......" [(ngModel)]="this.noteName" [ngClass]="{'showmodel':!titleEditor, 'editmodel':titleEditor}" [disabled]="!titleEditor" (blur)="this.showNoteTitle();this.updateNoteName(this.noteName)">
+    </div>
+    <div *ngIf="viewOnly" style="text-align: center">
+      <h2>{{noteName}}</h2>
     </div>
 
     <!--工具栏-->
-    <p-toolbar>
+    <p-toolbar *ngIf="!viewOnly">
       <div class="ui-toolbar-group-left">
 
         <button pButton type="button" pTooltip="运行所有片段" tooltipPosition="bottom" icon="fa-play"
@@ -20,18 +35,15 @@
         <button pButton type="button" pTooltip="{{(editorToggled ? '显示' : '隐藏')}}代码" tooltipPosition="bottom"
                 icon="fa-{{(editorToggled ? 'compress' : 'expand')}}"
                 (click)="toggleAllEditor()"
-                [hidden]="viewOnly"
                 [disabled]="revisionView"></button>
 
         <button pButton type="button" pTooltip="{{(tableToggled ? '显示' : '隐藏')}}输出" tooltipPosition="bottom"
                 icon="fa-{{(tableToggled ? 'eye-slash' : 'eye')}}"
                 (click)="toggleAllTable()"
-                [hidden]="viewOnly"
                 [disabled]="revisionView"></button>
 
         <button pButton type="button" pTooltip="清除输出" tooltipPosition="bottom" icon="fa-eraser"
                 (click)="clearAllParagraphOutput(note.id)"
-                [hidden]="viewOnly"
                 [disabled]="isNoteRunning() || revisionView"></button>
 
         <button pButton type="button" pTooltip="复制笔记" tooltipPosition="bottom" icon="fa-copy" (click)="showCreateNoteDialog()"></button>
@@ -39,7 +51,6 @@
 
         <button pButton type="button" pTooltip="导出笔记" tooltipPosition="bottom" icon="fa-arrow-down"
                 (click)="exportNote()"
-                [hidden]="viewOnly"
                 [disabled]="revisionView"></button>
         <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
 
@@ -47,19 +58,18 @@
         <!-- 协同 -->
         <button pButton type="button" pTooltip="转换到协同模式 {{isOwner ? '' : '(owner can change)'}}" tooltipPosition="bottom" icon="fa-user" (click)="toggleNotePersonalizedMode()"
                 *ngIf="globalService.ticket.principal && globalService.ticket.principal !== 'anonymous'"
-                [hidden]="viewOnly || note.config.personalizedMode !== 'true'"
+                [hidden]="note.config.personalizedMode !== 'true'"
                 [disabled]="isNoteRunning() || revisionView"></button>
 
         <button pButton type="button" pTooltip="转换到个人模式 {{isOwner ? '' : '(owner can change)'}}" tooltipPosition="bottom" icon="fa-users" (click)="toggleNotePersonalizedMode()"
                 *ngIf="globalService.ticket.principal && globalService.ticket.principal !== 'anonymous'"
-                [hidden]="viewOnly || note.config.personalizedMode === 'true'"
+                [hidden]="note.config.personalizedMode === 'true'"
                 [disabled]="isNoteRunning() || revisionView"></button>
         <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
 
 
         <!-- 版本管理 -->
         <button pButton type="button" pTooltip="提交笔记" tooltipPosition="bottom" class="info-btn" icon="fa-code"
-                [hidden]="viewOnly"
                 [disabled]="revisionView"
                 (click)="commit.toggle($event)"></button>
 
@@ -69,14 +79,12 @@
           </div>
           <div>
             <button pButton type="button" pTooltip="Commit" tooltipPosition="bottom" class="info-btn" icon="fa-arrow-circle-up" label="提交代码"
-                    [hidden]="viewOnly"
                     (click)="checkpointNote(commitMessage.message)"></button>
           </div>
 
         </p-overlayPanel>
 
         <button pButton type="button" pTooltip="恢复笔记" tooltipPosition="bottom" class="info-btn" icon="fa-arrow-circle-down"
-                [hidden]="viewOnly"
                 [disabled]="!revisionView"
                 (click)="setNoteRevision()"></button>
 
@@ -138,12 +146,10 @@
         <!--<button pButton type="button" pTooltip="永久删除笔记" tooltipPosition="bottom" class="danger-btn" icon="fa-bitbucket"
                 *ngIf="isTrash(note)"
                 (click)="removeNote(note.id)"
-                [hidden]="viewOnly"
                 [disabled]="revisionView"></button>-->
 
         <button pButton type="button" pTooltip="删除笔记" tooltipPosition="bottom" class="danger-btn" icon="fa-bitbucket"
                 (click)="moveNoteToTrash(note.id)"
-                [hidden]="viewOnly"
                 [disabled]="revisionView"></button>
         <span>&nbsp;&nbsp;</span>
 
@@ -187,10 +193,18 @@
           </div>
 
         </p-overlayPanel>
+
+        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+
+        <button pButton type="button" pTooltip="发布可视化" tooltipPosition="bottom" icon="fa-pie-chart"
+                (click)="showCreateVisionDialog();getAllDirectories()"
+                label="publish"></button>
+
       </div>
 
       <div class="ui-toolbar-group-right">
-        <button pButton type="button" pTooltip="快捷键" tooltipPosition="bottom" class="success-btn" icon="fa-keyboard-o" *ngIf="!revisionView" (click)="shortcutsDialog = true"></button>
+        <button pButton type="button" pTooltip="快捷键" tooltipPosition="bottom" class="success-btn" icon="fa-keyboard-o"
+                *ngIf="!revisionView" (click)="shortcutsDialog = true"></button>
         <p-dialog header="Keyboard shortcuts" [(visible)]="shortcutsDialog" height="750" [modal]="true">
           <table class="table table-shortcut">
             <tr>
@@ -491,8 +505,10 @@
           </table>
         </p-dialog>
 
-        <button pButton type="button" pTooltip="解析器绑定" tooltipPosition="bottom" class="success-btn" icon="fa-cog" *ngIf="!revisionView" (click)="toggleSetting()"></button>
-        <button pButton type="button" pTooltip="权限配置" tooltipPosition="bottom" class="success-btn" icon="fa-lock" *ngIf="!revisionView" (click)="togglePermissions()"></button>
+        <button pButton type="button" pTooltip="解析器绑定" tooltipPosition="bottom" class="success-btn" icon="fa-cog"
+                *ngIf="!revisionView" (click)="toggleSetting()"></button>
+        <button pButton type="button" pTooltip="权限配置" tooltipPosition="bottom" class="success-btn" icon="fa-lock"
+                *ngIf="!revisionView" (click)="togglePermissions()"></button>
 
         <p-splitButton label="{{note.config.looknfeel}}" icon="fa-bullseye" styleClass="ui-button-success" [model]="looknfeelOptionItems"></p-splitButton>
 
@@ -581,22 +597,29 @@
 
   <div [ngClass]="this.columnWidthClass(currentParagraph.config.colWidth)"
        id="{{currentParagraph.id}}_paragraphColumn_main"
-       *ngFor="let currentParagraph of this.note.paragraphs" style="padding-right: 3px; padding-left: 3px">
+       *ngFor="let currentParagraph of this.note.paragraphs; let i = index" style="padding-right: 3px; padding-left: 3px">
 
-    <div class="new-paragraph"
+    <!--<div class="new-paragraph"
          (click)="insertNew(currentParagraph.id,'above')"
          *ngIf="viewOnly || asIframe || revisionView"
          ng-class="{'first-paragraph': $first}">
       <span class="plus-sign">&#43;</span>
-    </div>
+    </div>-->
 
-    <div class="card card-w-title shadow-box ui-shadow-1 paragraphColumn" id="{{currentParagraph.id}}_paragraphColumn"
+    <div id="{{currentParagraph.id}}_paragraphColumn"
+         class="card card-w-title shadow-box ui-shadow-1 paragraphColumn"
          (click)="paragraphOnClick(currentParagraph.id)"
-         (dblclick)="paragraphOnDoubleClick(currentParagraph.id)">
+         (dblclick)="paragraphOnDoubleClick(currentParagraph.id)"
+         *ngIf="!viewOnly">
       <app-paragraph paragraphid="{{currentParagraph.id}}"></app-paragraph>
     </div>
 
-    <div class="new-paragraph last-paragraph" (click)="insertNew(currentParagraph.id,'below');" *ngIf="!$last || viewOnly || asIframe || revisionView">
+    <div id="{{currentParagraph.id}}_paragraphColumn_show"
+         *ngIf="viewOnly">
+      <app-paragraph paragraphid="{{currentParagraph.id}}"></app-paragraph>
+    </div>
+
+    <div class="new-paragraph last-paragraph" (click)="insertNew(currentParagraph.id,'below');" *ngIf=" !viewOnly && !asIframe && !revisionView">
       <span class="plus-sign">&#43;</span>
     </div>
 

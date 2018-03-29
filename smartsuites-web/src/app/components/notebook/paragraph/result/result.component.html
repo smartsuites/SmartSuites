@@ -106,6 +106,7 @@
 
       </div>
 
+      <!-- network -->
       <div id="p{{id}}_network_header" #p_result_network_header
            *ngIf="type == 'NETWORK' && graphMode == 'network' && networkNodes != null">
         <ul class="list-inline">
@@ -157,7 +158,6 @@
            ng-click="scrollParagraphDown()"
            pTooltip="Follow Output" tooltipPosition="bottom"></div>-->
       <div id="p{{id}}_text"
-           style="max-height: {{config.graph.height}} px;"
            class="text plainTextContent"></div>
       <!--<div class="fa fa-chevron-up scroll-paragraph-up"
            ng-show="showScrollUpIcon()"

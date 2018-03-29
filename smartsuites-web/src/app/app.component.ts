@@ -16,6 +16,7 @@ import {NoteListService} from "./service/note-list/note-list.service";
 import {MessageService} from "primeng/components/common/messageservice";
 import {Ticket} from "./model/Ticket";
 import {CommonService} from "./service/common/common.service";
+import {CaptureService} from "./service/capture/capture.service";
 
 enum MenuOrientation {
   STATIC,
@@ -80,15 +81,13 @@ export class AppComponent implements OnInit,AfterViewInit, OnDestroy {
               private router:Router,
               private websocketEventService:WebsocketEventService,
               private messageService: MessageService,
-              private noteListFactory:NoteListService,
-              private commonService:CommonService
+              private noteListFactory:NoteListService
               ) {
     this.ticket = globalService.ticket
     this.notes = this.noteListFactory.notes
   }
 
   ngAfterViewInit() {
-
     this.layoutMenuScroller = <HTMLDivElement> this.layoutMenuScrollerViewChild.nativeElement;
 
     setTimeout(() => {
@@ -239,7 +238,10 @@ export class AppComponent implements OnInit,AfterViewInit, OnDestroy {
   //对分析人员保存的Note集合
   notes
 
+  //Note的展现方式
   looknfeel = 'default'
+
+  //Note是否提供IFrame模式
   asIframe
 
   isLogin():boolean{
@@ -285,27 +287,17 @@ export class AppComponent implements OnInit,AfterViewInit, OnDestroy {
 
     // 监听登录状态
     self.eventService.subscribeRegister(self.subscribers,'loginSuccess', function (msg) {
-
-      /**/
-
-      //TODO 根据Role加载不同的菜单
-      //如果是分析人员
+      //根据Role加载不同的菜单
       if(self.loginService.isAnalyst()){
-
+        self.eventService.broadcast('analystMenu')
         self.listConfigurations()
         self.getHomeNote()
         self.loadNotes()
-
       }else if(self.loginService.isBusiness()){
-
         self.eventService.broadcast('businessMenu')
-
       }else if(self.loginService.isManager()){
-
         self.eventService.broadcast('managerMenu')
-
       }
-
     })
 
     self.eventService.subscribeRegister(self.subscribers,'setIframe', function (data) {

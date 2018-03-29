@@ -16,7 +16,7 @@ import {
 
 //const SETTING_TEMPLATE = require('./visualization-table-setting.html')
 
-const TABLE_OPTION_SPECS = [
+export const TABLE_OPTION_SPECS = [
   {
     name: 'useFilter',
     valueType: ValueType.BOOLEAN,
@@ -43,14 +43,16 @@ const TABLE_OPTION_SPECS = [
 /**
  * Visualize data in table format
  */
-/*export default class TableVisualization extends Visualization {
+export default class TableVisualization extends Visualization {
 
   passthrough
   emitTimeout
   isRestoring
 
-  constructor (targetEl, config, renderer, emitter, jitCompiler, commonService) {
-    super(targetEl, config, renderer, emitter, jitCompiler, commonService)
+  gridOptions
+
+  constructor (targetElId, config, emitter, jitCompiler, commonService) {
+    super(targetElId, config, emitter, jitCompiler, commonService)
     this.passthrough = new PassthroughTransformation(config, emitter, jitCompiler)
     this.emitTimeout = null
     this.isRestoring = false
@@ -69,66 +71,34 @@ const TABLE_OPTION_SPECS = [
     return width
   }
 
-  createGridOptions(tableData, onRegisterApiCallback, config) {
+  createGridOptions(tableData) {
     const rows = tableData.rows
-    const columnNames = tableData.columns.map(c => c.name)
+    const columnNames = tableData.columns.map(c => {
+      return {
+        'title':c.name, 'data':c.name
+      }
+    })
 
     const gridData = rows.map(r => {
       return columnNames.reduce((acc, colName, index) => {
-        acc[colName] = r[index]
+        acc[colName.data] = r[index]
         return acc
       }, {})
     })
 
     const gridOptions = {
       data: gridData,
-      enableGridMenu: true,
-      modifierKeysToMultiSelectCells: true,
-      exporterMenuCsv: true,
-      exporterMenuPdf: false,
-      flatEntityAccess: true,
-      fastWatch: false,
-      treeRowHeaderAlwaysVisible: false,
-
-      columnDefs: columnNames.map(colName => {
-        return {
-          displayName: colName,
-          name: colName,
-          type: DefaultTableColumnType,
-          cellTemplate: `
-            <div ng-if="!grid.getCellValue(row, col).startsWith('%html')"
-                 class="ui-grid-cell-contents">
-              {{grid.getCellValue(row, col)}}
-            </div>
-            <div ng-if="grid.getCellValue(row, col).startsWith('%html')"
-                 ng-bind-html="grid.getCellValue(row, col).split('%html')[1]"
-                 class="ui-grid-cell-contents">
-            </div>
-          `,
-          minWidth: this.getColumnMinWidth(colName),
-          width: '*',
-        }
-      }),
-      rowEditWaitInterval: -1, /!** disable saveRow event *!/
-      enableRowHashing: true,
-      saveFocus: false,
-      saveScroll: false,
-      saveSort: true,
-      savePinning: true,
-      saveGrouping: true,
-      saveGroupingExpandedStates: true,
-      saveOrder: true, // column order
-      saveVisible: true, // column visibility
-      saveTreeView: true,
-      saveFilter: true,
-      saveSelection: false,
+      scrollY:"253px",
+      scrollCollapse: true,
+      paging: false,
+      autoWidth: true,
+      columns: columnNames
     }
 
     return gridOptions
   }
 
   getGridElemId() {
-    // angular doesn't allow `-` in scope variable name
     const gridElemId = `${this.targetElId}_grid`.replace('-', '_')
     return gridElemId
   }
@@ -139,6 +109,7 @@ const TABLE_OPTION_SPECS = [
     return gridApiId
   }
 
+  // 刷新
   refresh() {
     const gridElemId = this.getGridElemId()
     const gridElem = this.jQuery(`#${gridElemId}`)
@@ -153,9 +124,9 @@ const TABLE_OPTION_SPECS = [
     const gridElem = this.jQuery(`#${gridElemId}`)
 
     if (gridElem) {
-      const scope = this.getScope()
-      const gridApiId = this.getGridApiId()
-      scope[gridApiId].core.notifyDataChange(this._uiGridConstants.dataChange.ALL)
+      /*const scope = this.getScope()
+      const gridApiId = this.getGridApiId()*/
+      //scope[gridApiId].core.notifyDataChange(this._uiGridConstants.dataChange.ALL)
     }
   }
 
@@ -171,8 +142,9 @@ const TABLE_OPTION_SPECS = [
     }
   }
 
+  // 添加列的目录
   addColumnMenus(gridOptions) {
-    if (!gridOptions || !gridOptions.columnDefs) { return }
+    /*if (!gridOptions || !gridOptions.columnDefs) { return }
 
     const self = this // for closure
 
@@ -207,12 +179,12 @@ const TABLE_OPTION_SPECS = [
           },
         },
       ]
-    })
+    })*/
   }
 
   setDynamicGridOptions(gridOptions, config) {
     // parse based on their type definitions
-    const parsed = parseTableOption(TABLE_OPTION_SPECS, config.tableOptionValue)
+    /*const parsed = parseTableOption(TABLE_OPTION_SPECS, config.tableOptionValue)
 
     const { showAggregationFooter, useFilter, showPagination, } = parsed
 
@@ -234,9 +206,10 @@ const TABLE_OPTION_SPECS = [
     gridOptions.enableFullRowSelection = false
     gridOptions.enableSelectAll = false
     gridOptions.enableGroupHeaderSelection = false
-    gridOptions.enableSelectionBatchEvent = false
+    gridOptions.enableSelectionBatchEvent = false*/
   }
 
+  // 渲染
   render (tableData) {
     const gridElemId = this.getGridElemId()
     let gridElem = document.getElementById(gridElemId)
@@ -246,69 +219,37 @@ const TABLE_OPTION_SPECS = [
 
     if (!gridElem) {
       // create, compile and append grid elem
-      gridElem = angular.element(
-        `<div id="${gridElemId}" ui-grid="${gridElemId}"
-              ui-grid-edit ui-grid-row-edit
-              ui-grid-pagination
-              ui-grid-selection
-              ui-grid-cellNav ui-grid-pinning
-              ui-grid-empty-base-layer
-              ui-grid-resize-columns
-              ui-grid-move-columns
-              ui-grid-grouping
-              ui-grid-save-state
-              ui-grid-exporter></div>`)
+      this.jQuery(`#${this.targetElId}`).append(`<table class="cell-border order-column hover" id="${gridElemId}"></table>`)
 
-      gridElem.css('height', this.targetEl.height() - 10)
-      const scope = this.getScope()
-      gridElem = this._compile(gridElem)(scope)
-      this.targetEl.append(gridElem)
+      // 设置图表的属性
+      const gridOptions = this.createGridOptions(tableData)
 
-      // set gridOptions for this elem
-      const gridOptions = this.createGridOptions(tableData, onRegisterApiCallback, config)
+      // 根据Config动态设置图表的属性
       this.setDynamicGridOptions(gridOptions, config)
+
+      // 设置图表列的目录
       this.addColumnMenus(gridOptions)
-      scope[gridElemId] = gridOptions
 
-      // set gridApi for this elem
-      const gridApiId = this.getGridApiId()
-      const onRegisterApiCallback = (gridApi) => {
-        scope[gridApiId] = gridApi
-        // should restore state before registering APIs
+      this.jQuery(`#${gridElemId}`).DataTable(gridOptions);
 
-        // register callbacks for change evens
-        // should persist `self.config` instead `config` (closure issue)
-        gridApi.core.on.columnVisibilityChanged(scope, () => { self.persistConfigWithGridState(self.config) })
-        gridApi.colMovable.on.columnPositionChanged(scope, () => { self.persistConfigWithGridState(self.config) })
-        gridApi.core.on.sortChanged(scope, () => { self.persistConfigWithGridState(self.config) })
-        gridApi.core.on.filterChanged(scope, () => { self.persistConfigWithGridState(self.config) })
-        gridApi.grouping.on.aggregationChanged(scope, () => { self.persistConfigWithGridState(self.config) })
-        gridApi.grouping.on.groupingChanged(scope, () => { self.persistConfigWithGridState(self.config) })
-        gridApi.treeBase.on.rowCollapsed(scope, () => { self.persistConfigWithGridState(self.config) })
-        gridApi.treeBase.on.rowExpanded(scope, () => { self.persistConfigWithGridState(self.config) })
-        gridApi.colResizable.on.columnSizeChanged(scope, () => { self.persistConfigWithGridState(self.config) })
 
-        // pagination doesn't follow usual life-cycle in ui-grid v4.0.4
-        // gridApi.pagination.on.paginationChanged(scope, () => { self.persistConfigWithGridState(self.config) })
-        // TBD: do we need to propagate row selection?
-        // gridApi.selection.on.rowSelectionChanged(scope, () => { self.persistConfigWithGridState(self.config) })
-        // gridApi.selection.on.rowSelectionChangedBatch(scope, () => { self.persistConfigWithGridState(self.config) })
-      }
-      gridOptions.onRegisterApi = onRegisterApiCallback
+      // 设置变量
+      this.gridOptions = gridOptions
+
     } else {
-      // don't need to update gridOptions.data since it's synchronized by paragraph execution
+      // 获取已经有的图表配置项
       const gridOptions = this.getGridOptions()
+
+      // 根据onfig动态设置图表的属性
       this.setDynamicGridOptions(gridOptions, config)
+
+      // 刷新图表
       this.refreshGrid()
     }
 
-    const columnDefs = this.getGridOptions().columnDefs
-    updateColumnTypeState(tableData.columns, config, columnDefs)
-    // SHOULD restore grid state after columnDefs are updated
-    this.restoreGridState(config.tableGridState)
   }
 
-  restoreGridState(gridState) {
+  /*restoreGridState(gridState) {
     if (!gridState) { return }
 
     // should set isRestoring to avoid that changed* events are triggered while restoring
@@ -322,30 +263,25 @@ const TABLE_OPTION_SPECS = [
       gridApi.saveState.restore(this.getScope(), gridState)
       this.isRestoring = false
     }
-  }
+  }*/
 
+  // 移除
   destroy () {
   }
 
+  // 获取数据转换器
   getTransformation () {
     return this.passthrough
   }
 
-  getScope() {
-    const scope = this.targetEl.scope()
-    return scope
-  }
-
   getGridOptions() {
-    const scope = this.getScope()
-    const gridElemId = this.getGridElemId()
-    return scope[gridElemId]
+    return this.gridOptions;
   }
 
   getGridApi() {
-    const scope = this.targetEl.scope()
+    /*const scope = this.getScope()
     const gridApiId = this.getGridApiId()
-    return scope[gridApiId]
+    return scope[gridApiId]*/
   }
 
   persistConfigImmediatelyWithGridState(config) {
@@ -356,7 +292,7 @@ const TABLE_OPTION_SPECS = [
     if (this.isRestoring) { return }
 
     const gridApi = this.getGridApi()
-    config.tableGridState = gridApi.saveState.save()
+    //config.tableGridState = gridApi.saveState.save()
     this.emitConfig(config)
   }
 
@@ -364,7 +300,8 @@ const TABLE_OPTION_SPECS = [
     this.emitConfig(config)
   }
 
-  getSetting (chart) {
+  // 提供图表配置
+  getSetting ():any {
     const self = this // for closure in scope
     const configObj = self.config
 
@@ -379,7 +316,7 @@ const TABLE_OPTION_SPECS = [
     }
 
     return {
-      template: SETTING_TEMPLATE,
+      //template: SETTING_TEMPLATE,
       scope: {
         config: configObj,
         tableOptionSpecs: TABLE_OPTION_SPECS,
@@ -407,9 +344,9 @@ const TABLE_OPTION_SPECS = [
             self.persistConfigWithGridState(configObj)
           }
 
-          event.stopPropagation() /!** avoid to conflict with paragraph shortcuts *!/
+          event.stopPropagation() /** avoid to conflict with paragraph shortcuts */
         }
       }
     }
   }
-}*/
+}

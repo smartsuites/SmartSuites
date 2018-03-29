@@ -15,8 +15,9 @@ import * as moment from "moment";
 import {Constants} from "../../model/Constants";
 import {MessageService} from "primeng/components/common/messageservice";
 import {CommonService} from "../../service/common/common.service";
-import {ConfirmationService, MenuItem} from "primeng/primeng";
+import {ConfirmationService, MenuItem, TreeNode} from "primeng/primeng";
 import {NoteCreateComponent} from "../note-create/note-create.component";
+import {isVisionMode, ObjectEqual} from "../../utils/Utils";
 
 @Component({
   selector: 'app-notebook',
@@ -24,6 +25,87 @@ import {NoteCreateComponent} from "../note-create/note-create.component";
   styleUrls: ['./notebook.component.css']
 })
 export class NotebookComponent implements OnInit,OnDestroy{
+
+  min_height = window.innerHeight - 183 + 'px'
+
+  /**************** 发布可视化 ****************/
+  createVisionDialogDisplay: boolean = false;
+
+  showCreateVisionDialog() {
+    this.createVisionDialogDisplay = true;
+  }
+
+  visionTree: TreeNode[] = [];
+  visionTreeLoading = true;
+
+  selectedTreeNode
+
+  createTree(children, item):boolean{
+
+    if(children.length == 0 && item.parent_directory == -1){
+      children.push({
+        label: item.directory_name,
+        data: item.id,
+        expandedIcon: "fa-folder-open",
+        collapsedIcon: "fa-folder",
+        expanded:true,
+        children:[]
+      })
+      return true;
+    }
+
+    for(let child of children){
+      if(child.data == item.parent_directory){
+        child.children.push({
+          label: item.directory_name,
+          data: item.id,
+          expandedIcon: "fa-folder-open",
+          collapsedIcon: "fa-folder",
+          expanded:true,
+          children:[]
+        })
+        return true;
+      }else{
+        this.createTree(child.children, item)
+      }
+    }
+    return false;
+  }
+
+  // 获取所有的目录
+  getAllDirectories(){
+    let self = this;
+    self.selectedTreeNode = undefined
+    self.visionTree = []
+    this.httpClient.get(this.baseUrlSrv.getRestApiBase() + '/directory')
+      .subscribe(
+        response => {
+          console.log('Success %o', response)
+          response['body'].forEach((item, index, array) => {
+            self.createTree(self.visionTree, item);
+          })
+          self.visionTreeLoading = false
+        },
+        errorResponse => {
+          console.log('Error %o', errorResponse)
+        }
+      );
+  }
+
+  publishNote(){
+    let self = this;
+    if(this.selectedTreeNode){
+      this.httpClient.post(self.baseUrlSrv.getRestApiBase() + '/directory/'+self.selectedTreeNode.data+"/"+ self.globalService.ticket.principal +"/"+self.noteId,null)
+        .subscribe(
+          response => {
+            console.log('Success %o', response)
+          },
+          errorResponse => {
+            console.log('Error %o', errorResponse)
+          }
+        );
+    }
+  }
 
 
   /**************** 更新Note名称 ***************/
@@ -105,6 +187,10 @@ export class NotebookComponent implements OnInit,OnDestroy{
 
   /**************** NoteBook的三种显示方式 **************/
 
+  // 不通过片段配置，
+  //looknfeel = 'default'
+  visionMode = false
+
   //当前Note三种显示模式
   looknfeelOption = ['default', 'simple', 'report']
 
@@ -126,8 +212,13 @@ export class NotebookComponent implements OnInit,OnDestroy{
     if (!this.note.config.looknfeel) {
       this.note.config.looknfeel = 'default'
     } else {
-      this.viewOnly = this.note.config.looknfeel === 'report' ? true : false
+      if(this.visionMode)
+        this.viewOnly = true
+      else
+        this.viewOnly = this.note.config.looknfeel === 'report' ? true : false
     }
+
+    console.log(this.viewOnly)
 
     if (this.note.paragraphs && this.note.paragraphs[0]) {
       this.note.paragraphs[0].focus = true
@@ -360,7 +451,7 @@ export class NotebookComponent implements OnInit,OnDestroy{
   }
 
   isSettingDirty() {
-    if (this.interpreterBindings == this.interpreterBindingsOrig) {
+    if (ObjectEqual(this.interpreterBindings,this.interpreterBindingsOrig)) {
       return false
     } else {
       return true
@@ -478,7 +569,7 @@ export class NotebookComponent implements OnInit,OnDestroy{
   }
 
   isPermissionsDirty() {
-    if (this.permissions == this.permissionsOrig) {
+    if (ObjectEqual(this.permissions,this.permissionsOrig)) {
       return false
     } else {
       return true
@@ -797,9 +888,14 @@ export class NotebookComponent implements OnInit,OnDestroy{
   removeNote(noteId) {
     this.noteActionService.removeNote(noteId, true)
   }
-  i= 0
+
+  clearTheTrash(noteIds){
+    for(let noteId of noteIds){
+      this.noteActionService.removeNote(noteId, true)
+    }
+  }
+
   isTrash(note) {
-    console.log(this.i++)
     return note ? note.name.split('/')[0] === Constants.TRASH_FOLDER_ID : false
   }
 
@@ -1032,6 +1128,8 @@ export class NotebookComponent implements OnInit,OnDestroy{
 
   // 单击片段聚焦
   paragraphOnClick(paragraphId){
+    if(this.viewOnly)
+      return
     // ui-shadow-2 = selected  ui-shadow-1 = unselected
     if(this.commonService._jQuery('#'+paragraphId+"_paragraphColumn").hasClass("ui-shadow-2")){
       return
@@ -1077,7 +1175,7 @@ export class NotebookComponent implements OnInit,OnDestroy{
   //当前的Note实例
   note:any
 
-  //是否只读
+  //是否只读 也就是是否为Report
   viewOnly = false
 
   // 是否连接到后台
@@ -1270,6 +1368,15 @@ export class NotebookComponent implements OnInit,OnDestroy{
 
       self.paragraphUrl = params.paragraphId
       self.asIframe = params.asIframe
+
+      // mode=vision 报表模式
+      /*if(isVisionMode(window.location.search)){
+        self.visionMode = true
+      }*/
+
+      if(params['mode'] && params['mode'] === 'vision'){
+        self.visionMode = true
+      }
 
       this.initNotebook()
     })

@@ -22,23 +22,6 @@ import {NotifyComponent} from "../components/notify/notify.component";
 
 
 const routes: Routes = [
-  /*{path: '', redirectTo: '/home', pathMatch: 'full'},
-  {path: 'movies/:id', component: AppComponent},
-
-
-  {path: 'login', component: LoginComponent},
-
-
-
-
-  {path: 'search/:searchTerm', component: SearchComponent},
-  {path: 'notebook', component: NotebookComponent},
-
-  {path: 'notebook/:noteId', component: NotebookComponent},
-  {path: 'notebook/:noteId/paragraph?=:paragraphId', component: NotebookComponent},
-  {path: 'notebook/:noteId/paragraph/:paragraphId?', component: NotebookComponent},
-  {path: 'notebook/:noteId/revision/:revisionId', component: NotebookComponent},*/
-
   {path: '', redirectTo: '/login', pathMatch: 'full'},
   {path: 'login', component: LoginComponent},
   {path: 'screen', component: ScreenComponent},

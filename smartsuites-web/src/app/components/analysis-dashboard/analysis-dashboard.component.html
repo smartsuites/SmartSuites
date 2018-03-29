@@ -11,7 +11,7 @@
         </div>
         <div class="ui-g" style="height: 860px;overflow: auto;">
 
-          <div class="ui-g-12" *ngFor="let note of this.noteListFactory.notes.flatList; let i = index">
+          <div class="ui-g-12" *ngFor="let note of this.noteListFactory.notes.flatList | filter:{ isTrash:false}; let i = index">
             <div class="ui-g-3">
               <span class="event-time">just now</span>
               <i class="fa fa-history" style="color:#3984b8"></i>

@@ -7,11 +7,14 @@ package com.smartsuites.rest;
 
 import com.smartsuites.annotation.ZeppelinApi;
 import com.smartsuites.conf.SmartsuitesConfiguration;
+import com.smartsuites.notebook.Note;
+import com.smartsuites.notebook.Notebook;
 import com.smartsuites.notebook.NotebookAuthorization;
 import com.smartsuites.realm.ActiveDirectoryGroupRealm;
 import com.smartsuites.realm.LdapRealm;
 import com.smartsuites.server.JsonResponse;
 import com.smartsuites.ticket.TicketContainer;
+import com.smartsuites.user.DirNotes;
 import com.smartsuites.user.Directory;
 import com.smartsuites.user.UserService;
 import com.smartsuites.utils.SecurityUtils;
@@ -38,11 +41,14 @@ import java.util.*;
 public class DirectoryRestApi {
   private static final Logger LOG = LoggerFactory.getLogger(DirectoryRestApi.class);
 
+  private Notebook notebook;
+
   /**
    * Required by Swagger.
    */
-  public DirectoryRestApi() {
+  public DirectoryRestApi(Notebook notebook) {
     super();
+    this.notebook = notebook;
   }
 
   @GET
@@ -91,6 +97,100 @@ public class DirectoryRestApi {
     Directory directory = UserService.getDirById(id);
     boolean success = UserService.deleteDir(directory);
     JsonResponse response = new JsonResponse(Response.Status.OK, "",directory);
+    LOG.warn(response.toString());
+    return response.build();
+  }
+
+  @POST
+  @Path("{dirid}/{username}/{noteid}")
+  @ZeppelinApi
+  public Response addNoteToDir(@PathParam("dirid") String dirid,
+                               @PathParam("username") String username,
+                               @PathParam("noteid") String noteid) {
+    UserService.addNoteToDir(dirid, username,noteid);
+
+    JsonResponse response = new JsonResponse(Response.Status.OK, "");
+    LOG.warn(response.toString());
+    return response.build();
+  }
+
+  @DELETE
+  @Path("{dirid}/{username}/{noteid}")
+  @ZeppelinApi
+  public Response deleteNoteToDir(@PathParam("dirid") String dirid,
+                                  @PathParam("username") String username,
+                                  @PathParam("noteid") String noteid) {
+    UserService.removeNoteToDir(dirid, username,noteid);
+    JsonResponse response = new JsonResponse(Response.Status.OK, "");
+    LOG.warn(response.toString());
+    return response.build();
+  }
+
+  @GET
+  @Path("{dirid}/{username}")
+  @ZeppelinApi
+  public Response getNoteToDir(@PathParam("dirid") String dirid,@PathParam("username") String username) {
+    List<String> notes = UserService.getNoteToDir(dirid, username);
+    List<Note> noteList = new ArrayList<>();
+    for(String noteid : notes){
+      noteList.add(notebook.getNote(noteid));
+    }
+    JsonResponse response = new JsonResponse(Response.Status.OK, "",noteList);
+    LOG.warn(response.toString());
+    return response.build();
+  }
+
+  private boolean isDirExist(List<Directory> directories, String dirid){
+    for(Directory directory:directories){
+      if(directory.getId().equalsIgnoreCase(dirid))
+        return true;
+    }
+    return false;
+  }
+
+  private void fillFullDir(List<Directory> allDirs, Directory dir){
+    // -1 means the top tree
+    if(dir.getParent_directory().equalsIgnoreCase("-1"))
+      return;
+
+    Directory parent = UserService.getDirById(dir.getParent_directory());
+    if(!isDirExist(allDirs, parent.getId())){
+      allDirs.add(parent);
+      fillFullDir(allDirs, parent);
+    }
+
+  }
+
+  @GET
+  @Path("{username}")
+  @ZeppelinApi
+  public Response getUserDirs(@PathParam("username") String username) {
+
+    // 有权限的目录
+    List<Directory> ownDirs = UserService.getDirsByUser(username);
+
+    // 获取所有路线的目录
+    List<Directory> allDirs = new ArrayList<>();
+    allDirs.addAll(ownDirs);
+
+    for(Directory ownDir: ownDirs){
+      fillFullDir(allDirs, ownDir);
+    }
+
+    List<DirNotes> dirNotes = new ArrayList<>();
+    for(Directory dir:ownDirs){
+      List<DirNotes> notes = UserService.getNoteToDir(dir.getId());
+      for (DirNotes dirN : notes){
+        dirN.setName(notebook.getNote(dirN.getNote()).getNameWithoutPath());
+      }
+      dirNotes.addAll(notes);
+    }
+
+    HashMap<String, List> result = new HashMap<>();
+    result.put("dirs",allDirs);
+    result.put("notes",dirNotes);
+
+    JsonResponse response = new JsonResponse(Response.Status.OK, "",result);
     LOG.warn(response.toString());
     return response.build();
   }

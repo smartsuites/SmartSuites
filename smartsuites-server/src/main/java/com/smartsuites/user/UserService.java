@@ -431,19 +431,64 @@ public class UserService {
     }
 
     // Push Note To Dir
-    public static boolean addNoteToDir(Directory directory, User user, String noteid){
+    public static boolean addNoteToDir(String dirid, String username, String noteid){
         boolean success = false;
         String sql = "INSERT INTO " + TABLE_DIR_NOTES + " (dir_id, note, username) VALUES (?,?,?)";
         try (PreparedStatement statement = getConnection().prepareStatement(sql)) {
-            statement.setString(1,directory.getId());
+            statement.setString(1,dirid);
             statement.setString(2,noteid);
-            statement.setString(3,user.getUsername());
+            statement.setString(3,username);
             statement.executeUpdate();
             success = true;
         } catch (SQLException e) {
             LOG.error("Add Note To Dir Error {}", e.toString());
         }
         return success;
+    }
+
+    public static boolean removeNoteToDir(String dirid, String username, String noteid){
+        boolean success = false;
+        String sql = "DELETE FROM " + TABLE_DIR_NOTES + " WHERE dir_id='" + dirid + "' and username='" + username + "' and note='" + noteid +"'";
+        try (Statement statement = getConnection().createStatement()) {
+            statement.executeUpdate(sql);
+            success = true;
+        } catch (SQLException e) {
+            LOG.error("Delete Note To Dir Error {}", e.toString());
+        }
+        return success;
+    }
+
+    public static List<String> getNoteToDir(String dirid, String username){
+        String sql = "select * FROM " + TABLE_DIR_NOTES + " WHERE dir_id='" + dirid + "' and username='" + username + "'";
+        List<String> notes = new ArrayList<>();
+        try (Statement statement = getConnection().createStatement();
+             ResultSet result = statement.executeQuery(sql);) {
+            while (result.next()) {
+                notes.add(result.getString("note"));
+            }
+        } catch (SQLException e) {
+            LOG.error("Get All Dirs Error {}", e.toString());
+            return null;
+        }
+        return notes;
+    }
+
+    public static List<DirNotes> getNoteToDir(String dirid){
+        String sql = "select * FROM " + TABLE_DIR_NOTES + " WHERE dir_id='" + dirid + "'";
+        List<DirNotes> dirNotes = new ArrayList<>();
+        try (Statement statement = getConnection().createStatement();
+             ResultSet result = statement.executeQuery(sql);) {
+            while (result.next()) {
+                DirNotes dirN = new DirNotes();
+                dirN.setDir(result.getString("dir_id"));
+                dirN.setNote(result.getString("note"));
+                dirNotes.add(dirN);
+            }
+        } catch (SQLException e) {
+            LOG.error("Get All Dirs Error {}", e.toString());
+            return null;
+        }
+        return dirNotes;
     }
 
     // Init Tables

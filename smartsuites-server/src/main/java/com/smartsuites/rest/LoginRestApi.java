@@ -51,6 +51,7 @@ public class LoginRestApi {
   @ZeppelinApi
   public Response postLogin(@FormParam("userName") String userName,
                             @FormParam("password") String password) {
+    String message = null;
     JsonResponse response = null;
     // ticket set to anonymous for anonymous user. Simplify testing.
     Subject currentUser = org.apache.shiro.SecurityUtils.getSubject();
@@ -79,28 +80,37 @@ public class LoginRestApi {
         data.put("roles", roles.toString());
         data.put("ticket", ticket);
 
-        response = new JsonResponse(Response.Status.OK, "", data);
+        message = "登录成功，跳转中...";
+        response = new JsonResponse(Response.Status.OK, message, data);
         //if no exception, that's it, we're done!
         
         //set roles for user in NotebookAuthorization module
         NotebookAuthorization.getInstance().setRoles(principal, roles);
       } catch (UnknownAccountException uae) {
-        //username wasn't in the system, show them an error message?
+        message = "用户不存在，请重试！";
+        response = new JsonResponse(Response.Status.EXPECTATION_FAILED, message, "");
         LOG.error("Exception in login: ", uae);
+        return response.build();
       } catch (IncorrectCredentialsException ice) {
-        //password didn't match, try again?
+        message = "密码不匹配，请重试！";
+        response = new JsonResponse(Response.Status.EXPECTATION_FAILED, message, "");
         LOG.error("Exception in login: ", ice);
+        return response.build();
       } catch (LockedAccountException lae) {
-        //account for that username is locked - can't login.  Show them a message?
+        message = "账户被锁定，请联系管理员！";
+        response = new JsonResponse(Response.Status.EXPECTATION_FAILED, message, "");
         LOG.error("Exception in login: ", lae);
+        return response.build();
       } catch (AuthenticationException ae) {
-        //unexpected condition - error?
+        message = "未知异常，请联系管理员！";
+        response = new JsonResponse(Response.Status.EXPECTATION_FAILED, message, "");
         LOG.error("Exception in login: ", ae);
+        return response.build();
       }
     }
 
     if (response == null) {
-      response = new JsonResponse(Response.Status.FORBIDDEN, "", "");
+      response = new JsonResponse(Response.Status.FORBIDDEN, message, "");
     }
 
     LOG.warn(response.toString());

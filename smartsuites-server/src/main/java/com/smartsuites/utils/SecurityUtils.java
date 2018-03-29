@@ -16,8 +16,10 @@ import java.util.Map;
 
 import javax.naming.NamingException;
 
+import com.smartsuites.realm.SmartRealm;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.realm.Realm;
+import org.apache.shiro.realm.jdbc.JdbcRealm;
 import org.apache.shiro.realm.text.IniRealm;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
@@ -142,6 +144,8 @@ public class SecurityUtils {
         } else if (name.equals("com.smartsuites.realm.ActiveDirectoryGroupRealm")) {
           allRoles = ((ActiveDirectoryGroupRealm) realm).getListRoles();
           break;
+        } else if (name.equals("com.smartsuites.realm.SmartRealm")){
+          roles = (HashSet<String>) ((SmartRealm)realm).getRoleNamesForUser((String) subject.getPrincipal());
         }
       }
       if (allRoles != null) {

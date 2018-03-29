@@ -413,7 +413,7 @@ public class SmartsuitesServer extends Application {
     ConfigurationsRestApi settingsApi = new ConfigurationsRestApi(notebook);
     singletons.add(settingsApi);
 
-    DirectoryRestApi directoryRestApi = new DirectoryRestApi();
+    DirectoryRestApi directoryRestApi = new DirectoryRestApi(notebook);
     singletons.add(directoryRestApi);
 
     UserRestApi userRestApi = new UserRestApi();

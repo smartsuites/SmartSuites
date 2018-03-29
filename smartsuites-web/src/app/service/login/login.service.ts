@@ -1,16 +1,16 @@
 import { Injectable } from '@angular/core';
-import {NavigationStart, Router} from "@angular/router";
+import {ActivatedRoute, NavigationStart, Params, Router} from "@angular/router";
 import {HttpClient} from "@angular/common/http";
 import {GlobalService} from "../global/global.service";
 import {BaseUrlService} from "../base-url/base-url.service";
 import {Ticket} from "../../model/Ticket";
 import {EventService} from "../event/event.service";
-import {AnalysisDashboardComponent} from "../../components/analysis-dashboard/analysis-dashboard.component";
-import {AdminDashboardComponent} from "../../components/admin-dashboard/admin-dashboard.component";
-import {BussDashboardComponent} from "../../components/buss-dashboard/buss-dashboard.component";
+import {isVisionMode} from "../../utils/Utils";
 
 @Injectable()
 export class LoginService {
+
+  message = ''
 
   constructor(private router:Router,
               private httpClient:HttpClient,
@@ -27,7 +27,8 @@ export class LoginService {
             // DO NOTHING
           }else{
             if(!vm.isLogin()){
-              vm.router.navigate(['/login']);
+              if(!isVisionMode(x.url))
+                vm.router.navigate(['/login']);
             }
           }
         }
@@ -52,60 +53,63 @@ export class LoginService {
     return this.globalService.ticket
   }
 
-  setRole(role:string){
-    this.globalService.role = role
-  }
-
   getRole(){
-    return this.globalService.role
+    if(this.isAnalyst()){
+      return '分析人员'
+    }else if(this.isBusiness()){
+      return '业务人员'
+    }else if(this.isManager()){
+      return '管理人员'
+    }
   }
 
   isAnalyst():boolean {
-    return this.globalService.role == 'analyst'
+    return this.globalService.ticket.roles.includes("ANALYST")
   }
 
   isBusiness():boolean {
-    return this.globalService.role == 'business'
+    return this.globalService.ticket.roles.includes("BUSINESS")
   }
 
   isManager():boolean {
-    return this.globalService.role == 'manager'
+    return this.globalService.ticket.roles.includes("MANAGER")
   }
 
   // 登录
-  login():void {
-    this.globalService.login = true
-
-    if(this.isAnalyst()){
-      this.router.navigate(['/analysisDashboard']);
-    }else if(this.isBusiness()){
-      this.router.navigate(['/bussDashboard']);
-    }else if(this.isManager()){
-      this.router.navigate(['/adminDashboard']);
-    }
-
-    this.eventService.broadcast("loginSuccess")
-    /*let config = {}
-    this.httpClient.get(this.baseUrlSrv.getRestApiBase() + '/security/ticket', config)
+  login(username, password):void {
+    let self = this;
+    this.httpClient.post(this.baseUrlSrv.getRestApiBase() + '/login', null,{
+        headers:{'Content-Type': 'application/x-www-form-urlencoded'},
+        params:{
+          'userName': username,
+          'password': password
+        }
+      })
       .subscribe(
         response => {
-          this.globalService.ticket = response['body']
-          this.globalService.ticket.screenUsername = this.globalService.ticket.principal
-
-          if (this.globalService.ticket.principal.indexOf('#Pac4j') === 0) {
-            let re = ', name=(.*?),'
-            this.globalService.ticket.screenUsername = this.globalService.ticket.principal.match(re)[1]
+          self.message = response['message']
+          self.globalService.ticket = response['body']
+          self.globalService.ticket.screenUsername = self.globalService.ticket.principal
+          self.globalService.login = true;
+          console.log(response)
+          this.eventService.broadcast("loginSuccess")
+          if(this.isAnalyst()){
+            this.router.navigate(['/analysisDashboard']);
+          }else if(this.isBusiness()){
+            this.router.navigate(['/bussDashboard']);
+          }else if(this.isManager()){
+            this.router.navigate(['/adminDashboard']);
           }
+          setTimeout(function(){
+            self.message = "";
+          },2000)
         },
         errorResponse => {
-          let redirect = errorResponse.headers('Location')
-          if (errorResponse.status === 401 && redirect !== undefined) {
-            // Handle page redirect
-            window.location.href = redirect
-          }
+          self.message = errorResponse.error.message
+          self.globalService.login = false;
+          console.log(errorResponse)
         }
-      );*/
-
+      );
   }
 
   // 注册用户
@@ -134,6 +138,7 @@ export class LoginService {
     this.globalService.ticket = new Ticket
     this.globalService.login = false
     this.router.navigate(['/login'])
+
   }
 
 }

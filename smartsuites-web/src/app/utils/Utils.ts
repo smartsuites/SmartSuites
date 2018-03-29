@@ -25,3 +25,18 @@ export function DeepClone(obj){
     return undefined
   return JSON.parse(JSON.stringify(obj))
 }
+
+export function isVisionMode(url):boolean {
+
+  if (url.indexOf(";") != -1) {
+    var str = url.substr(url.indexOf(";") + 1);
+    let strs = str.split("&");
+    for(var i = 0; i < strs.length; i ++) {
+      let key = strs[i].split("=")[0];
+      let value = strs[i].split("=")[1];
+      if(key == "mode" && value == "vision")
+        return true;
+    }
+  }
+  return false;
+}

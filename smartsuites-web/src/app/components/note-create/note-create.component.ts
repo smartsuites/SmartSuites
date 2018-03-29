@@ -120,12 +120,12 @@ export class NoteCreateComponent implements OnInit {
 
 
   interpreterSettingOptions: SelectItem[] = [];
-  selectInterpreterSetting: SelectItem;
+  selectInterpreterSetting
 
   updateDefaultInterpreter(){
     if(this.selectInterpreterSetting){
       for(let interpreterSetting of this.interpreterSettings){
-        if(interpreterSetting.id == this.selectInterpreterSetting.value.id){
+        if(interpreterSetting.id == this.selectInterpreterSetting.id){
           this.note.defaultInterpreter = interpreterSetting
         }
       }

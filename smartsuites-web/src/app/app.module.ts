@@ -126,6 +126,7 @@ import {JobmanagerService} from "./service/job/jobmanager.service";
 import {NotifyComponent} from './components/notify/notify.component';
 import {NotifyService} from './service/notify/notify.service';
 import { PersonalComponent } from './common/personal/personal.component';
+import {CaptureService} from "./service/capture/capture.service";
 
 
 @NgModule({
@@ -141,7 +142,6 @@ import { PersonalComponent } from './common/personal/personal.component';
     NotebookRepositoryComponent,
     HeliumComponent,
     /*
-    JobComponent,
     SearchComponent,
     */
     AppProfileComponent,
@@ -264,7 +264,8 @@ import { PersonalComponent } from './common/personal/personal.component';
     HighlightJsService,
     JobmanagerService,
     NotifyService,
-    HeliumService
+    HeliumService,
+    CaptureService
   ],
   bootstrap: [AppComponent]
 })

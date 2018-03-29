@@ -28,30 +28,30 @@
         <div class="ui-g-12" style="text-align:left;">
           <div class="ui-inputgroup">
             <span class="ui-inputgroup-addon" style="color: #000000"><i class="fa fa-user"></i></span>
-            <input type="text" pInputText placeholder="用户名">
+            <input type="text" pInputText placeholder="用户名" #username (keydown)="KeyDown($event,username.value, password.value)">
           </div>
         </div>
         <div class="ui-g-12" style="text-align:left;">
           <div class="ui-inputgroup">
             <span class="ui-inputgroup-addon" style="color: #000000"><i class="fa fa-lock"></i></span>
-            <input type="password" pPassword placeholder="密码">
+            <input type="password" pPassword placeholder="密码" #password (keydown)="KeyDown($event,username.value, password.value)">
           </div>
-        </div>
-        <div class="ui-g-12" style="text-align:left;">
-          <div class="ui-g-4"><p-radioButton name="group" value="analyst" label="分析人员" [(ngModel)]="selectedRole" inputId="opt1"></p-radioButton></div>
-          <div class="ui-g-4"><p-radioButton name="group" value="business" label="业务人员" [(ngModel)]="selectedRole" inputId="opt2"></p-radioButton></div>
-          <div class="ui-g-4"><p-radioButton name="group" value="manager" label="管理人员" [(ngModel)]="selectedRole" inputId="opt3"></p-radioButton></div>
         </div>
 
         <div class="ui-g-12 ui-md-6 button-pane">
           <button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only"
-                  role="button" aria-disabled="false" (click)="this._submitLoginForm()">
+                  role="button" aria-disabled="false" (click)="this._submitLoginForm(username.value, password.value)">
             <span class="ui-button-text ui-c">登  录</span>
           </button>
         </div>
         <div class="ui-g-12 ui-md-6 link-pane">
           <a (click)="this.showForgetForm()" style="cursor: pointer">忘记密码?</a>
         </div>
+
+        <div class="ui-g-12" style="text-align:left;">
+          <span>{{this.loginService.message}}</span>
+        </div>
+
       </div>
     </div>
 

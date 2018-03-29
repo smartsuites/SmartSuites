@@ -17,7 +17,7 @@ export class FilterPipe implements PipeTransform {
       for (let key in filter) {
         if(filter[key] == '')
           continue
-        if (!item[key].includes(filter[key]))
+        if (!item[key] === filter[key])
           return false
       }
       return true

@@ -2,7 +2,7 @@
 /*
  * Copyright (c) 2018. 联思智云（北京）科技有限公司. All rights reserved.
  */
-
+// 控件的类型
 export const Widget = {
   CHECKBOX: 'checkbox',
   INPUT: 'input',
@@ -11,6 +11,7 @@ export const Widget = {
   BTN_GROUP: 'btn-group',
 }
 
+// 值得类型
 export const ValueType = {
   INT: 'int',
   FLOAT: 'float',
@@ -19,6 +20,7 @@ export const ValueType = {
   JSON: 'JSON',
 }
 
+// 表列的类型
 export const TableColumnType = {
   STRING: 'string',
   BOOLEAN: 'boolean',

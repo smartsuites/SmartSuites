@@ -7,6 +7,9 @@ import {AppComponent} from '../../app.component';
 import {EventService} from "../../service/event/event.service";
 import {Constants} from "../../model/Constants";
 import {NoteCreateComponent} from "../../components/note-create/note-create.component";
+import {BaseUrlService} from "../../service/base-url/base-url.service";
+import {HttpClient} from "@angular/common/http";
+import {GlobalService} from "../../service/global/global.service";
 
 @Component({
   selector: 'app-menu',
@@ -16,7 +19,8 @@ export class AppMenuComponent implements OnInit,OnDestroy {
 
   @Input() reset: boolean;
 
-  model: any[];
+  model: any[] = [];
+  tmpModel: any[] = [];
 
   items = [];
 
@@ -47,7 +51,10 @@ export class AppMenuComponent implements OnInit,OnDestroy {
   }
 
   constructor(public app: AppComponent,
-              private eventService: EventService) {
+              private eventService: EventService,
+              private baseUrlSrv: BaseUrlService,
+              private httpClient: HttpClient,
+              private globalService:GlobalService) {
   }
 
   subscribers = []
@@ -56,19 +63,63 @@ export class AppMenuComponent implements OnInit,OnDestroy {
     this.eventService.unsubscribeSubscriptions(this.subscribers)
   }
 
+
+  createTree(children, item):boolean{
+    let self = this
+    if(children.length == 0 && item.parent_directory == -1){
+      children.push({
+        label: item.directory_name,
+        icon: 'fa fa-pie-chart',
+        id: item.id
+      })
+      return true;
+    }
+
+    for(let child of children){
+      if(child.id == item.parent_directory){
+        if(!child.items)
+          child.items = []
+        child.items.push({
+          label: item.directory_name,
+          icon: 'fa fa-pie-chart',
+          id: item.id
+        })
+        return true;
+      }else{
+        if(child.items)
+          this.createTree(child.items, item)
+      }
+    }
+    return false;
+  }
+
+  findNode(node, id,callback):boolean{
+    if(node.id == id){
+      callback(null,null, node)
+    }
+    if(node.items)
+      node.items.forEach((child, index, array) =>{
+        if(child.id == id){
+          callback(node, index, child)
+          return true;
+        }else{
+          this.findNode(child,id,callback)
+        }
+      })
+
+    return false;
+  }
+
   ngOnInit() {
 
     let self = this;
     // 用于监听笔记加载消息，异步加载Notes
     self.eventService.subscribeRegister(self.subscribers,'noteComplete', function (notes) {
-
       self.items = self.generateNoteBookMenu(self.app.notes.root.children)
-
       self.model = [
-        /*{label: '系统首页', icon: 'fa fa-fw fa-home', routerLink: ['/home']},*/
         {label: '系统首页', icon: 'fa fa-fw fa-home', routerLink: ['/analysisDashboard']},
         {
-          label: '笔记管理', icon: 'fa fa-fw fa-book', /*routerLink: ['/notebook'],*/
+          label: '笔记管理', icon: 'fa fa-fw fa-book',
           items: self.items
         },
         {label: '新建笔记', icon: 'fa fa-fw fa-plus-circle', command: (event) => {
@@ -82,128 +133,62 @@ export class AppMenuComponent implements OnInit,OnDestroy {
         {label: '远程HUB', icon: 'fa fa-fw fa-soundcloud', routerLink: ['/hub']},
         {label: '在线文档', icon: 'fa fa-fw fa-book', routerLink: ['/document']}
       ];
-
-
     });
 
+    self.eventService.subscribeRegister(self.subscribers,'analystMenu', function () {
+
+    })
 
     self.eventService.subscribeRegister(self.subscribers,'businessMenu', function () {
 
-      self.model = [
-        /*{label: '系统首页', icon: 'fa fa-fw fa-home', routerLink: ['/home']},*/
-        {label: '系统首页', icon: 'fa fa-fw fa-home', routerLink: ['/bussDashboard']},
-        {
-          label: '财务部报表', icon: 'fa fa-fw fa-laptop',
-          items: [
-            {
-              label: 'Submenu 1', icon: 'fa fa-fw fa-sign-in',
-              items: [
-                {
-                  label: 'Submenu 1.1', icon: 'fa fa-fw fa-sign-in',
-                  items: [
-                    {label: 'Submenu 1.1.2', icon: 'fa fa-fw fa-sign-in'},
-                    {label: 'Submenu 1.1.3', icon: 'fa fa-fw fa-sign-in'},
-                  ]
-                },
-                {
-                  label: 'Submenu 1.2', icon: 'fa fa-fw fa-sign-in',
-                  items: [
-                    {label: 'Submenu 1.2.1', icon: 'fa fa-fw fa-sign-in'},
-                    {label: 'Submenu 1.2.2', icon: 'fa fa-fw fa-sign-in'}
-                  ]
-                },
-              ]
-            },
-            {label: 'Utils', icon: 'fa fa-fw fa-wrench', routerLink: ['/utils']},
-          ]
-        },
-        {
-          label: '销售部报表', icon: 'fa fa-fw fa-laptop',
-          items: [
-            {
-              label: 'Submenu 1', icon: 'fa fa-fw fa-sign-in',
-              items: [
-                {
-                  label: 'Submenu 1.1', icon: 'fa fa-fw fa-sign-in',
-                  items: [
-                    {label: 'Submenu 1.1.1', icon: 'fa fa-fw fa-sign-in'},
-                    {label: 'Submenu 1.1.2', icon: 'fa fa-fw fa-sign-in'},
-                    {label: 'Submenu 1.1.3', icon: 'fa fa-fw fa-sign-in'},
-                  ]
-                },
-                {
-                  label: 'Submenu 1.2', icon: 'fa fa-fw fa-sign-in',
-                  items: [
-                    {label: 'Submenu 1.2.1', icon: 'fa fa-fw fa-sign-in'},
-                    {label: 'Submenu 1.2.2', icon: 'fa fa-fw fa-sign-in'}
-                  ]
-                },
-              ]
-            },
-            {label: 'Utils', icon: 'fa fa-fw fa-wrench', routerLink: ['/utils']},
-          ]
-        },
-        {
-          label: '人事部报表', icon: 'fa fa-fw fa-laptop',
-          items: [
-            {
-              label: 'Submenu 1', icon: 'fa fa-fw fa-sign-in',
-              items: [
-                {
-                  label: 'Submenu 1.1', icon: 'fa fa-fw fa-sign-in',
-                  items: [
-                    {label: 'Submenu 1.1.1', icon: 'fa fa-fw fa-sign-in'},
-                    {label: 'Submenu 1.1.2', icon: 'fa fa-fw fa-sign-in'},
-                    {label: 'Submenu 1.1.3', icon: 'fa fa-fw fa-sign-in'},
-                  ]
-                },
-                {
-                  label: 'Submenu 1.2', icon: 'fa fa-fw fa-sign-in',
-                  items: [
-                    {label: 'Submenu 1.2.1', icon: 'fa fa-fw fa-sign-in'},
-                    {label: 'Submenu 1.2.2', icon: 'fa fa-fw fa-sign-in'}
-                  ]
-                },
-              ]
-            },
-            {label: 'Utils', icon: 'fa fa-fw fa-wrench', routerLink: ['/utils']},
-          ]
-        },
-        {
-          label: '生产部报表', icon: 'fa fa-fw fa-laptop',
-          items: [
-            {
-              label: 'Submenu 1', icon: 'fa fa-fw fa-sign-in',
-              items: [
-                {
-                  label: 'Submenu 1.1', icon: 'fa fa-fw fa-sign-in',
-                  items: [
-                    {label: 'Submenu 1.1.1', icon: 'fa fa-fw fa-sign-in'},
-                    {label: 'Submenu 1.1.2', icon: 'fa fa-fw fa-sign-in'},
-                    {label: 'Submenu 1.1.3', icon: 'fa fa-fw fa-sign-in'},
-                  ]
-                },
-                {
-                  label: 'Submenu 1.2', icon: 'fa fa-fw fa-sign-in',
-                  items: [
-                    {label: 'Submenu 1.2.1', icon: 'fa fa-fw fa-sign-in'},
-                    {label: 'Submenu 1.2.2', icon: 'fa fa-fw fa-sign-in'}
-                  ]
-                },
-              ]
-            },
-            {label: 'Utils', icon: 'fa fa-fw fa-wrench', routerLink: ['/utils']},
-          ]
-        },
-        {label: '我的订阅', icon: 'fa fa-fw fa-book', routerLink: ['/documentation']}
-      ]
+      //加载有权限的目录
+      //加载目录下挂载的Note
+      self.httpClient.get(self.baseUrlSrv.getRestApiBase() + '/directory/'+ self.globalService.ticket.principal)
+        .subscribe(
+          response => {
+            console.log('Success %o', response)
+
+            self.tmpModel = []
+            self.model = []
+
+            response['body'].dirs.forEach((item, index, array) => {
+              self.createTree(self.tmpModel, item);
+            })
+
+            for(let item of response['body'].notes){
+              self.findNode(self.tmpModel[0], item.dir, (node, index, child) => {
+                if(!child.items)
+                  child.items = []
+                child.items.push({
+                  label: item.name,
+                  icon: 'fa fa-area-chart',
+                  id: item.note,
+                  routerLink: ['/notebook/' + item.note , {mode:'vision'}]
+                })
+              });
+            }
+
+            self.model = self.tmpModel[0].items;
+
+            //添加首页
+            self.model.unshift({
+              label: '系统首页', icon: 'fa fa-fw fa-home', routerLink: ['/bussDashboard']
+            })
+            self.model.push({
+              label: '我的订阅', icon: 'fa fa-fw fa-book', routerLink: ['/document']
+            })
+
+          },
+          errorResponse => {
+            console.log('Error %o', errorResponse)
+          }
+        );
 
     })
 
     self.eventService.subscribeRegister(self.subscribers,'managerMenu', function () {
 
       self.model = [
-        /*{label: '系统首页', icon: 'fa fa-fw fa-home', routerLink: ['/home']},*/
         {label: '系统首页', icon: 'fa fa-fw fa-home', routerLink: ['/adminDashboard']},
         {label: '运行任务', icon: 'fa fa-fw fa-tasks', routerLink: ['/jobmanager']},
         {
@@ -213,7 +198,6 @@ export class AppMenuComponent implements OnInit,OnDestroy {
             {label: '笔记仓库管理', icon: 'fa fa-fw fa-database', routerLink: ['/notebookRepos']},
             {label: '用户权限管理', icon: 'fa fa-fw fa-users', routerLink: ['/credential']},
             {label: '插件配置管理', icon: 'fa fa-fw fa-list-alt', routerLink: ['/helium']},
-            /*{label: '目录管理', icon: 'fa fa-fw fa-list', routerLink: ['/catalog']},*/
             {label: '个性化配置管理', icon: 'fa fa-fw fa-pencil-square-o', routerLink: ['/custom']},
             {label: '参数配置管理', icon: 'fa fa-fw fa-cog', routerLink: ['/configuration']}
           ]
@@ -443,93 +427,7 @@ export class AppMenuComponent implements OnInit,OnDestroy {
               ]
             }
           ]
-        }/*,
-        {
-          label: 'Components', icon: 'fa fa-fw fa-sitemap',
-          items: [
-            {label: 'Sample Page', icon: 'fa fa-fw fa-columns', routerLink: ['/sample']},
-            {label: 'Forms', icon: 'fa fa-fw fa-code', routerLink: ['/forms']},
-            {label: 'Data', icon: 'fa fa-fw fa-table', routerLink: ['/data']},
-            {label: 'Panels', icon: 'fa fa-fw fa-list-alt', routerLink: ['/panels']},
-            {label: 'Overlays', icon: 'fa fa-fw fa-square', routerLink: ['/overlays']},
-            {label: 'Menus', icon: 'fa fa-fw fa-minus-square-o', routerLink: ['/menus']},
-            {label: 'Messages', icon: 'fa fa-fw fa-circle-o-notch', routerLink: ['/messages']},
-            {label: 'Charts', icon: 'fa fa-fw fa-area-chart', routerLink: ['/charts']},
-            {label: 'File', icon: 'fa fa-fw fa-arrow-circle-o-up', routerLink: ['/file']},
-            {label: 'Misc', icon: 'fa fa-fw fa-user-secret', routerLink: ['/misc']}
-          ]
-        },
-        {
-          label: 'Template Pages', icon: 'fa fa-fw fa-life-saver',
-          items: [
-            {label: 'Empty Page', icon: 'fa fa-fw fa-square-o', routerLink: ['/empty']},
-            {
-              label: 'Landing Page',
-              icon: 'fa fa-fw fa-certificate',
-              url: 'assets/pages/landing.html',
-              target: '_blank'
-            },
-            {label: 'Login Page', icon: 'fa fa-fw fa-sign-in', url: 'assets/pages/login.html', target: '_blank'},
-            {
-              label: 'Error Page',
-              icon: 'fa fa-fw fa-exclamation-circle',
-              url: 'assets/pages/error.html',
-              target: '_blank'
-            },
-            {label: 'Not Found Page', icon: 'fa fa-fw fa-times', url: 'assets/pages/notfound.html', target: '_blank'},
-            {
-              label: 'Access Denied Page', icon: 'fa fa-fw fa-exclamation-triangle',
-              url: 'assets/pages/access.html', target: '_blank'
-            }
-          ]
-        },
-        {
-          label: 'Menu Hierarchy', icon: 'fa fa-fw fa-gg',
-          items: [
-            {
-              label: 'Submenu 1', icon: 'fa fa-fw fa-sign-in',
-              items: [
-                {
-                  label: 'Submenu 1.1', icon: 'fa fa-fw fa-sign-in',
-                  items: [
-                    {label: 'Submenu 1.1.1', icon: 'fa fa-fw fa-sign-in'},
-                    {label: 'Submenu 1.1.2', icon: 'fa fa-fw fa-sign-in'},
-                    {label: 'Submenu 1.1.3', icon: 'fa fa-fw fa-sign-in'},
-                  ]
-                },
-                {
-                  label: 'Submenu 1.2', icon: 'fa fa-fw fa-sign-in',
-                  items: [
-                    {label: 'Submenu 1.2.1', icon: 'fa fa-fw fa-sign-in'},
-                    {label: 'Submenu 1.2.2', icon: 'fa fa-fw fa-sign-in'}
-                  ]
-                },
-              ]
-            },
-            {
-              label: 'Submenu 2', icon: 'fa fa-fw fa-sign-in',
-              items: [
-                {
-                  label: 'Submenu 2.1', icon: 'fa fa-fw fa-sign-in',
-                  items: [
-                    {label: 'Submenu 2.1.1', icon: 'fa fa-fw fa-sign-in'},
-                    {label: 'Submenu 2.1.2', icon: 'fa fa-fw fa-sign-in'},
-                    {label: 'Submenu 2.1.3', icon: 'fa fa-fw fa-sign-in'},
-                  ]
-                },
-                {
-                  label: 'Submenu 2.2', icon: 'fa fa-fw fa-sign-in',
-                  items: [
-                    {label: 'Submenu 2.2.1', icon: 'fa fa-fw fa-sign-in'},
-                    {label: 'Submenu 2.2.2', icon: 'fa fa-fw fa-sign-in'}
-                  ]
-                },
-              ]
-            }
-          ]
-        },
-        {label: 'Utils', icon: 'fa fa-fw fa-wrench', routerLink: ['/utils']},
-        {label: 'Documentation', icon: 'fa fa-fw fa-book', routerLink: ['/documentation']}*/
+        }
       ];
 
     })

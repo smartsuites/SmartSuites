@@ -32,8 +32,8 @@ export default class NetworkVisualization extends Visualization {
 
   transformation
 
-  constructor (targetElId, config, renderer, emitter, jitCompiler, commonService) {
-    super(targetElId, config, renderer, emitter, jitCompiler, commonService)
+  constructor (targetElId, config, emitter, jitCompiler, commonService) {
+    super(targetElId, config, emitter, jitCompiler, commonService)
     console.log('Init network viz')
     if (!config.properties) {
       config.properties = {}

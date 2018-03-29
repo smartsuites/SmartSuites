@@ -17,9 +17,11 @@ import {CommonService} from "../../../../service/common/common.service";
 import PiechartVisualization from "../../../../service/visualization/builtins/visualization-piechart";
 import LinechartVisualization from "../../../../service/visualization/builtins/visualization-linechart";
 import ScatterchartVisualization from "../../../../service/visualization/builtins/visualization-scatterchart";
+import TableVisualization from "../../../../service/visualization/builtins/visualization-table";
 import {HighlightJsService} from "angular2-highlight-js";
 import {DeepClone, ObjectEqual} from "../../../../utils/Utils";
 import {ParagraphStatus} from "../paragraph.status";
+
 /*import {AnsiUp} from "ansi_up/ansi_up"*/
 
 @Component({
@@ -129,10 +131,10 @@ export class ResultComponent implements OnInit,OnDestroy {
 
   //内置的可视化实例信息
   builtInVisualizations = {
-    /*'table': {
+    'table': {
       class: TableVisualization,
       instance: undefined   // created from setGraphMode()
-    },*/
+    },
     'multiBarChart': {
       class: BarchartVisualization,
       instance: undefined
@@ -173,6 +175,9 @@ export class ResultComponent implements OnInit,OnDestroy {
 
     // see switchApp()
     //newConfig.set('helium.activeApp', undefined)
+    if(!newConfig.helium){
+      newConfig.helium = {}
+    }
     newConfig.helium.activeApp = undefined
 
     this.commitParagraphResult(this.paragraph.title, this.paragraph.text, newConfig, newParams)
@@ -294,14 +299,7 @@ export class ResultComponent implements OnInit,OnDestroy {
             self.commitVizConfigChange(graphSetting, graphMode)
           }
 
-          builtInViz.instance = new Visualization(loadedElem, config, self.renderer2, emitter, self.jitCompile, self.commonService)
-
-          /*builtInViz.instance._emitter = emitter
-          builtInViz.instance._jitCompiler = self.jitCompile*/
-
-          //builtInViz.instance._renderer2 = self.renderer2
-
-          //builtInViz.instance._compile = $compile
+          builtInViz.instance = new Visualization(loadedElem, config, emitter, self.jitCompile, self.commonService)
 
           // ui-grid related
           /*$templateCache.put('ui-grid/ui-grid-filter', TableGridFilterTemplate)
@@ -842,7 +840,7 @@ export class ResultComponent implements OnInit,OnDestroy {
   data
 
   //结果的配置
-  config = null
+  config
 
   //resultId = paragraph.id + index
   id = null
@@ -939,7 +937,7 @@ export class ResultComponent implements OnInit,OnDestroy {
     }
 
     this.graphMode = this.config.graph.mode
-    this.config = Object.assign({},config)
+    //this.config = Object.assign({},config)
 
     // enable only when it is last result
     this.enableHelium = (index === paragraphRef.results.msg.length - 1)
@@ -957,6 +955,8 @@ export class ResultComponent implements OnInit,OnDestroy {
     } else if (this.type === 'IMG') {
       this.imageData = this.data
     }
+
+
   }
 
   constructor(private websocketMsgSrv:WebsocketMessageService,

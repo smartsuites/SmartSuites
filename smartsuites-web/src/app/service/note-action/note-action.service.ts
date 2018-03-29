@@ -16,13 +16,13 @@ export class NoteActionService {
 
   moveNoteToTrash(noteId, redirectToHome) {
     this.confirmationService.confirm({
-      message: 'This note will be moved to <strong>trash</strong>.',
-      header: 'Move this note to trash?',
+      message: '笔记将被删除到 <strong>回收站</strong>.',
+      header: '删除笔记到回收站?',
       icon: 'fa fa-question-circle',
       accept: () => {
         this.websocketMsgSrv.moveNoteToTrash(noteId)
         if (redirectToHome) {
-          this.router.navigate(['/'])
+          this.router.navigate(['/analysisDashboard'])
         }
       },
       reject: () => {
@@ -32,8 +32,8 @@ export class NoteActionService {
 
   moveFolderToTrash(folderId) {
     this.confirmationService.confirm({
-      message: 'This folder will be moved to <strong>trash</strong>.',
-      header: 'Move this folder to trash?',
+      message: '整个文件夹将要被删除到 <strong>回收站</strong>.',
+      header: '删除文件夹到回收站?',
       icon: 'fa fa-question-circle',
       accept: () => {
         this.websocketMsgSrv.moveFolderToTrash(folderId)

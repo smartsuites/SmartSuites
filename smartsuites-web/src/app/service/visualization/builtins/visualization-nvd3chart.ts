@@ -11,9 +11,9 @@ export default class Nvd3ChartVisualization extends Visualization {
 
   chart
 
-  constructor (targetEl, config, renderer, emitter, jitCompiler, commonService) {
-    super(targetEl, config, renderer, emitter, jitCompiler, commonService)
-    this._commonService._jQuery('#'+targetEl).append('<svg></svg>');
+  constructor (targetElId, config, emitter, jitCompiler, commonService) {
+    super(targetElId, config, emitter, jitCompiler, commonService)
+    this._commonService._jQuery('#'+targetElId).append('<svg></svg>');
   }
 
   refresh () {

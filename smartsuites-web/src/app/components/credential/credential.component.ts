@@ -152,20 +152,19 @@ export class CredentialComponent implements OnInit {
       "username":"管理人员",
       "data":"MANAGER",
       "type":"Folder",
-      "icon":"fa fa-user"
     },
     "children":[]
   },{
     "data":{
       "username":"分析人员",
-      "size":"ANALYST",
+      "data":"ANALYST",
       "type":"Folder"
     },
     "children":[]
   },{
     "data":{
       "username":"业务人员",
-      "size":"BUSINESS",
+      "data":"BUSINESS",
       "type":"Folder"
     },
     "children":[]
