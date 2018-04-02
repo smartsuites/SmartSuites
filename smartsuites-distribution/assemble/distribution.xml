@@ -65,7 +65,6 @@
                 <exclude>credentials.json</exclude>
                 <exclude>interpreter.json</exclude>
                 <exclude>notebook-authorization.json</exclude>
-                <exclude>shiro.ini</exclude>
                 <exclude>smartsuites-env.cmd</exclude>
                 <exclude>smartsuites-env.sh</exclude>
                 <exclude>smartsuites-site.xml</exclude>

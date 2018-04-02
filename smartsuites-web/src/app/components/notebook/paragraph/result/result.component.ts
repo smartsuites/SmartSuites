@@ -961,7 +961,7 @@ export class ResultComponent implements OnInit,OnDestroy {
 
   constructor(private websocketMsgSrv:WebsocketMessageService,
               private elementRef: ElementRef,
-              private notebookCom:NotebookComponent,
+              public notebookCom:NotebookComponent,
               private httpCient:HttpClient,
               private baseUrlSrv:BaseUrlService,
               private jitCompile:JitCompileService,

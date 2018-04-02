@@ -169,6 +169,14 @@ export class InterpreterComponent implements OnInit {
       .subscribe(
         response => {
           self.interpreterSettings = response['body']
+          //ADD default exclusions
+          for(let interpreterSetting of self.interpreterSettings){
+            for(let depend of interpreterSetting.dependencies){
+              if(!depend.exclusions)
+                depend.exclusions = []
+            }
+          }
+
           self.checkDownloadingDependencies()
         },
         errorResponse => {

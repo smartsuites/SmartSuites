@@ -211,12 +211,12 @@ export class NotebookComponent implements OnInit,OnDestroy{
   initializeLookAndFeel():void {
     if (!this.note.config.looknfeel) {
       this.note.config.looknfeel = 'default'
-    } else {
-      if(this.visionMode)
-        this.viewOnly = true
-      else
-        this.viewOnly = this.note.config.looknfeel === 'report' ? true : false
     }
+
+    if(this.visionMode && this.visionMode === true)
+      this.viewOnly = true
+    else
+      this.viewOnly = this.note.config.looknfeel === 'report' ? true : false
 
     console.log(this.viewOnly)
 

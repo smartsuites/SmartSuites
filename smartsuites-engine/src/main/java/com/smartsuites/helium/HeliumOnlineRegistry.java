@@ -5,6 +5,7 @@ package com.smartsuites.helium;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.smartsuites.conf.SmartsuitesConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpHost;
@@ -54,7 +55,8 @@ public class HeliumOnlineRegistry extends HeliumRegistry {
     List<HeliumPackage> packageList = new LinkedList<>();
 
     BufferedReader reader;
-    reader = new BufferedReader(new FileReader("/Users/wuyufei/Downloads/helium.json"));
+    //reader = new BufferedReader(new FileReader("/Users/wuyufei/Downloads/helium.json"))
+    reader = new BufferedReader(new FileReader(SmartsuitesConfiguration.create().getHeliumConfPath()));
 
     List<Map<String, Map<String, HeliumPackage>>> packages = gson.fromJson(
             reader,

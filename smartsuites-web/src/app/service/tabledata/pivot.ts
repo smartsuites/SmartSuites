@@ -122,7 +122,6 @@ export default class PivotTransformation extends Transformation {
       config.values.push(item)
     })
 
-
     //*************    END   *********************//
 
     this.removeUnknown()

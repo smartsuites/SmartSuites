@@ -87,7 +87,7 @@ public class Helium {
       for (String uri : paths) {
         if (uri.startsWith("http://") || uri.startsWith("https://")) {
           logger.info("Add helium online registry {}", uri);
-          registry.add(new HeliumOnlineRegistry(uri, uri, registryCacheDir));
+          //registry.add(new HeliumOnlineRegistry(uri, uri, registryCacheDir));
         } else {
           logger.info("Add helium local registry {}", uri);
           registry.add(new HeliumLocalRegistry(uri, uri));

@@ -1,8 +1,14 @@
-<div class="dashboard">
+<div class="dashboard" [ngStyle]="{'min-height': min_height}">
 
   <div class="ui-g">
 
-    <div class=" ui-g-12">
+    <div class="display-inline" style=" margin:auto;margin-top: 10%;text-align: center;">
+      <a class="fa fa-plus-circle" style="font-size: 200px"></a>
+      <h2>设置首页报表</h2>
+    </div>
+
+
+    <!--<div class=" ui-g-12">
       <div style="height:400px;width: 100%" id="stackedArea"></div>
     </div>
 
@@ -21,7 +27,7 @@
 
     <div class="ui-g-6">
       <div style="height:400px;width: 100%" id="abc"></div>
-    </div>
+    </div>-->
   </div>
 
 </div>

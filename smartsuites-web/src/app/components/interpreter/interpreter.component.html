@@ -553,7 +553,7 @@
               <tbody>
               <tr *ngFor="let dep of setting.dependencies">
                 <td>{{dep.groupArtifactVersion}}</td>
-                <td *ngIf="!isCurrentEdit(setting.id)">{{dep.exclusions.join()}}</td>
+                <td *ngIf="!isCurrentEdit(setting.id)">{{dep.exclusions}}</td>
                 <td *ngIf="isCurrentEdit(setting.id)"><input type="text" style="width: 100%;" pInputText [(ngModel)]="dep.exclusions"></td>
                 <td style="text-align: center" [hidden]="!isCurrentEdit(setting.id)"><button type="button" pButton (click)="removeInterpreterDependency(dep.groupArtifactVersion, setting.id)" icon="fa-remove"></button></td>
               </tr>

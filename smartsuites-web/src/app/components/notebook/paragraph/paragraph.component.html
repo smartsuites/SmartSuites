@@ -6,7 +6,7 @@
       <input type="text" pInputText [(ngModel)]="paragraph.title" [ngClass]="{'showpmodel':!titleEditor, 'editpmodel':titleEditor}" [disabled]="!titleEditor" (blur)="this.showParagraphTitle();this.setTitle(paragraph)">
     </div>
 
-    <div *ngIf="notebook.viewOnly">
+    <div *ngIf="notebook.viewOnly" style="text-align: center">
       <h3>{{paragraph.title}}</h3>
     </div>
 

@@ -490,6 +490,7 @@
                         </includes>
                         <excludes>
                             <exclude>smartsuites-site-dev.xml</exclude>
+                            <exclude>smart.sql</exclude>
                         </excludes>
                         <filtering>true</filtering>
                     </resource>

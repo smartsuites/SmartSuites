@@ -1,6 +1,6 @@
 <div>
   <!-- selector -->
-  <div>
+  <div *ngIf="!this.notebookCom.viewOnly">
     <div id="{{id}}_switch"
          *ngIf="(type == 'TABLE' || type == 'NETWORK' || apps.length > 0 || suggestion.available && suggestion.available.length > 0) && !asIframe && !viewOnly"
          class="result-chart-selector">

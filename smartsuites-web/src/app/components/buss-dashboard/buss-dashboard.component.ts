@@ -10,6 +10,8 @@ import {AppComponent} from "../../app.component";
 })
 export class BussDashboardComponent implements OnInit {
 
+  min_height = window.innerHeight - 183 + 'px'
+
   echarts:any
   nv:any
   d3:any
@@ -366,7 +368,7 @@ export class BussDashboardComponent implements OnInit {
 
   ngOnInit() {
 
-    this.generatePieChart()
+    /*this.generatePieChart()
 
     this.generateMultiBarChart()
 
@@ -374,6 +376,6 @@ export class BussDashboardComponent implements OnInit {
 
     this.generateScatterPlusLineChart()
 
-    this.generateData()
+    this.generateData()*/
   }
 }

@@ -90,3 +90,7 @@ kbd {
   text-decoration: none;
   cursor: default;
 }
+
+.reportBg{
+  background-color: white;
+}
